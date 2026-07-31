@@ -1,74 +1,97 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
 
-    <title>World Creator</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="World Creator">
-    <meta name="theme-color" content="#202124">
 
-    <link rel="manifest" href="./manifest.json">
+    <title>
+        World Creator
+    </title>
 
-    <link rel="icon" href="./assets/icons/icon-192.png">
-    <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/common.css">
-    <link rel="stylesheet" href="./css/layout.css">
-    <link rel="stylesheet" href="./css/components.css">
-    <link rel="stylesheet" href="./css/pages.css">
+    <!-- CSS -->
+
+    <link rel="stylesheet"
+        href="./css/style.css">
+
+
+    <!-- PWA -->
+
+    <link rel="manifest"
+        href="./manifest.json">
+
+
+    <meta name="theme-color"
+        content="#000000">
+
+
 </head>
+
 
 <body>
 
-    <!-- Application Root -->
-    <div id="app">
 
-        <!-- Header -->
-        <header id="app-header">
-            <h1>World Creator</h1>
-        </header>
+    <!-- Game Root -->
 
-        <!-- Navigation -->
-        <nav id="app-nav">
-            <!-- JavaScriptで生成 -->
-        </nav>
+    <main id="app">
 
-        <!-- Main -->
-        <main id="app-main">
-            <!-- SPA描画先 -->
-        </main>
+        Loading...
 
-        <!-- Footer -->
-        <footer id="app-footer">
-            <small>World Creator</small>
-        </footer>
+    </main>
 
-    </div>
 
-    <!-- No Script -->
-    <noscript>
-        <p>
-            このアプリケーションを利用するにはJavaScriptを有効にしてください。
-        </p>
-    </noscript>
 
-    <!-- Entry -->
-    <script type="module" src="./js/main.js"></script>
+    <!-- Service Worker 登録 -->
 
-    <!-- Service Worker -->
     <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js");
-            });
+
+        if (
+            "serviceWorker" in navigator
+        ) {
+
+
+            window.addEventListener(
+
+                "load",
+
+                () => {
+
+
+                    navigator.serviceWorker.register(
+
+                        "./service-worker.js"
+
+                    );
+
+
+                }
+
+            );
+
+
         }
+
+
     </script>
 
+
+
+    <!-- Game Entry -->
+
+    <script
+        type="module"
+        src="./js/core/main.js">
+
+    </script>
+
+
+
 </body>
+
+
 </html>
