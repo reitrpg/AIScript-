@@ -1,8 +1,8 @@
 /**
  * World Creator
- * Resource
+ * Resource Object
  *
- * 個別資源管理
+ * 個別資源データ管理
  */
 
 
@@ -20,15 +20,14 @@ class Resource {
     ) {
 
 
-        this.id =
-            id;
+        this.id = id;
 
 
-        this.name =
-            name;
+        this.name = name;
 
 
         this.amount =
+
             BigNumber.from(
                 value
             );
@@ -42,9 +41,7 @@ class Resource {
      * 追加
      */
 
-    add(
-        value
-    ) {
+    add(value) {
 
 
         this.amount.add(
@@ -60,9 +57,7 @@ class Resource {
      * 消費
      */
 
-    remove(
-        value
-    ) {
+    remove(value) {
 
 
         this.amount.subtract(
@@ -75,7 +70,7 @@ class Resource {
 
 
     /**
-     * 取得
+     * 所持量取得
      */
 
     getValue() {
@@ -83,30 +78,19 @@ class Resource {
 
         return this.amount;
 
+
     }
 
 
 
     /**
-     * 数値表示
+     * 表示
      */
 
     display() {
 
 
-        return (
-
-            this.amount.value
-
-            +
-
-            "e"
-
-            +
-
-            this.amount.exponent
-
-        );
+        return this.amount.toString();
 
 
     }
@@ -114,7 +98,7 @@ class Resource {
 
 
     /**
-     * 保存
+     * 保存形式
      */
 
     toJSON() {
@@ -124,14 +108,17 @@ class Resource {
 
 
             id:
+
                 this.id,
 
 
             name:
+
                 this.name,
 
 
             amount:
+
                 this.amount.toJSON()
 
 
@@ -155,4 +142,20 @@ class Resource {
 
             data.name,
 
-            BigNumber
+            BigNumber.from(
+
+                data.amount
+
+            )
+
+        );
+
+
+    }
+
+
+}
+
+
+
+export default Resource;
