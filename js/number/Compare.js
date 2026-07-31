@@ -9,153 +9,209 @@
 import BigNumber from "./BigNumber.js";
 
 
-/**
- * 比較
- *
- * 戻り値:
- *  1  : a > b
- *  0  : a = b
- * -1  : a < b
- */
-
-export function compare(a, b) {
+class Compare {
 
 
-    const left =
-        BigNumber.from(a);
+    /**
+     * 比較
+     *
+     * return
+     *  1 : a > b
+     *  0 : a = b
+     * -1 : a < b
+     */
 
-
-    const right =
-        BigNumber.from(b);
-
-
-
-    /*
-        符号比較
-    */
-
-    if (
-        left.value > 0 &&
-        right.value < 0
+    static compare(
+        a,
+        b
     ) {
 
-        return 1;
+
+        const left =
+            BigNumber.from(
+                a
+            );
+
+
+        const right =
+            BigNumber.from(
+                b
+            );
+
+
+
+        if (
+            left.exponent >
+            right.exponent
+        ) {
+
+            return 1;
+
+        }
+
+
+        if (
+            left.exponent <
+            right.exponent
+        ) {
+
+            return -1;
+
+        }
+
+
+
+        if (
+            left.value >
+            right.value
+        ) {
+
+            return 1;
+
+        }
+
+
+        if (
+            left.value <
+            right.value
+        ) {
+
+            return -1;
+
+        }
+
+
+        return 0;
 
     }
 
 
-    if (
-        left.value < 0 &&
-        right.value > 0
+
+    /**
+     * 大小判定
+     */
+
+    static greater(
+        a,
+        b
     ) {
 
-        return -1;
+
+        return (
+            this.compare(
+                a,
+                b
+            ) > 0
+        );
 
     }
 
 
 
-    /*
-        指数比較
-    */
+    /**
+     * 以下判定
+     */
 
-    if (
-        left.exponent >
-        right.exponent
+    static less(
+        a,
+        b
     ) {
 
-        return left.value > 0 ? 1 : -1;
 
-    }
-
-
-    if (
-        left.exponent <
-        right.exponent
-    ) {
-
-        return left.value > 0 ? -1 : 1;
+        return (
+            this.compare(
+                a,
+                b
+            ) < 0
+        );
 
     }
 
 
 
-    /*
-        仮数比較
-    */
+    /**
+     * 等価判定
+     */
 
-    if (
-        left.value >
-        right.value
+    static equal(
+        a,
+        b
     ) {
 
-        return 1;
+
+        return (
+            this.compare(
+                a,
+                b
+            ) === 0
+        );
 
     }
 
 
-    if (
-        left.value <
-        right.value
+
+    /**
+     * 最大値
+     */
+
+    static max(
+        a,
+        b
     ) {
 
-        return -1;
+
+        return (
+
+            this.greater(
+                a,
+                b
+            )
+
+            ?
+
+            BigNumber.from(a)
+
+            :
+
+            BigNumber.from(b)
+
+        );
 
     }
 
 
-    return 0;
+
+    /**
+     * 最小値
+     */
+
+    static min(
+        a,
+        b
+    ) {
+
+
+        return (
+
+            this.less(
+                a,
+                b
+            )
+
+            ?
+
+            BigNumber.from(a)
+
+            :
+
+            BigNumber.from(b)
+
+        );
+
+    }
+
 
 }
 
 
-
-/**
- * 等価判定
- */
-
-export function equal(a, b) {
-
-    return compare(a, b) === 0;
-
-}
-
-
-
-/**
- * 大小判定
- */
-
-export function greater(a, b) {
-
-    return compare(a, b) > 0;
-
-}
-
-
-
-export function less(a, b) {
-
-    return compare(a, b) < 0;
-
-}
-
-
-
-/**
- * 以上・以下
- */
-
-export function greaterOrEqual(a, b) {
-
-    return compare(a, b) >= 0;
-
-}
-
-
-
-export function lessOrEqual(a, b) {
-
-    return compare(a, b) <= 0;
-
-}
+export default Compare;
