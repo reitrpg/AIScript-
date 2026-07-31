@@ -2,11 +2,12 @@
  * World Creator
  * Tabs System
  *
- * SPAタブ管理
+ * タブ切替管理
  */
 
 
 import eventBus from "../core/eventBus.js";
+
 
 
 class Tabs {
@@ -14,16 +15,58 @@ class Tabs {
 
     constructor() {
 
-        this.tabs = new Map();
+
+        this.tabs = {};
 
         this.active = null;
+
 
     }
 
 
 
     /**
-     * タブ登録
+     * 初期化
+     */
+
+    init() {
+
+
+        const elements =
+
+            document.querySelectorAll(
+
+                "[data-tab]"
+
+            );
+
+
+
+        elements.forEach(
+
+            element => {
+
+
+                this.register(
+
+                    element.dataset.tab,
+
+                    element
+
+                );
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    /**
+     * 登録
      */
 
     register(
@@ -32,10 +75,23 @@ class Tabs {
     ) {
 
 
-        this.tabs.set(
-            id,
-            element
-        );
+        this.tabs[id] =
+
+            element;
+
+
+
+        element.onclick = () => {
+
+
+            this.open(
+
+                id
+
+            );
+
+
+        };
 
 
     }
@@ -43,64 +99,68 @@ class Tabs {
 
 
     /**
-     * タブ切替
+     * 表示切替
      */
 
     open(id) {
 
 
-        const target =
-            this.tabs.get(id);
-
-
-        if (!target) {
-
-            return false;
-
-        }
-
-
-
-        for (
-            const [
-                tabId,
-                element
-            ]
-            of this.tabs
-        ) {
-
-
-            if (
-                tabId === id
-            ) {
-
-                element.style.display =
-                    "";
-
-            }
-            else {
-
-                element.style.display =
-                    "none";
-
-            }
-
-        }
-
-
-
         this.active =
+
             id;
 
 
 
+        for (
+            const key in this.tabs
+        ) {
+
+
+            const element =
+
+                this.tabs[key];
+
+
+
+            if (
+                key === id
+            ) {
+
+
+                element.classList.add(
+
+                    "active"
+
+                );
+
+
+            }
+
+            else {
+
+
+                element.classList.remove(
+
+                    "active"
+
+                );
+
+
+            }
+
+
+        }
+
+
+
         eventBus.emit(
-            "tabs:changed",
+
+            "tab:change",
+
             id
+
         );
 
-
-        return true;
 
     }
 
@@ -110,65 +170,11 @@ class Tabs {
      * 現在タブ取得
      */
 
-    current() {
+    getCurrent() {
+
 
         return this.active;
 
-    }
-
-
-
-    /**
-     * 全取得
-     */
-
-    getAll() {
-
-        return this.tabs;
-
-    }
-
-
-
-    /**
-     * 保存
-     */
-
-    toJSON() {
-
-
-        return {
-
-            active:
-                this.active
-
-        };
-
-    }
-
-
-
-    /**
-     * 復元
-     */
-
-    load(data) {
-
-
-        if (!data) {
-
-            return;
-
-        }
-
-
-        if (data.active) {
-
-            this.open(
-                data.active
-            );
-
-        }
 
     }
 
@@ -178,7 +184,9 @@ class Tabs {
 
 
 const tabs =
+
     new Tabs();
+
 
 
 export default tabs;
