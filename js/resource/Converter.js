@@ -174,3 +174,63 @@ class Converter {
 
     /**
      * 自動生産
+     */
+
+    tick() {
+
+
+        for (
+            const id in this.recipes
+        ) {
+
+
+            this.convert(
+                id
+            );
+
+
+        }
+
+
+    }
+
+
+
+}
+
+
+
+const converter =
+
+    new Converter();
+
+
+
+/*
+ 初期レシピ
+*/
+
+
+converter.register(
+
+    "wood_to_food",
+
+    {
+
+        wood:
+            10
+
+    },
+
+    {
+
+        food:
+            5
+
+    }
+
+);
+
+
+
+export default converter;
