@@ -7,16 +7,17 @@
 
 
 import eventBus from "./eventBus.js";
-import save from "./save.js";
+
 import time from "./time.js";
 
+import save from "./save.js";
+
+
 import ResourceManager from "../resource/Manager.js";
-import Converter from "../resource/Converter.js";
 
 import WorldManager from "../world/Manager.js";
 
-import UpgradeManager from "../upgrade/Manager.js";
-import ResearchManager from "../research/Manager.js";
+import Converter from "../resource/Converter.js";
 
 
 
@@ -26,9 +27,9 @@ class Game {
     constructor() {
 
 
-        this.initialized = false;
-
         this.running = false;
+
+        this.initialized = false;
 
 
     }
@@ -54,14 +55,7 @@ class Game {
 
         ResourceManager.init();
 
-
         WorldManager.init();
-
-
-        UpgradeManager.init();
-
-
-        ResearchManager.init();
 
 
 
@@ -72,18 +66,12 @@ class Game {
         this.initialized = true;
 
 
-
-        eventBus.emit(
-            "game:initialized"
-        );
-
-
     }
 
 
 
     /**
-     * イベント接続
+     * イベント登録
      */
 
     bind() {
@@ -97,6 +85,22 @@ class Game {
 
 
                 this.update();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "game:save",
+
+            () => {
+
+
+                this.save();
 
 
             }
@@ -141,12 +145,6 @@ class Game {
         time.start();
 
 
-
-        eventBus.emit(
-            "game:start"
-        );
-
-
     }
 
 
@@ -164,7 +162,7 @@ class Game {
         time.stop();
 
 
-        this.saveGame();
+        this.save();
 
 
     }
@@ -172,7 +170,7 @@ class Game {
 
 
     /**
-     * Tick更新
+     * 1Tick処理
      */
 
     update() {
@@ -189,7 +187,7 @@ class Game {
 
 
         /*
-            資源生産
+         基本生産
         */
 
 
@@ -202,7 +200,6 @@ class Game {
         );
 
 
-
         ResourceManager.add(
 
             "stone",
@@ -213,18 +210,8 @@ class Game {
 
 
 
-        /*
-            変換処理
-        */
-
-
         Converter.tick();
 
-
-
-        /*
-            世界更新
-        */
 
 
         WorldManager.update();
@@ -246,7 +233,7 @@ class Game {
      * 保存
      */
 
-    saveGame() {
+    save() {
 
 
         save.save({
@@ -256,19 +243,9 @@ class Game {
                 ResourceManager.toJSON(),
 
 
-            worlds:
+            world:
 
                 WorldManager.toJSON(),
-
-
-            upgrades:
-
-                UpgradeManager.toJSON(),
-
-
-            research:
-
-                ResearchManager.toJSON(),
 
 
             time:
@@ -291,6 +268,7 @@ class Game {
 
 
         const data =
+
             save.load();
 
 
@@ -304,31 +282,7 @@ class Game {
 
 
         ResourceManager.load(
+
             data.resources
+
         );
-
-
-        WorldManager.load(
-            data.worlds
-        );
-
-
-        time.load(
-            data.time
-        );
-
-
-    }
-
-
-}
-
-
-
-const game =
-
-    new Game();
-
-
-
-export default game;
