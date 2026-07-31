@@ -1,8 +1,6 @@
 /**
  * World Creator
  * Main Entry
- *
- * アプリ起動管理
  */
 
 
@@ -18,16 +16,9 @@ import ResourceManager from "../resource/Manager.js";
 
 import WorldManager from "../world/Manager.js";
 
-import eventBus from "./eventBus.js";
-
 
 
 function initialize() {
-
-
-    ui.init(
-        "app"
-    );
 
 
     ResourceManager.init();
@@ -36,12 +27,25 @@ function initialize() {
     WorldManager.init();
 
 
-    router.init(
-        "/"
+
+    ui.init(
+
+        "app"
+
     );
 
 
+
+    router.init(
+
+        "/"
+
+    );
+
+
+
     tabs.init();
+
 
 
     game.init();
@@ -51,24 +55,15 @@ function initialize() {
 
 
 
-    eventBus.emit(
-
-        "app:ready"
-
-    );
-
-
 }
 
 
 
-/**
- * DOM読込後起動
- */
-
 if (
 
-    document.readyState === "loading"
+    document.readyState ===
+
+    "loading"
 
 ) {
 
@@ -83,6 +78,7 @@ if (
 
 
 }
+
 else {
 
 
