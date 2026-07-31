@@ -6,8 +6,10 @@
  */
 
 
-import eventBus from "../core/eventBus.js";
 import BigNumber from "../number/BigNumber.js";
+
+import eventBus from "../core/eventBus.js";
+
 
 
 class WorldManager {
@@ -18,9 +20,12 @@ class WorldManager {
 
         this.worlds = [];
 
-        this.activeWorld = null;
+
+        this.current = null;
+
 
         this.initialized = false;
+
 
     }
 
@@ -33,11 +38,14 @@ class WorldManager {
     init() {
 
 
-        if (this.initialized) {
+        if (
+            this.initialized
+        ) {
 
             return;
 
         }
+
 
 
         this.initialized = true;
@@ -48,7 +56,7 @@ class WorldManager {
 
 
     /**
-     * 世界生成
+     * 世界作成
      */
 
     createWorld() {
@@ -60,7 +68,8 @@ class WorldManager {
             id:
 
                 Date.now()
-                .toString(),
+                    .toString(),
+
 
 
             level:
@@ -68,14 +77,21 @@ class WorldManager {
                 1,
 
 
+
             age:
 
-                BigNumber.from(0),
+                BigNumber.from(
+
+                    0
+
+                ),
+
 
 
             population:
 
                 0,
+
 
 
             created:
@@ -88,11 +104,15 @@ class WorldManager {
 
 
         this.worlds.push(
+
             world
+
         );
 
 
-        this.activeWorld =
+
+        this.current =
+
             world;
 
 
@@ -106,21 +126,23 @@ class WorldManager {
         );
 
 
+
         return world;
+
 
     }
 
 
 
     /**
-     * 更新
+     * Tick更新
      */
 
     update() {
 
 
         if (
-            !this.activeWorld
+            !this.current
         ) {
 
             return;
@@ -128,6 +150,204 @@ class WorldManager {
         }
 
 
-        this.activeWorld.age.add(
+
+        this.current.age.add(
+
             1
-       
+
+        );
+
+
+
+        eventBus.emit(
+
+            "world:update",
+
+            this.current
+
+        );
+
+
+    }
+
+
+
+    /**
+     * 現在世界取得
+     */
+
+    getCurrent() {
+
+
+        return this.current;
+
+
+    }
+
+
+
+    /**
+     * 保存
+     */
+
+    toJSON() {
+
+
+        return {
+
+
+            worlds:
+
+                this.worlds.map(
+
+                    world => ({
+
+
+                        id:
+
+                            world.id,
+
+
+                        level:
+
+                            world.level,
+
+
+                        age:
+
+                            world.age.toJSON(),
+
+
+                        population:
+
+                            world.population,
+
+
+                        created:
+
+                            world.created
+
+
+                    })
+
+                ),
+
+
+
+            current:
+
+                this.current
+
+                ?
+
+                this.current.id
+
+                :
+
+                null
+
+
+        };
+
+
+    }
+
+
+
+    /**
+     * 復元
+     */
+
+    load(data) {
+
+
+        if (!data) {
+
+            return;
+
+        }
+
+
+
+        this.worlds =
+
+            data.worlds
+
+            ?
+
+            data.worlds.map(
+
+                world => ({
+
+
+                    ...world,
+
+
+                    age:
+
+                        BigNumber.from(
+
+                            world.age
+
+                        )
+
+
+                })
+
+            )
+
+            :
+
+            [];
+
+
+
+        this.current =
+
+
+            this.worlds.find(
+
+                world =>
+
+                    world.id ===
+
+                    data.current
+
+
+            )
+
+            ||
+
+            null;
+
+
+    }
+
+
+}
+
+
+
+const worldManager =
+
+    new WorldManager();
+
+
+
+eventBus.on(
+
+    "world:create",
+
+    () => {
+
+
+        worldManager.createWorld();
+
+
+    }
+
+);
+
+
+
+export default worldManager;
