@@ -2,13 +2,13 @@
  * World Creator
  * Resource Converter
  *
- * 資源変換処理
+ * 資源変換・生産処理
  */
 
 
-import BigNumber from "../number/BigNumber.js";
 import ResourceManager from "./Manager.js";
 import eventBus from "../core/eventBus.js";
+
 
 
 class Converter {
@@ -16,74 +16,35 @@ class Converter {
 
     constructor() {
 
-        this.recipes = new Map();
+
+        this.recipes = {};
+
 
     }
 
 
 
     /**
-     * 変換レシピ登録
+     * レシピ登録
      */
 
-    register(id, recipe) {
-
-        this.recipes.set(
-            id,
-            recipe
-        );
-
-    }
+    register(
+        id,
+        input,
+        output
+    ) {
 
 
-
-    /**
-     * 変換可能確認
-     */
-
-    canConvert(id) {
+        this.recipes[id] = {
 
 
-        const recipe =
-            this.recipes.get(id);
+            input,
+
+            output
 
 
-        if (!recipe) {
+        };
 
-            return false;
-
-        }
-
-
-        for (const cost in recipe.cost) {
-
-
-            const resource =
-                ResourceManager.get(cost);
-
-
-            if (!resource) {
-
-                return false;
-
-            }
-
-
-            if (
-                resource.amount.value <
-                BigNumber.from(
-                    recipe.cost[cost]
-                ).value
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        return true;
 
     }
 
@@ -93,11 +54,15 @@ class Converter {
      * 変換実行
      */
 
-    convert(id) {
+    convert(
+        id
+    ) {
 
 
         const recipe =
-            this.recipes.get(id);
+
+            this.recipes[id];
+
 
 
         if (!recipe) {
@@ -107,9 +72,41 @@ class Converter {
         }
 
 
-        if (!this.canConvert(id)) {
 
-            return false;
+        /*
+            消費確認
+        */
+
+        for (
+            const key in recipe.input
+        ) {
+
+
+            const resource =
+
+                ResourceManager.get(
+                    key
+                );
+
+
+
+            if (
+
+                resource.compare
+
+                &&
+
+                resource.compare(
+                    recipe.input[key]
+                ) < 0
+
+            ) {
+
+
+                return false;
+
+            }
+
 
         }
 
@@ -119,15 +116,19 @@ class Converter {
             消費
         */
 
-        for (const cost in recipe.cost) {
+        for (
+            const key in recipe.input
+        ) {
 
-            ResourceManager.subtract(
 
-                cost,
+            ResourceManager.remove(
 
-                recipe.cost[cost]
+                key,
+
+                recipe.input[key]
 
             );
+
 
         }
 
@@ -137,15 +138,19 @@ class Converter {
             生成
         */
 
-        for (const output in recipe.output) {
+        for (
+            const key in recipe.output
+        ) {
+
 
             ResourceManager.add(
 
-                output,
+                key,
 
-                recipe.output[output]
+                recipe.output[key]
 
             );
+
 
         }
 
@@ -153,7 +158,7 @@ class Converter {
 
         eventBus.emit(
 
-            "resource:converted",
+            "resource:convert",
 
             id
 
@@ -162,27 +167,10 @@ class Converter {
 
         return true;
 
+
     }
 
 
 
     /**
-     * レシピ取得
-     */
-
-    get(id) {
-
-        return this.recipes.get(id);
-
-    }
-
-
-}
-
-
-
-const converter =
-    new Converter();
-
-
-export default converter;
+     * 自動生産
