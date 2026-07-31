@@ -2,11 +2,12 @@
  * World Creator
  * Resource Converter
  *
- * 資源変換・生産処理
+ * 資源変換・生産システム
  */
 
 
 import ResourceManager from "./Manager.js";
+
 import eventBus from "../core/eventBus.js";
 
 
@@ -51,12 +52,10 @@ class Converter {
 
 
     /**
-     * 変換実行
+     * 変換可能確認
      */
 
-    convert(
-        id
-    ) {
+    canConvert(id) {
 
 
         const recipe =
@@ -73,10 +72,6 @@ class Converter {
 
 
 
-        /*
-            消費確認
-        */
-
         for (
             const key in recipe.input
         ) {
@@ -92,18 +87,23 @@ class Converter {
 
             if (
 
-                resource.compare
+                resource
+                    .getValue()
+                    .compare(
 
-                &&
+                        recipe.input[key]
 
-                resource.compare(
-                    recipe.input[key]
-                ) < 0
+                    )
+
+                    <
+
+                    0
 
             ) {
 
 
                 return false;
+
 
             }
 
@@ -112,9 +112,37 @@ class Converter {
 
 
 
-        /*
-            消費
-        */
+        return true;
+
+
+    }
+
+
+
+    /**
+     * 変換実行
+     */
+
+    convert(id) {
+
+
+        if (
+            !this.canConvert(id)
+        ) {
+
+
+            return false;
+
+
+        }
+
+
+
+        const recipe =
+
+            this.recipes[id];
+
+
 
         for (
             const key in recipe.input
@@ -133,10 +161,6 @@ class Converter {
         }
 
 
-
-        /*
-            生成
-        */
 
         for (
             const key in recipe.output
@@ -165,6 +189,7 @@ class Converter {
         );
 
 
+
         return true;
 
 
@@ -173,7 +198,7 @@ class Converter {
 
 
     /**
-     * 自動生産
+     * Tick処理
      */
 
     tick() {
@@ -193,7 +218,6 @@ class Converter {
 
 
     }
-
 
 
 }
@@ -218,6 +242,7 @@ converter.register(
     {
 
         wood:
+
             10
 
     },
@@ -225,6 +250,7 @@ converter.register(
     {
 
         food:
+
             5
 
     }
