@@ -2,7 +2,7 @@
  * World Creator
  * Event Bus
  *
- * イベント通信システム
+ * システム間通信管理
  */
 
 
@@ -11,7 +11,9 @@ class EventBus {
 
     constructor() {
 
-        this.events = new Map();
+
+        this.events = {};
+
 
     }
 
@@ -22,65 +24,90 @@ class EventBus {
      */
 
     on(
-        event,
+        name,
         callback
     ) {
 
 
         if (
-            !this.events.has(event)
+            !this.events[name]
         ) {
 
-            this.events.set(
-                event,
-                []
-            );
+
+            this.events[name] = [];
+
 
         }
 
 
-        this.events
-            .get(event)
-            .push(
-                callback
-            );
+
+        this.events[name].push(
+
+            callback
+
+        );
+
 
     }
 
 
 
     /**
-     * 一度だけ実行
+     * イベント発行
      */
 
-    once(
-        event,
-        callback
+    emit(
+        name,
+        data = null
     ) {
 
 
-        const wrapper =
-            (...args) => {
+        if (
+            !this.events[name]
+        ) {
+
+            return;
+
+        }
 
 
-                callback(
-                    ...args
-                );
+
+        this.events[name].forEach(
+
+            callback => {
 
 
-                this.off(
-                    event,
-                    wrapper
-                );
+                try {
 
 
-            };
+                    callback(
+                        data
+                    );
 
 
-        this.on(
-            event,
-            wrapper
+                }
+
+                catch(error) {
+
+
+                    console.error(
+
+                        "Event Error:",
+
+                        name,
+
+                        error
+
+                    );
+
+
+                }
+
+
+            }
+
         );
+
 
     }
 
@@ -91,93 +118,33 @@ class EventBus {
      */
 
     off(
-        event,
+        name,
         callback
     ) {
 
 
-        const listeners =
-            this.events.get(
-                event
-            );
-
-
-        if (!listeners) {
-
-            return;
-
-        }
-
-
-        const index =
-            listeners.indexOf(
-                callback
-            );
-
-
         if (
-            index !== -1
+            !this.events[name]
         ) {
-
-            listeners.splice(
-                index,
-                1
-            );
-
-        }
-
-    }
-
-
-
-    /**
-     * 発火
-     */
-
-    emit(
-        event,
-        ...args
-    ) {
-
-
-        const listeners =
-            this.events.get(
-                event
-            );
-
-
-        if (!listeners) {
 
             return;
 
         }
 
 
-        for (
-            const callback
-            of [
-                ...listeners
-            ]
-        ) {
 
+        this.events[name] =
 
-            try {
+            this.events[name]
 
-                callback(
-                    ...args
-                );
+            .filter(
 
-            }
-            catch(error) {
+                event =>
 
-                console.error(
-                    "EventBus Error:",
-                    error
-                );
+                    event !== callback
 
-            }
+            );
 
-        }
 
     }
 
@@ -189,21 +156,9 @@ class EventBus {
 
     clear() {
 
-        this.events.clear();
 
-    }
+        this.events = {};
 
-
-
-    /**
-     * イベント一覧
-     */
-
-    list() {
-
-        return [
-            ...this.events.keys()
-        ];
 
     }
 
@@ -213,7 +168,9 @@ class EventBus {
 
 
 const eventBus =
+
     new EventBus();
 
 
-export default eventBus;
+
+export default eventBus
