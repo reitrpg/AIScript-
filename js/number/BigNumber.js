@@ -1,12 +1,9 @@
 /**
  * World Creator
- * BigNumber
+ * BigNumber System
  *
- * 完全自作巨大数クラス
+ * 巨大数管理
  */
-
-
-import Constants from "./Constants.js";
 
 
 class BigNumber {
@@ -18,15 +15,13 @@ class BigNumber {
     ) {
 
 
-        this.value =
-            Number(value);
+        this.value = Number(value);
 
-
-        this.exponent =
-            Number(exponent);
+        this.exponent = Number(exponent);
 
 
         this.normalize();
+
 
     }
 
@@ -43,15 +38,22 @@ class BigNumber {
             value instanceof BigNumber
         ) {
 
-            return value.clone();
+
+            return new BigNumber(
+
+                value.value,
+
+                value.exponent
+
+            );
+
 
         }
 
 
+
         if (
             typeof value === "object"
-            &&
-            value !== null
         ) {
 
 
@@ -63,59 +65,19 @@ class BigNumber {
 
             );
 
+
         }
 
 
-        return new BigNumber(
-            value
-        );
-
-    }
-
-
-
-    /**
-     * 0
-     */
-
-    static zero() {
 
         return new BigNumber(
+
+            value,
+
             0
-        );
-
-    }
-
-
-
-    /**
-     * 1
-     */
-
-    static one() {
-
-        return new BigNumber(
-            1
-        );
-
-    }
-
-
-
-    /**
-     * 複製
-     */
-
-    clone() {
-
-
-        return new BigNumber(
-
-            this.value,
-
-            this.exponent
 
         );
+
 
     }
 
@@ -132,42 +94,53 @@ class BigNumber {
             this.value === 0
         ) {
 
+
             this.exponent = 0;
 
-            return this;
+
+            return;
+
 
         }
+
 
 
         while (
-            Math.abs(this.value)
-            >=
-            Constants.NORMALIZE_THRESHOLD
+
+            Math.abs(this.value) >= 10
+
         ) {
 
 
-            this.value /= 1000;
+            this.value /= 10;
 
-            this.exponent += 3;
+
+            this.exponent++;
+
 
         }
+
 
 
         while (
-            Math.abs(this.value)
-            < 1
+
+            Math.abs(this.value) < 1
+
+            &&
+
+            this.value !== 0
+
         ) {
 
 
-            this.value *= 1000;
+            this.value *= 10;
 
-            this.exponent -= 3;
+
+            this.exponent--;
 
 
         }
 
-
-        return this;
 
     }
 
@@ -181,53 +154,62 @@ class BigNumber {
 
 
         const target =
+
             BigNumber.from(
                 value
             );
 
 
+
         if (
-            this.exponent ===
-            target.exponent
+
+            target.exponent ===
+
+            this.exponent
+
         ) {
 
 
             this.value +=
+
                 target.value;
 
 
         }
+
         else {
 
 
             const diff =
-                this.exponent -
+
+                this.exponent
+
+                -
+
                 target.exponent;
 
 
+
             if (
-                diff > 0
+                diff > 15
             ) {
 
-                this.value +=
-                    target.value *
-                    Math.pow(
-                        10,
-                        -diff
-                    );
+                return this;
 
             }
-            else {
+
+
+
+            if (
+                diff < -15
+            ) {
+
 
                 this.value =
-                    this.value *
-                    Math.pow(
-                        10,
-                        diff
-                    )
-                    +
+
                     target.value;
 
 
                 this.exponent =
-                    target.exponent
+
+                    target
