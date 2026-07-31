@@ -2,33 +2,74 @@
  * World Creator
  * Service Worker
  *
- * PWA Cache Management
+ * PWA Cache System
  */
 
 
 const CACHE_NAME =
+
     "world-creator-v1";
 
 
 
-const CACHE_FILES = [
+const FILES = [
+
 
     "./",
 
     "./index.html",
 
-    "./manifest.json",
 
     "./css/style.css",
 
-    "./css/mobile.css"
+    "./css/mobile.css",
+
+
+    "./manifest.json",
+
+
+
+    "./js/core/main.js",
+
+    "./js/core/game.js",
+
+    "./js/core/eventBus.js",
+
+    "./js/core/save.js",
+
+    "./js/core/time.js",
+
+
+
+    "./js/number/BigNumber.js",
+
+
+
+    "./js/resource/Resource.js",
+
+    "./js/resource/Manager.js",
+
+    "./js/resource/Converter.js",
+
+
+
+    "./js/world/Manager.js",
+
+
+
+    "./js/ui/UI.js",
+
+    "./js/ui/Router.js",
+
+    "./js/ui/Tabs.js"
+
 
 ];
 
 
 
 /**
- * インストール
+ * Install
  */
 
 self.addEventListener(
@@ -40,20 +81,25 @@ self.addEventListener(
 
         event.waitUntil(
 
+
             caches.open(
+
                 CACHE_NAME
+
             )
+
             .then(
 
-                cache => {
+                cache =>
 
-                    return cache.addAll(
-                        CACHE_FILES
-                    );
+                    cache.addAll(
 
-                }
+                        FILES
+
+                    )
 
             )
+
 
         );
 
@@ -67,7 +113,7 @@ self.addEventListener(
 
 
 /**
- * 起動
+ * Activate
  */
 
 self.addEventListener(
@@ -79,14 +125,15 @@ self.addEventListener(
 
         event.waitUntil(
 
+
             caches.keys()
 
             .then(
 
-                keys => {
+                keys =>
 
 
-                    return Promise.all(
+                    Promise.all(
 
                         keys.map(
 
@@ -94,12 +141,18 @@ self.addEventListener(
 
 
                                 if (
+
                                     key !== CACHE_NAME
+
                                 ) {
 
+
                                     return caches.delete(
+
                                         key
+
                                     );
+
 
                                 }
 
@@ -108,12 +161,11 @@ self.addEventListener(
 
                         )
 
-                    );
+                    )
 
-
-                }
 
             )
+
 
         );
 
@@ -127,7 +179,7 @@ self.addEventListener(
 
 
 /**
- * リクエスト処理
+ * Fetch
  */
 
 self.addEventListener(
@@ -139,30 +191,31 @@ self.addEventListener(
 
         event.respondWith(
 
+
             caches.match(
+
                 event.request
+
             )
+
             .then(
 
-                response => {
+                response =>
 
 
-                    return (
+                    response
 
-                        response
+                    ||
 
-                        ||
+                    fetch(
 
-                        fetch(
-                            event.request
-                        )
+                        event.request
 
-                    );
+                    )
 
-
-                }
 
             )
+
 
         );
 
