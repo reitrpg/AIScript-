@@ -2,25 +2,25 @@
  * World Creator
  * Main Entry
  *
- * アプリ起動処理
+ * アプリ起動管理
  */
 
 
 import game from "./game.js";
+
 import ui from "../ui/UI.js";
+
 import router from "../ui/Router.js";
+
 import tabs from "../ui/Tabs.js";
+
+import ResourceManager from "../resource/Manager.js";
+
+import WorldManager from "../world/Manager.js";
 
 import eventBus from "./eventBus.js";
 
-import WorldManager from "../world/Manager.js";
-import ResourceManager from "../resource/Manager.js";
 
-
-
-/**
- * アプリ初期化
- */
 
 function initialize() {
 
@@ -30,16 +30,18 @@ function initialize() {
     );
 
 
-    setupRouter();
-
-
-    setupTabs();
-
-
     ResourceManager.init();
 
 
     WorldManager.init();
+
+
+    router.init(
+        "/"
+    );
+
+
+    tabs.init();
 
 
     game.init();
@@ -50,7 +52,9 @@ function initialize() {
 
 
     eventBus.emit(
+
         "app:ready"
+
     );
 
 
@@ -59,78 +63,30 @@ function initialize() {
 
 
 /**
- * ルーター設定
+ * DOM読込後起動
  */
 
-function setupRouter() {
+if (
+
+    document.readyState === "loading"
+
+) {
 
 
-    router.register(
+    document.addEventListener(
 
-        "/",
+        "DOMContentLoaded",
 
-        () => {
-
-            eventBus.emit(
-                "page:home"
-            );
-
-        }
+        initialize
 
     );
 
-
-    router.register(
-
-        "/world",
-
-        () => {
-
-            eventBus.emit(
-                "page:world"
-            );
-
-        }
-
-    );
-
-
-    router.register(
-
-        "/research",
-
-        () => {
-
-            eventBus.emit(
-                "page:research"
-            );
-
-        }
-
-    );
-
-
-    router.init(
-        "/"
-    );
 
 }
+else {
 
 
-
-/**
- * タブ設定
- */
-
-function setupTabs() {
+    initialize();
 
 
-    const elements =
-
-        document.querySelectorAll(
-            "[data-tab]"
-        );
-
-
-
-   
+}
