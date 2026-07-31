@@ -1,6 +1,8 @@
 /**
  * World Creator
  * Main Entry
+ *
+ * Debug Version
  */
 
 
@@ -21,16 +23,46 @@ import WorldManager from "../world/Manager.js";
 function initialize() {
 
 
+    console.log(
+
+        "[World Creator] Starting..."
+
+    );
+
+
+
     ResourceManager.init();
 
 
+    console.log(
+
+        "[Resource] Initialized"
+
+    );
+
+
+
     WorldManager.init();
+
+
+    console.log(
+
+        "[World] Initialized"
+
+    );
 
 
 
     ui.init(
 
         "app"
+
+    );
+
+
+    console.log(
+
+        "[UI] Initialized"
 
     );
 
@@ -48,11 +80,33 @@ function initialize() {
 
 
 
+    console.log(
+
+        "[Navigation] Initialized"
+
+    );
+
+
+
     game.init();
+
+
+    console.log(
+
+        "[Game] Initialized"
+
+    );
+
 
 
     game.start();
 
+
+    console.log(
+
+        "[Game] Started"
+
+    );
 
 
 }
