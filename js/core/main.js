@@ -13,6 +13,9 @@ import tabs from "../ui/Tabs.js";
 
 import eventBus from "./eventBus.js";
 
+import WorldManager from "../world/Manager.js";
+import ResourceManager from "../resource/Manager.js";
+
 
 
 /**
@@ -31,6 +34,12 @@ function initialize() {
 
 
     setupTabs();
+
+
+    ResourceManager.init();
+
+
+    WorldManager.init();
 
 
     game.init();
@@ -62,16 +71,13 @@ function setupRouter() {
 
         () => {
 
-
             eventBus.emit(
                 "page:home"
             );
 
-
         }
 
     );
-
 
 
     router.register(
@@ -80,16 +86,13 @@ function setupRouter() {
 
         () => {
 
-
             eventBus.emit(
                 "page:world"
             );
 
-
         }
 
     );
-
 
 
     router.register(
@@ -98,16 +101,13 @@ function setupRouter() {
 
         () => {
 
-
             eventBus.emit(
                 "page:research"
             );
 
-
         }
 
     );
-
 
 
     router.init(
@@ -125,60 +125,12 @@ function setupRouter() {
 function setupTabs() {
 
 
-    const tabElements =
+    const elements =
+
         document.querySelectorAll(
             "[data-tab]"
         );
 
 
 
-    tabElements.forEach(
-
-        element => {
-
-
-            const id =
-                element.dataset.tab;
-
-
-            tabs.register(
-                id,
-                element
-            );
-
-
-        }
-
-    );
-
-
-}
-
-
-
-/**
- * DOM読み込み後起動
- */
-
-if (
-    document.readyState ===
-    "loading"
-) {
-
-
-    document.addEventListener(
-
-        "DOMContentLoaded",
-
-        initialize
-
-    );
-
-
-}
-else {
-
-
-    initialize();
-
-}
+   
