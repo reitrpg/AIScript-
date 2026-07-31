@@ -2,7 +2,7 @@
  * World Creator
  * UI System
  *
- * メイン画面表示管理
+ * Display Stable Version
  */
 
 
@@ -27,24 +27,33 @@ class UI {
 
 
 
-    /**
-     * 初期化
-     */
-
     init(id) {
 
 
         this.root =
 
             document.getElementById(
+
                 id
+
             );
 
 
 
         if (!this.root) {
 
+
+            console.error(
+
+                "UI root not found:",
+
+                id
+
+            );
+
+
             return;
+
 
         }
 
@@ -56,16 +65,20 @@ class UI {
         this.bind();
 
 
+
         this.update();
+
+
+        console.log(
+
+            "[UI] Render Complete"
+
+        );
 
 
     }
 
 
-
-    /**
-     * 画面生成
-     */
 
     render() {
 
@@ -73,24 +86,34 @@ class UI {
         this.root.innerHTML = `
 
 
-        <div class="header">
+        <section class="header">
+
 
             <h1>
+
                 World Creator
+
             </h1>
 
+
             <p>
+
                 Create and evolve your world
+
             </p>
 
-        </div>
+
+        </section>
 
 
 
-        <div class="panel">
+        <section class="panel">
+
 
             <h2>
+
                 Resources
+
             </h2>
 
 
@@ -99,14 +122,17 @@ class UI {
             </div>
 
 
-        </div>
+        </section>
 
 
 
-        <div class="panel">
+        <section class="panel">
+
 
             <h2>
-                World
+
+                World Status
+
             </h2>
 
 
@@ -115,11 +141,11 @@ class UI {
             </div>
 
 
-        </div>
+        </section>
 
 
 
-        <div class="panel">
+        <section class="panel">
 
 
             <button id="create-world">
@@ -129,7 +155,6 @@ class UI {
             </button>
 
 
-
             <button id="save-game">
 
                 Save Game
@@ -137,7 +162,7 @@ class UI {
             </button>
 
 
-        </div>
+        </section>
 
 
         `;
@@ -147,14 +172,10 @@ class UI {
 
 
 
-    /**
-     * イベント接続
-     */
-
     bind() {
 
 
-        const createButton =
+        const create =
 
             document.getElementById(
 
@@ -164,10 +185,10 @@ class UI {
 
 
 
-        if (createButton) {
+        if (create) {
 
 
-            createButton.onclick = () => {
+            create.onclick = () => {
 
 
                 eventBus.emit(
@@ -184,7 +205,7 @@ class UI {
 
 
 
-        const saveButton =
+        const save =
 
             document.getElementById(
 
@@ -194,10 +215,10 @@ class UI {
 
 
 
-        if (saveButton) {
+        if (save) {
 
 
-            saveButton.onclick = () => {
+            save.onclick = () => {
 
 
                 eventBus.emit(
@@ -234,4 +255,192 @@ class UI {
 
             "resource:update",
 
-            ()
+            () => {
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "world:created",
+
+            () => {
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    update() {
+
+
+        this.updateResources();
+
+
+        this.updateWorld();
+
+
+    }
+
+
+
+    updateResources() {
+
+
+        const area =
+
+            document.getElementById(
+
+                "resource-list"
+
+            );
+
+
+
+        if (!area) {
+
+
+            return;
+
+
+        }
+
+
+
+        area.innerHTML = "";
+
+
+
+        const resources =
+
+            ResourceManager.getAll();
+
+
+
+        Object.entries(resources)
+
+        .forEach(
+
+            ([id,value]) => {
+
+
+                const row =
+
+                    document.createElement(
+
+                        "div"
+
+                    );
+
+
+
+                row.textContent =
+
+                    `${id} : ${value}`;
+
+
+
+                area.appendChild(
+
+                    row
+
+                );
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    updateWorld() {
+
+
+        const area =
+
+            document.getElementById(
+
+                "world-info"
+
+            );
+
+
+
+        if (!area) {
+
+
+            return;
+
+
+        }
+
+
+
+        const world =
+
+            WorldManager.getCurrent();
+
+
+
+        if (!world) {
+
+
+            area.textContent =
+
+                "No World";
+
+
+            return;
+
+
+        }
+
+
+
+        area.innerHTML = `
+
+            Level : ${world.level}
+
+            <br>
+
+            Age : ${world.age.toString()}
+
+            <br>
+
+            Population : ${world.population}
+
+        `;
+
+
+    }
+
+
+}
+
+
+
+const ui =
+
+    new UI();
+
+
+
+export default ui;
