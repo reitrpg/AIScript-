@@ -7,146 +7,152 @@
 
 
 import BigNumber from "./BigNumber.js";
+import Normalize from "./Normalize.js";
 
 
-/**
- * 加算
- */
-
-export function add(a, b) {
-
-    return BigNumber
-        .from(a)
-        .add(b);
-
-}
+class Arithmetic {
 
 
-/**
- * 減算
- */
+    /**
+     * 加算
+     */
 
-export function subtract(a, b) {
-
-    return BigNumber
-        .from(a)
-        .subtract(b);
-
-}
+    static add(
+        a,
+        b
+    ) {
 
 
-/**
- * 乗算
- */
-
-export function multiply(a, b) {
-
-    return BigNumber
-        .from(a)
-        .multiply(b);
-
-}
+        const result =
+            BigNumber.from(
+                a
+            );
 
 
-/**
- * 除算
- */
-
-export function divide(a, b) {
-
-    return BigNumber
-        .from(a)
-        .divide(b);
-
-}
+        result.add(
+            b
+        );
 
 
-/**
- * 剰余
- *
- * 巨大数では精度維持のため
- * 現在値変換可能範囲のみ対応
- */
+        return Normalize.apply(
+            result
+        );
 
-export function modulo(a, b) {
+    }
 
-    const left =
-        BigNumber
-            .from(a)
+
+
+    /**
+     * 減算
+     */
+
+    static subtract(
+        a,
+        b
+    ) {
+
+
+        const result =
+            BigNumber.from(
+                a
+            );
+
+
+        result.subtract(
+            b
+        );
+
+
+        return Normalize.apply(
+            result
+        );
+
+    }
+
+
+
+    /**
+     * 乗算
+     */
+
+    static multiply(
+        a,
+        b
+    ) {
+
+
+        const result =
+            BigNumber.from(
+                a
+            );
+
+
+        result.multiply(
+            b
+        );
+
+
+        return Normalize.apply(
+            result
+        );
+
+    }
+
+
+
+    /**
+     * 除算
+     */
+
+    static divide(
+        a,
+        b
+    ) {
+
+
+        const result =
+            BigNumber.from(
+                a
+            );
+
+
+        result.divide(
+            b
+        );
+
+
+        return Normalize.apply(
+            result
+        );
+
+    }
+
+
+
+    /**
+     * 剰余
+     */
+
+    static modulo(
+        a,
+        b
+    ) {
+
+
+        const left =
+            BigNumber.from(
+                a
+            )
             .toNumber();
 
 
-    const right =
-        BigNumber
-            .from(b)
+
+        const right =
+            BigNumber.from(
+                b
+            )
             .toNumber();
 
 
-    return new BigNumber(
-        left % right
-    );
 
-}
-
-
-/**
- * 絶対値
- */
-
-export function abs(value) {
-
-    const result =
-        BigNumber.from(value);
-
-
-    result.value =
-        Math.abs(result.value);
-
-
-    return result;
-
-}
-
-
-/**
- * 最大値
- */
-
-export function max(a, b) {
-
-    const left =
-        BigNumber.from(a);
-
-    const right =
-        BigNumber.from(b);
-
-
-    return (
-        left.toNumber() >= right.toNumber()
-            ? left
-            : right
-    );
-
-}
-
-
-/**
- * 最小値
- */
-
-export function min(a, b) {
-
-    const left =
-        BigNumber.from(a);
-
-    const right =
-        BigNumber.from(b);
-
-
-    return (
-        left.toNumber() <= right.toNumber()
-            ? left
-            : right
-    );
-
-}
+        return
