@@ -2,13 +2,14 @@
  * World Creator
  * UI System
  *
- * ゲーム画面UI
+ * メイン画面表示管理
  */
 
 
 import eventBus from "../core/eventBus.js";
 
 import ResourceManager from "../resource/Manager.js";
+
 import WorldManager from "../world/Manager.js";
 
 
@@ -40,6 +41,7 @@ class UI {
             );
 
 
+
         if (!this.root) {
 
             return;
@@ -62,7 +64,7 @@ class UI {
 
 
     /**
-     * 描画
+     * 画面生成
      */
 
     render() {
@@ -78,7 +80,7 @@ class UI {
             </h1>
 
             <p>
-                Create your world
+                Create and evolve your world
             </p>
 
         </div>
@@ -87,33 +89,12 @@ class UI {
 
         <div class="panel">
 
-
             <h2>
                 Resources
             </h2>
 
 
-            <div
-                id="resource-list"
-            ></div>
-
-
-        </div>
-
-
-
-
-        <div class="panel">
-
-
-            <h2>
-                World Status
-            </h2>
-
-
-            <div
-                id="world-info"
-            >
+            <div id="resource-list">
 
             </div>
 
@@ -122,35 +103,41 @@ class UI {
 
 
 
+        <div class="panel">
+
+            <h2>
+                World
+            </h2>
+
+
+            <div id="world-info">
+
+            </div>
+
+
+        </div>
+
+
 
         <div class="panel">
 
 
-            <h2>
-                Actions
-            </h2>
-
-
-            <button
-                id="create-world"
-            >
+            <button id="create-world">
 
                 Create World
 
             </button>
 
 
-            <button
-                id="save-game"
-            >
 
-                Save
+            <button id="save-game">
+
+                Save Game
 
             </button>
 
 
         </div>
-
 
 
         `;
@@ -161,45 +148,69 @@ class UI {
 
 
     /**
-     * イベント設定
+     * イベント接続
      */
 
     bind() {
 
 
-        document
+        const createButton =
 
-        .getElementById(
-            "create-world"
-        )
+            document.getElementById(
 
-        .onclick = () => {
+                "create-world"
 
-
-            eventBus.emit(
-                "world:create"
             );
 
 
-        };
+
+        if (createButton) {
+
+
+            createButton.onclick = () => {
+
+
+                eventBus.emit(
+
+                    "world:create"
+
+                );
+
+
+            };
+
+
+        }
 
 
 
-        document
+        const saveButton =
 
-        .getElementById(
-            "save-game"
-        )
+            document.getElementById(
 
-        .onclick = () => {
+                "save-game"
 
-
-            eventBus.emit(
-                "game:save"
             );
 
 
-        };
+
+        if (saveButton) {
+
+
+            saveButton.onclick = () => {
+
+
+                eventBus.emit(
+
+                    "game:save"
+
+                );
+
+
+            };
+
+
+        }
 
 
 
@@ -221,189 +232,6 @@ class UI {
 
         eventBus.on(
 
-            "world:created",
+            "resource:update",
 
-            () => {
-
-
-                this.update();
-
-
-            }
-
-        );
-
-
-    }
-
-
-
-    /**
-     * 更新
-     */
-
-    update() {
-
-
-        this.updateResources();
-
-
-        this.updateWorld();
-
-
-    }
-
-
-
-    /**
-     * 資源表示
-     */
-
-    updateResources() {
-
-
-        const area =
-
-            document.getElementById(
-                "resource-list"
-            );
-
-
-
-        if (!area) {
-
-            return;
-
-        }
-
-
-
-        const data =
-
-            ResourceManager.getAll();
-
-
-
-        area.innerHTML = "";
-
-
-
-        for (
-            const key in data
-        ) {
-
-
-            const div =
-
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
-                "value";
-
-
-            div.textContent =
-
-                key
-                +
-                " : "
-                +
-                data[key];
-
-
-
-            area.appendChild(
-                div
-            );
-
-
-        }
-
-
-    }
-
-
-
-    /**
-     * 世界表示
-     */
-
-    updateWorld() {
-
-
-        const area =
-
-            document.getElementById(
-                "world-info"
-            );
-
-
-
-        if (!area) {
-
-            return;
-
-        }
-
-
-
-        const world =
-
-            WorldManager.getCurrent();
-
-
-
-        if (!world) {
-
-
-            area.textContent =
-
-                "No World";
-
-
-            return;
-
-
-        }
-
-
-
-        area.innerHTML = `
-
-
-            Level:
-            ${world.level}
-
-            <br>
-
-
-            Age:
-            ${world.age.value}e${world.age.exponent}
-
-
-            <br>
-
-
-            Population:
-            ${world.population}
-
-
-        `;
-
-
-    }
-
-
-}
-
-
-
-const ui =
-
-    new UI();
-
-
-
-export default ui;
+            ()
