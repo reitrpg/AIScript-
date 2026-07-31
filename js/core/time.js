@@ -6,24 +6,32 @@
  */
 
 
-import settings from "./settings.js";
 import eventBus from "./eventBus.js";
 
 
-class Time {
+
+class TimeManager {
 
 
     constructor() {
 
+
         this.interval = null;
 
+
+        this.tickRate = 1000;
+
+
+        this.tick = 0;
+
+
         this.lastTime =
+
             Date.now();
+
 
         this.running = false;
 
-        this.tick =
-            0;
 
     }
 
@@ -36,33 +44,41 @@ class Time {
     start() {
 
 
-        if (this.running) {
+        if (
+            this.running
+        ) {
 
             return;
 
         }
 
 
+
         this.running = true;
 
 
         this.lastTime =
+
             Date.now();
 
 
 
         this.interval =
+
             setInterval(
 
                 () => {
 
+
                     this.update();
+
 
                 },
 
-                settings.time.tickRate
+                this.tickRate
 
             );
+
 
     }
 
@@ -75,47 +91,46 @@ class Time {
     stop() {
 
 
-        if (!this.running) {
+        this.running = false;
 
-            return;
+
+
+        if (
+            this.interval
+        ) {
+
+
+            clearInterval(
+
+                this.interval
+
+            );
+
+
+            this.interval = null;
+
 
         }
 
-
-        clearInterval(
-            this.interval
-        );
-
-
-        this.interval = null;
-
-        this.running = false;
 
     }
 
 
 
     /**
-     * 更新
+     * 時間更新
      */
 
     update() {
 
 
-        const now =
-            Date.now();
-
-
-        const delta =
-            now -
-            this.lastTime;
+        this.tick++;
 
 
         this.lastTime =
-            now;
 
+            Date.now();
 
-        this.tick++;
 
 
         eventBus.emit(
@@ -125,48 +140,43 @@ class Time {
             {
 
                 tick:
-                    this.tick,
 
-                delta
+                    this.tick
+
 
             }
 
         );
 
-    }
-
-
-
-    /**
-     * 現在tick取得
-     */
-
-    getTick() {
-
-        return this.tick;
 
     }
 
 
 
     /**
-     * 経過時間取得
+     * オフライン時間計算
      */
 
-    getDelta() {
+    getOfflineTime() {
+
 
         return (
+
             Date.now()
+
             -
+
             this.lastTime
+
         );
+
 
     }
 
 
 
     /**
-     * 保存
+     * 保存用
      */
 
     toJSON() {
@@ -174,13 +184,19 @@ class Time {
 
         return {
 
+
             tick:
+
                 this.tick,
 
+
             lastTime:
+
                 this.lastTime
 
+
         };
+
 
     }
 
@@ -200,13 +216,25 @@ class Time {
         }
 
 
+
         this.tick =
-            data.tick ?? 0;
+
+            data.tick
+
+            ??
+
+            0;
+
 
 
         this.lastTime =
-            data.lastTime ??
+
+            data.lastTime
+
+            ??
+
             Date.now();
+
 
     }
 
@@ -216,7 +244,9 @@ class Time {
 
 
 const time =
-    new Time();
+
+    new TimeManager();
+
 
 
 export default time;
