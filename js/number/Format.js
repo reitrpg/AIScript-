@@ -2,215 +2,150 @@
  * World Creator
  * BigNumber Format
  *
- * 表示用フォーマット処理
+ * 巨大数表示処理
  */
 
 
 import BigNumber from "./BigNumber.js";
 
 
-/*
-    単位表
-*/
+class Format {
 
-const UNITS = [
 
-    {
-        value: 3,
-        name: "K"
-    },
+    /**
+     * 標準表示
+     */
 
-    {
-        value: 6,
-        name: "M"
-    },
+    static format(
+        value,
+        decimal = 2
+    ) {
 
-    {
-        value: 9,
-        name: "B"
-    },
 
-    {
-        value: 12,
-        name: "T"
-    },
+        const number =
+            BigNumber.from(
+                value
+            );
 
-    {
-        value: 15,
-        name: "Qa"
-    },
 
-    {
-        value: 18,
-        name: "Qi"
-    },
+        if (
+            number.value === 0
+        ) {
 
-    {
-        value: 21,
-        name: "Sx"
-    },
+            return "0";
 
-    {
-        value: 24,
-        name: "Sp"
-    },
-
-    {
-        value: 27,
-        name: "Oc"
-    },
-
-    {
-        value: 30,
-        name: "No"
-    }
-
-];
+        }
 
 
 
-/**
- * 表示変換
- */
-
-export function format(value, precision = 2) {
-
-
-    const number =
-        BigNumber.from(value);
-
-
-
-    if (number.value === 0) {
-
-        return "0";
-
-    }
-
-
-
-    const exponent =
-        number.exponent;
-
-
-
-    /*
-        通常表示
-    */
-
-    if (exponent < 3) {
-
-        return number
-            .toNumber()
-            .toFixed(precision);
-
-    }
-
-
-
-    /*
-        単位表示
-    */
-
-    const unit =
-        UNITS
-            .slice()
-            .reverse()
-            .find(
-                item =>
-                    exponent >= item.value
+        const suffix =
+            this.getSuffix(
+                number.exponent
             );
 
 
 
-    if (!unit) {
+        if (
+            suffix
+        ) {
 
-        return scientific(number);
+
+            return (
+
+                number.value
+                    .toFixed(
+                        decimal
+                    )
+
+                +
+
+                suffix
+
+            );
+
+        }
+
+
+
+        return number
+            .toNumber()
+            .toFixed(
+                decimal
+            );
 
     }
 
 
 
-    const scaled =
-        number.value *
-        Math.pow(
-            10,
-            exponent - unit.value
+    /**
+     * 接尾辞取得
+     */
+
+    static getSuffix(
+        exponent
+    ) {
+
+
+        const table = {
+
+
+            3:
+                "K",
+
+
+            6:
+                "M",
+
+
+            9:
+                "B",
+
+
+            12:
+                "T",
+
+
+            15:
+                "Qa",
+
+
+            18:
+                "Qi",
+
+
+            21:
+                "Sx",
+
+
+            24:
+                "Sp",
+
+
+            27:
+                "Oc",
+
+
+            30:
+                "No"
+
+        };
+
+
+
+        return (
+            table[
+                exponent
+            ]
+            ??
+            (
+                exponent > 30
+                    ?
+                    "e"
+                    +
+                    exponent
+                    :
+                    ""
+            )
         );
 
-
-
-    return (
-        scaled.toFixed(precision)
-        +
-        unit.name
-    );
-
-}
-
-
-
-/**
- * 科学表記
- */
-
-export function scientific(value) {
-
-
-    const number =
-        BigNumber.from(value);
-
-
-    return (
-        number.value.toFixed(3)
-        +
-        "e"
-        +
-        number.exponent
-    );
-
-}
-
-
-
-/**
- * 詳細表示
- */
-
-export function detailed(value) {
-
-
-    const number =
-        BigNumber.from(value);
-
-
-    return {
-
-        value:
-            number.value,
-
-        exponent:
-            number.exponent,
-
-        text:
-            scientific(number)
-
-    };
-
-}
-
-
-
-/**
- * 整数表示
- */
-
-export function integer(value) {
-
-
-    return format(
-        value,
-        0
-    );
-
-}
+   
