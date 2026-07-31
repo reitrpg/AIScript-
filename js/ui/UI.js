@@ -2,12 +2,14 @@
  * World Creator
  * UI System
  *
- * メイン画面生成
+ * メイン画面管理
  */
 
 
 import eventBus from "../core/eventBus.js";
 import ResourceManager from "../resource/Manager.js";
+import WorldManager from "../world/Manager.js";
+
 
 
 class UI {
@@ -29,16 +31,13 @@ class UI {
 
 
         this.root =
+
             document.getElementById(
                 id
             );
 
 
         if (!this.root) {
-
-            console.error(
-                "UI root not found"
-            );
 
             return;
 
@@ -48,17 +47,10 @@ class UI {
         this.render();
 
 
-        eventBus.on(
+        this.bindEvents();
 
-            "game:update",
 
-            () => {
-
-                this.update();
-
-            }
-
-        );
+        this.update();
 
 
     }
@@ -66,13 +58,14 @@ class UI {
 
 
     /**
-     * 画面生成
+     * 描画
      */
 
     render() {
 
 
         this.root.innerHTML = `
+
 
         <div class="header">
 
@@ -83,15 +76,18 @@ class UI {
         </div>
 
 
+
         <div class="panel">
 
             <h2>
                 Resources
             </h2>
 
-            <div id="resource-list">
 
-            </div>
+            <div
+                id="resource-list"
+            ></div>
+
 
         </div>
 
@@ -103,11 +99,15 @@ class UI {
                 World
             </h2>
 
-            <p id="world-status">
 
-                世界を創造中...
+            <div
+                id="world-info"
+            >
 
-            </p>
+                未生成
+
+            </div>
+
 
         </div>
 
@@ -115,12 +115,9 @@ class UI {
 
         <div class="panel">
 
-            <h2>
-                Actions
-            </h2>
-
-
-            <button id="create-world">
+            <button
+                id="create-world"
+            >
 
                 Create World
 
@@ -129,122 +126,23 @@ class UI {
 
         </div>
 
+
         `;
 
 
-
-        this.bind();
-
     }
 
 
 
     /**
-     * ボタン接続
+     * イベント接続
      */
 
-    bind() {
+    bindEvents() {
 
 
         const button =
+
             document.getElementById(
                 "create-world"
-            );
-
-
-        if (button) {
-
-
-            button.onclick = () => {
-
-
-                eventBus.emit(
-                    "world:create"
-                );
-
-
-            };
-
-        }
-
-    }
-
-
-
-    /**
-     * 更新
-     */
-
-    update() {
-
-
-        const area =
-            document.getElementById(
-                "resource-list"
-            );
-
-
-        if (!area) {
-
-            return;
-
-        }
-
-
-
-        const resources =
-            ResourceManager
-                .getAll();
-
-
-
-        area.innerHTML = "";
-
-
-
-        for (
-            const key in resources
-        ) {
-
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "value";
-
-
-            item.textContent =
-
-                key
-                +
-                ": "
-                +
-                resources[key];
-
-
-
-            area.appendChild(
-                item
-            );
-
-
-        }
-
-
-    }
-
-
-
-}
-
-
-
-const ui =
-    new UI();
-
-
-export default ui;
+           
