@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>World Creator</title>
+
+    <meta name="theme-color" content="#111111">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+
+</head>
+
+<body>
+
+    <header id="header">
+
+        <h1>World Creator</h1>
+
+        <div id="version">
+            Version :
+            <span id="versionText">0.1.0</span>
+        </div>
+
+    </header>
+
+    <main>
+
+        <!-- EP -->
+
+        <section class="panel">
+
+            <h2>Energy</h2>
+
+            <div class="value">
+
+                EP
+
+                <span id="epValue">0</span>
+
+            </div>
+
+        </section>
+
+        <!-- ワールド -->
+
+        <section class="panel">
+
+            <h2>World</h2>
+
+            <div id="worldContainer">
+
+            </div>
+
+        </section>
+
+        <!-- 素材 -->
+
+        <section class="panel">
+
+            <h2>Resources</h2>
+
+            <div id="resourceContainer">
+
+            </div>
+
+        </section>
+
+        <!-- アップグレード -->
+
+        <section class="panel">
+
+            <h2>Upgrade</h2>
+
+            <div id="upgradeContainer">
+
+            </div>
+
+        </section>
+
+        <!-- 世界創造 -->
+
+        <section class="panel">
+
+            <h2>Create World</h2>
+
+            <button id="createWorldButton">
+
+                New World
+
+            </button>
+
+        </section>
+
+        <!-- デバッグ -->
+
+        <section
+            class="panel"
+            id="debugPanel"
+            style="display:none;">
+
+            <h2>Debug</h2>
+
+            <button id="debugButton">
+
+                Toggle Debug
+
+            </button>
+
+            <div id="debugContainer">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <button id="saveButton">
+
+            Save
+
+        </button>
+
+        <button id="loadButton">
+
+            Load
+
+        </button>
+
+        <button id="settingButton">
+
+            Settings
+
+        </button>
+
+    </footer>
+
+    <!-- JavaScript -->
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+
+</html>
