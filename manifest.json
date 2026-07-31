@@ -1,27 +1,23 @@
 {
-    "name": "World Creator",
-    "short_name": "WorldCreator",
-    "description": "Create and develop your own world.",
-    
-    "start_url": "./index.html",
-    "display": "standalone",
-    "orientation": "portrait",
+  "name": "World Creator",
+  "short_name": "WorldCreator",
+  "description": "World Creator - Idle World Building Simulation",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#111111",
 
-    "theme_color": "#202124",
-    "background_color": "#202124",
-
-    "lang": "ja",
-
-    "icons": [
-        {
-            "src": "./assets/icon/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "./assets/icon/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "icons": [
+    {
+      "src": "./assets/icon/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icon/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
