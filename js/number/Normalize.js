@@ -2,114 +2,143 @@
  * World Creator
  * BigNumber Normalize
  *
- * BigNumber形式統一処理
+ * 巨大数正規化処理
  */
 
 
-import {
-    MIN_MANTISSA,
-    MAX_MANTISSA
-} from "./Constants.js";
+import BigNumber from "./BigNumber.js";
+import Constants from "./Constants.js";
 
 
-/**
- * 正規化
- *
- * value × 10^exponent
- *
- * mantissaを
- * 1 <= value < 1000
- * に調整
- */
-
-export function normalize(value, exponent = 0) {
+class Normalize {
 
 
-    if (value === 0) {
+    /**
+     * 正規化
+     */
 
-        return {
-            value: 0,
-            exponent: 0
-        };
-
-    }
+    static apply(value) {
 
 
-    while (
-        Math.abs(value) >= MAX_MANTISSA
-    ) {
-
-        value /= 1000;
-
-        exponent += 3;
-
-    }
+        const number =
+            BigNumber.from(
+                value
+            );
 
 
-    while (
-        Math.abs(value) < MIN_MANTISSA &&
-        exponent > 0
-    ) {
+        if (
+            number.value === 0
+        ) {
 
-        value *= 1000;
+            number.exponent = 0;
 
-        exponent -= 3;
+            return number;
 
-    }
-
-
-    return {
-
-        value,
-
-        exponent
-
-    };
-
-}
+        }
 
 
-/**
- * BigNumber形式確認
- */
 
-export function isNormalized(number) {
+        while (
+            Math.abs(number.value)
+            >=
+            Constants.NORMALIZE_THRESHOLD
+        ) {
 
 
-    if (!number) {
+            number.value /= 1000;
 
-        return false;
+            number.exponent += 3;
+
+
+        }
+
+
+
+        while (
+            Math.abs(number.value)
+            < 1
+        ) {
+
+
+            number.value *= 1000;
+
+            number.exponent -= 3;
+
+
+        }
+
+
+
+        return number;
 
     }
 
 
-    if (number.value === 0) {
 
-        return (
-            number.exponent === 0
+    /**
+     * 強制正規化
+     */
+
+    static force(value) {
+
+
+        return this.apply(
+            value
         );
 
     }
 
 
-    return (
-        Math.abs(number.value) >= MIN_MANTISSA &&
-        Math.abs(number.value) < MAX_MANTISSA
-    );
+
+    /**
+     * 桁調整
+     */
+
+    static adjust(
+        value,
+        exponent
+    ) {
+
+
+        const number =
+            BigNumber.from(
+                value
+            );
+
+
+        const diff =
+            exponent -
+            number.exponent;
+
+
+
+        if (
+            diff !== 0
+        ) {
+
+
+            number.value *=
+                Math.pow(
+                    10,
+                    -diff
+                );
+
+
+            number.exponent =
+                exponent;
+
+
+        }
+
+
+        return this.apply(
+            number
+        );
+
+    }
+
 
 }
 
 
-/**
- * コピーして正規化
- */
-
-export function normalizedCopy(number) {
-
-
-    return normalize(
-        number.value,
-        number.exponent
-    );
-
-}
+export default Normalize;
