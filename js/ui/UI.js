@@ -2,11 +2,12 @@
  * World Creator
  * UI System
  *
- * ユーザーインターフェース管理
+ * メイン画面生成
  */
 
 
 import eventBus from "../core/eventBus.js";
+import ResourceManager from "../resource/Manager.js";
 
 
 class UI {
@@ -14,9 +15,7 @@ class UI {
 
     constructor() {
 
-        this.elements = new Map();
-
-        this.container = null;
+        this.root = null;
 
     }
 
@@ -26,193 +25,218 @@ class UI {
      * 初期化
      */
 
-    init(containerId = "app") {
+    init(id) {
 
 
-        this.container =
+        this.root =
             document.getElementById(
-                containerId
+                id
             );
 
 
-        if (!this.container) {
+        if (!this.root) {
 
-            this.container =
-                document.body;
-
-        }
-
-
-        eventBus.emit(
-            "ui:initialized"
-        );
-
-    }
-
-
-
-    /**
-     * 要素登録
-     */
-
-    register(id, element) {
-
-
-        this.elements.set(
-            id,
-            element
-        );
-
-
-    }
-
-
-
-    /**
-     * 要素取得
-     */
-
-    get(id) {
-
-        return this.elements.get(id);
-
-    }
-
-
-
-    /**
-     * 表示
-     */
-
-    show(id) {
-
-
-        const element =
-            this.get(id);
-
-
-        if (!element) {
-
-            return false;
-
-        }
-
-
-        element.style.display =
-            "";
-
-
-        return true;
-
-    }
-
-
-
-    /**
-     * 非表示
-     */
-
-    hide(id) {
-
-
-        const element =
-            this.get(id);
-
-
-        if (!element) {
-
-            return false;
-
-        }
-
-
-        element.style.display =
-            "none";
-
-
-        return true;
-
-    }
-
-
-
-    /**
-     * HTML生成
-     */
-
-    create(tag, options = {}) {
-
-
-        const element =
-            document.createElement(
-                tag
+            console.error(
+                "UI root not found"
             );
-
-
-        if (options.id) {
-
-            element.id =
-                options.id;
-
-        }
-
-
-        if (options.class) {
-
-            element.className =
-                options.class;
-
-        }
-
-
-        if (options.text) {
-
-            element.textContent =
-                options.text;
-
-        }
-
-
-        return element;
-
-    }
-
-
-
-    /**
-     * 追加
-     */
-
-    append(element) {
-
-
-        if (!this.container) {
 
             return;
 
         }
 
 
-        this.container.appendChild(
-            element
+        this.render();
+
+
+        eventBus.on(
+
+            "game:update",
+
+            () => {
+
+                this.update();
+
+            }
+
         );
+
 
     }
 
 
 
     /**
-     * 更新通知
+     * 画面生成
      */
 
-    refresh() {
+    render() {
 
 
-        eventBus.emit(
-            "ui:update"
-        );
+        this.root.innerHTML = `
+
+        <div class="header">
+
+            <h1>
+                World Creator
+            </h1>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>
+                Resources
+            </h2>
+
+            <div id="resource-list">
+
+            </div>
+
+        </div>
+
+
+
+        <div class="panel">
+
+            <h2>
+                World
+            </h2>
+
+            <p id="world-status">
+
+                世界を創造中...
+
+            </p>
+
+        </div>
+
+
+
+        <div class="panel">
+
+            <h2>
+                Actions
+            </h2>
+
+
+            <button id="create-world">
+
+                Create World
+
+            </button>
+
+
+        </div>
+
+        `;
+
+
+
+        this.bind();
 
     }
+
+
+
+    /**
+     * ボタン接続
+     */
+
+    bind() {
+
+
+        const button =
+            document.getElementById(
+                "create-world"
+            );
+
+
+        if (button) {
+
+
+            button.onclick = () => {
+
+
+                eventBus.emit(
+                    "world:create"
+                );
+
+
+            };
+
+        }
+
+    }
+
+
+
+    /**
+     * 更新
+     */
+
+    update() {
+
+
+        const area =
+            document.getElementById(
+                "resource-list"
+            );
+
+
+        if (!area) {
+
+            return;
+
+        }
+
+
+
+        const resources =
+            ResourceManager
+                .getAll();
+
+
+
+        area.innerHTML = "";
+
+
+
+        for (
+            const key in resources
+        ) {
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "value";
+
+
+            item.textContent =
+
+                key
+                +
+                ": "
+                +
+                resources[key];
+
+
+
+            area.appendChild(
+                item
+            );
+
+
+        }
+
+
+    }
+
 
 
 }
