@@ -1,152 +1,74 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
 
     <title>World Creator</title>
 
-    <meta name="theme-color" content="#111111">
+    <meta name="description" content="World Creator">
+    <meta name="theme-color" content="#202124">
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="manifest" href="./manifest.json">
 
+    <link rel="icon" href="./assets/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/pages.css">
 </head>
 
 <body>
 
-    <header id="header">
+    <!-- Application Root -->
+    <div id="app">
 
-        <h1>World Creator</h1>
+        <!-- Header -->
+        <header id="app-header">
+            <h1>World Creator</h1>
+        </header>
 
-        <div id="version">
-            Version :
-            <span id="versionText">0.1.0</span>
-        </div>
+        <!-- Navigation -->
+        <nav id="app-nav">
+            <!-- JavaScriptで生成 -->
+        </nav>
 
-    </header>
+        <!-- Main -->
+        <main id="app-main">
+            <!-- SPA描画先 -->
+        </main>
 
-    <main>
+        <!-- Footer -->
+        <footer id="app-footer">
+            <small>World Creator</small>
+        </footer>
 
-        <!-- EP -->
+    </div>
 
-        <section class="panel">
+    <!-- No Script -->
+    <noscript>
+        <p>
+            このアプリケーションを利用するにはJavaScriptを有効にしてください。
+        </p>
+    </noscript>
 
-            <h2>Energy</h2>
+    <!-- Entry -->
+    <script type="module" src="./js/main.js"></script>
 
-            <div class="value">
-
-                EP
-
-                <span id="epValue">0</span>
-
-            </div>
-
-        </section>
-
-        <!-- ワールド -->
-
-        <section class="panel">
-
-            <h2>World</h2>
-
-            <div id="worldContainer">
-
-            </div>
-
-        </section>
-
-        <!-- 素材 -->
-
-        <section class="panel">
-
-            <h2>Resources</h2>
-
-            <div id="resourceContainer">
-
-            </div>
-
-        </section>
-
-        <!-- アップグレード -->
-
-        <section class="panel">
-
-            <h2>Upgrade</h2>
-
-            <div id="upgradeContainer">
-
-            </div>
-
-        </section>
-
-        <!-- 世界創造 -->
-
-        <section class="panel">
-
-            <h2>Create World</h2>
-
-            <button id="createWorldButton">
-
-                New World
-
-            </button>
-
-        </section>
-
-        <!-- デバッグ -->
-
-        <section
-            class="panel"
-            id="debugPanel"
-            style="display:none;">
-
-            <h2>Debug</h2>
-
-            <button id="debugButton">
-
-                Toggle Debug
-
-            </button>
-
-            <div id="debugContainer">
-
-            </div>
-
-        </section>
-
-    </main>
-
-    <footer>
-
-        <button id="saveButton">
-
-            Save
-
-        </button>
-
-        <button id="loadButton">
-
-            Load
-
-        </button>
-
-        <button id="settingButton">
-
-            Settings
-
-        </button>
-
-    </footer>
-
-    <!-- JavaScript -->
-
-    <script type="module" src="js/main.js"></script>
+    <!-- Service Worker -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js");
+            });
+        }
+    </script>
 
 </body>
-
 </html>
