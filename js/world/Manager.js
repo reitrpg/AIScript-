@@ -2,7 +2,7 @@
  * World Creator
  * World Manager
  *
- * 世界管理システム
+ * World Create Check Version
  */
 
 
@@ -31,18 +31,18 @@ class WorldManager {
 
 
 
-    /**
-     * 初期化
-     */
-
     init() {
 
 
         if (
+
             this.initialized
+
         ) {
 
+
             return;
+
 
         }
 
@@ -51,13 +51,17 @@ class WorldManager {
         this.initialized = true;
 
 
+
+        console.log(
+
+            "[World] Ready"
+
+        );
+
+
     }
 
 
-
-    /**
-     * 世界作成
-     */
 
     createWorld() {
 
@@ -68,7 +72,8 @@ class WorldManager {
             id:
 
                 Date.now()
-                    .toString(),
+
+                .toString(),
 
 
 
@@ -90,7 +95,7 @@ class WorldManager {
 
             population:
 
-                0,
+                10,
 
 
 
@@ -117,6 +122,16 @@ class WorldManager {
 
 
 
+        console.log(
+
+            "[World] Created",
+
+            world.id
+
+        );
+
+
+
         eventBus.emit(
 
             "world:created",
@@ -134,18 +149,18 @@ class WorldManager {
 
 
 
-    /**
-     * Tick更新
-     */
-
     update() {
 
 
         if (
+
             !this.current
+
         ) {
 
+
             return;
+
 
         }
 
@@ -172,10 +187,6 @@ class WorldManager {
 
 
 
-    /**
-     * 現在世界取得
-     */
-
     getCurrent() {
 
 
@@ -185,10 +196,6 @@ class WorldManager {
     }
 
 
-
-    /**
-     * 保存
-     */
 
     toJSON() {
 
@@ -208,9 +215,11 @@ class WorldManager {
                             world.id,
 
 
+
                         level:
 
                             world.level,
+
 
 
                         age:
@@ -218,9 +227,11 @@ class WorldManager {
                             world.age.toJSON(),
 
 
+
                         population:
 
                             world.population,
+
 
 
                         created:
@@ -254,16 +265,18 @@ class WorldManager {
 
 
 
-    /**
-     * 復元
-     */
-
     load(data) {
 
 
-        if (!data) {
+        if (
+
+            !data
+
+        ) {
+
 
             return;
+
 
         }
 
