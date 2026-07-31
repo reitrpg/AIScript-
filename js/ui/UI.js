@@ -2,11 +2,12 @@
  * World Creator
  * UI System
  *
- * メイン画面管理
+ * ゲーム画面UI
  */
 
 
 import eventBus from "../core/eventBus.js";
+
 import ResourceManager from "../resource/Manager.js";
 import WorldManager from "../world/Manager.js";
 
@@ -17,7 +18,9 @@ class UI {
 
     constructor() {
 
+
         this.root = null;
+
 
     }
 
@@ -44,10 +47,11 @@ class UI {
         }
 
 
+
         this.render();
 
 
-        this.bindEvents();
+        this.bind();
 
 
         this.update();
@@ -73,11 +77,16 @@ class UI {
                 World Creator
             </h1>
 
+            <p>
+                Create your world
+            </p>
+
         </div>
 
 
 
         <div class="panel">
+
 
             <h2>
                 Resources
@@ -93,18 +102,18 @@ class UI {
 
 
 
+
         <div class="panel">
 
+
             <h2>
-                World
+                World Status
             </h2>
 
 
             <div
                 id="world-info"
             >
-
-                未生成
 
             </div>
 
@@ -113,7 +122,14 @@ class UI {
 
 
 
+
         <div class="panel">
+
+
+            <h2>
+                Actions
+            </h2>
+
 
             <button
                 id="create-world"
@@ -124,7 +140,17 @@ class UI {
             </button>
 
 
+            <button
+                id="save-game"
+            >
+
+                Save
+
+            </button>
+
+
         </div>
+
 
 
         `;
@@ -135,14 +161,249 @@ class UI {
 
 
     /**
-     * イベント接続
+     * イベント設定
      */
 
-    bindEvents() {
+    bind() {
 
 
-        const button =
+        document
+
+        .getElementById(
+            "create-world"
+        )
+
+        .onclick = () => {
+
+
+            eventBus.emit(
+                "world:create"
+            );
+
+
+        };
+
+
+
+        document
+
+        .getElementById(
+            "save-game"
+        )
+
+        .onclick = () => {
+
+
+            eventBus.emit(
+                "game:save"
+            );
+
+
+        };
+
+
+
+        eventBus.on(
+
+            "game:update",
+
+            () => {
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "world:created",
+
+            () => {
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    /**
+     * 更新
+     */
+
+    update() {
+
+
+        this.updateResources();
+
+
+        this.updateWorld();
+
+
+    }
+
+
+
+    /**
+     * 資源表示
+     */
+
+    updateResources() {
+
+
+        const area =
 
             document.getElementById(
-                "create-world"
-           
+                "resource-list"
+            );
+
+
+
+        if (!area) {
+
+            return;
+
+        }
+
+
+
+        const data =
+
+            ResourceManager.getAll();
+
+
+
+        area.innerHTML = "";
+
+
+
+        for (
+            const key in data
+        ) {
+
+
+            const div =
+
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "value";
+
+
+            div.textContent =
+
+                key
+                +
+                " : "
+                +
+                data[key];
+
+
+
+            area.appendChild(
+                div
+            );
+
+
+        }
+
+
+    }
+
+
+
+    /**
+     * 世界表示
+     */
+
+    updateWorld() {
+
+
+        const area =
+
+            document.getElementById(
+                "world-info"
+            );
+
+
+
+        if (!area) {
+
+            return;
+
+        }
+
+
+
+        const world =
+
+            WorldManager.getCurrent();
+
+
+
+        if (!world) {
+
+
+            area.textContent =
+
+                "No World";
+
+
+            return;
+
+
+        }
+
+
+
+        area.innerHTML = `
+
+
+            Level:
+            ${world.level}
+
+            <br>
+
+
+            Age:
+            ${world.age.value}e${world.age.exponent}
+
+
+            <br>
+
+
+            Population:
+            ${world.population}
+
+
+        `;
+
+
+    }
+
+
+}
+
+
+
+const ui =
+
+    new UI();
+
+
+
+export default ui;
