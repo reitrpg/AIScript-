@@ -2,21 +2,20 @@
  * World Creator
  * Save System
  *
- * LocalStorage保存管理
+ * LocalStorage管理
  */
 
 
-import settings from "./settings.js";
-import eventBus from "./eventBus.js";
-
-
-class Save {
+class SaveManager {
 
 
     constructor() {
 
+
         this.key =
-            settings.save.key;
+
+            "world_creator_save";
+
 
     }
 
@@ -33,38 +32,45 @@ class Save {
 
 
             const json =
+
                 JSON.stringify(
                     data
                 );
 
 
+
             localStorage.setItem(
+
                 this.key,
+
                 json
+
             );
 
-
-            eventBus.emit(
-                "save:complete"
-            );
 
 
             return true;
 
 
         }
+
         catch(error) {
 
 
             console.error(
+
                 "Save Error:",
+
                 error
+
             );
 
 
             return false;
 
+
         }
+
 
     }
 
@@ -80,37 +86,52 @@ class Save {
         try {
 
 
-            const data =
+            const json =
+
                 localStorage.getItem(
+
                     this.key
+
                 );
 
 
-            if (!data) {
+
+            if (!json) {
+
 
                 return null;
+
 
             }
 
 
+
             return JSON.parse(
-                data
+
+                json
+
             );
 
 
         }
+
         catch(error) {
 
 
             console.error(
+
                 "Load Error:",
+
                 error
+
             );
 
 
             return null;
 
+
         }
+
 
     }
 
@@ -124,13 +145,11 @@ class Save {
 
 
         localStorage.removeItem(
+
             this.key
+
         );
 
-
-        eventBus.emit(
-            "save:cleared"
-        );
 
     }
 
@@ -144,36 +163,19 @@ class Save {
 
 
         return (
+
             localStorage.getItem(
+
                 this.key
-            ) !== null
+
+            )
+
+            !==
+
+            null
+
         );
 
-    }
-
-
-
-    /**
-     * 保存キー変更
-     */
-
-    setKey(key) {
-
-
-        this.key =
-            key;
-
-    }
-
-
-
-    /**
-     * 現在キー取得
-     */
-
-    getKey() {
-
-        return this.key;
 
     }
 
@@ -183,7 +185,9 @@ class Save {
 
 
 const save =
-    new Save();
+
+    new SaveManager();
+
 
 
 export default save;
