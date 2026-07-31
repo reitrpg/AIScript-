@@ -2,148 +2,173 @@
  * World Creator
  * BigNumber Power
  *
- * 累乗処理
+ * 累乗計算処理
  */
 
 
 import BigNumber from "./BigNumber.js";
+import Normalize from "./Normalize.js";
 
 
-/**
- * 累乗
- *
- * BigNumber ^ exponent
- */
-
-export function power(value, exponent) {
+class Power {
 
 
-    const base =
-        BigNumber.from(value);
+    /**
+     * 累乗
+     */
+
+    static pow(
+        value,
+        exponent
+    ) {
 
 
-    if (exponent === 0) {
-
-        return BigNumber.one();
-
-    }
-
-
-    if (exponent < 0) {
-
-        return reciprocal(
-            power(base, Math.abs(exponent))
-        );
-
-    }
+        const base =
+            BigNumber.from(
+                value
+            );
 
 
-    let result =
-        BigNumber.one();
+        if (
+            exponent === 0
+        ) {
 
-
-    let current =
-        base.clone();
-
-
-    let count = exponent;
-
-
-
-    /*
-        べき乗高速化
-        Exponentiation by Squaring
-    */
-
-    while (count > 0) {
-
-
-        if (count % 2 === 1) {
-
-            result.multiply(current);
+            return BigNumber.one();
 
         }
 
 
-        current.multiply(current);
+        if (
+            exponent < 0
+        ) {
 
+            return this.inverse(
+                base,
+                Math.abs(exponent)
+            );
 
-        count =
-            Math.floor(count / 2);
-
-    }
-
-
-    return result;
-
-}
+        }
 
 
 
-/**
- * 逆数
- */
-
-export function reciprocal(value) {
+        let result =
+            BigNumber.one();
 
 
-    const number =
-        BigNumber.from(value);
+
+        for (
+            let i = 0;
+            i < exponent;
+            i++
+        ) {
 
 
-    if (number.value === 0) {
+            result.multiply(
+                base
+            );
 
-        throw new Error(
-            "Cannot divide by zero"
+
+        }
+
+
+
+        return Normalize.apply(
+            result
         );
 
     }
 
 
-    const result =
-        BigNumber.one();
 
+    /**
+     * 逆数累乗
+     */
 
-    return result.divide(number);
-
-}
-
-
-
-/**
- * 10の指数乗
- *
- * 10^n をBigNumber形式で生成
- */
-
-export function tenPower(exponent) {
-
-
-    return new BigNumber(
-        1,
+    static inverse(
+        value,
         exponent
-    );
+    ) {
+
+
+        const result =
+            BigNumber.one();
+
+
+        for (
+            let i = 0;
+            i < exponent;
+            i++
+        ) {
+
+
+            result.divide(
+                value
+            );
+
+
+        }
+
+
+        return Normalize.apply(
+            result
+        );
+
+    }
+
+
+
+    /**
+     * 指数増加用
+     *
+     * 10^n
+     */
+
+    static tenPower(
+        exponent
+    ) {
+
+
+        return new BigNumber(
+
+            1,
+
+            exponent
+
+        );
+
+    }
+
+
+
+    /**
+     * 平方根近似
+     */
+
+    static sqrt(
+        value
+    ) {
+
+
+        const number =
+            BigNumber.from(
+                value
+            )
+            .toNumber();
+
+
+
+        return BigNumber.from(
+
+            Math.sqrt(
+                number
+            )
+
+        );
+
+    }
+
 
 }
 
 
-
-/**
- * 指数増加
- *
- * 現在値 × 10^amount
- */
-
-export function scale(value, amount) {
-
-
-    const result =
-        BigNumber.from(value);
-
-
-    result.exponent += amount;
-
-
-    return result.normalize();
-
-}
+export default Power;
