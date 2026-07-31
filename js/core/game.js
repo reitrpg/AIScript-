@@ -2,7 +2,7 @@
  * World Creator
  * Game Core
  *
- * ゲーム進行管理
+ * Operation Check Version
  */
 
 
@@ -29,6 +29,7 @@ class Game {
 
         this.running = false;
 
+
         this.initialized = false;
 
 
@@ -36,43 +37,40 @@ class Game {
 
 
 
-    /**
-     * 初期化
-     */
-
     init() {
 
 
         if (
+
             this.initialized
+
         ) {
+
 
             return;
 
+
         }
-
-
-
-        ResourceManager.init();
-
-        WorldManager.init();
 
 
 
         this.bind();
 
 
-
         this.initialized = true;
+
+
+
+        console.log(
+
+            "[Game] Ready"
+
+        );
 
 
     }
 
 
-
-    /**
-     * イベント登録
-     */
 
     bind() {
 
@@ -112,28 +110,18 @@ class Game {
 
 
 
-    /**
-     * 開始
-     */
-
     start() {
 
 
         if (
-            !this.initialized
-        ) {
 
-            this.init();
-
-        }
-
-
-
-        if (
             this.running
+
         ) {
+
 
             return;
+
 
         }
 
@@ -142,16 +130,21 @@ class Game {
         this.running = true;
 
 
+
         time.start();
+
+
+
+        console.log(
+
+            "[Game] Running"
+
+        );
 
 
     }
 
 
-
-    /**
-     * 停止
-     */
 
     stop() {
 
@@ -169,18 +162,18 @@ class Game {
 
 
 
-    /**
-     * 1Tick処理
-     */
-
     update() {
 
 
         if (
+
             !this.running
+
         ) {
 
+
             return;
+
 
         }
 
@@ -229,18 +222,16 @@ class Game {
 
 
 
-    /**
-     * 保存
-     */
-
     save() {
 
 
         save.save({
 
+
             resources:
 
                 ResourceManager.toJSON(),
+
 
 
             world:
@@ -248,41 +239,35 @@ class Game {
                 WorldManager.toJSON(),
 
 
+
             time:
 
                 time.toJSON()
 
 
+
         });
+
+
+
+        console.log(
+
+            "[Game] Saved"
+
+        );
 
 
     }
 
 
-
-    /**
-     * 読込
-     */
-
-    load() {
-
-
-        const data =
-
-            save.load();
+}
 
 
 
-        if (!data) {
+const game =
 
-            return;
-
-        }
+    new Game();
 
 
 
-        ResourceManager.load(
-
-            data.resources
-
-        );
+export default game;
