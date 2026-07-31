@@ -1,59 +1,136 @@
 /**
  * World Creator
- * BigNumber Core
+ * BigNumber
  *
  * 完全自作巨大数クラス
- *
- * 表現:
- * value × 10^exponent
- *
- * 例:
- * 12345
- * = 12.345 × 10^3
  */
 
 
-import {
-    MIN_MANTISSA,
-    MAX_MANTISSA,
-    ZERO,
-    ONE
-} from "./Constants.js";
+import Constants from "./Constants.js";
 
 
 class BigNumber {
 
 
-    constructor(value = 0, exponent = 0) {
+    constructor(
+        value = 0,
+        exponent = 0
+    ) {
 
-        this.value = Number(value);
 
-        this.exponent = Number(exponent);
+        this.value =
+            Number(value);
+
+
+        this.exponent =
+            Number(exponent);
+
 
         this.normalize();
 
     }
 
 
+
     /**
-     * 数値正規化
+     * 生成
+     */
+
+    static from(value) {
+
+
+        if (
+            value instanceof BigNumber
+        ) {
+
+            return value.clone();
+
+        }
+
+
+        if (
+            typeof value === "object"
+            &&
+            value !== null
+        ) {
+
+
+            return new BigNumber(
+
+                value.value,
+
+                value.exponent
+
+            );
+
+        }
+
+
+        return new BigNumber(
+            value
+        );
+
+    }
+
+
+
+    /**
+     * 0
+     */
+
+    static zero() {
+
+        return new BigNumber(
+            0
+        );
+
+    }
+
+
+
+    /**
+     * 1
+     */
+
+    static one() {
+
+        return new BigNumber(
+            1
+        );
+
+    }
+
+
+
+    /**
+     * 複製
+     */
+
+    clone() {
+
+
+        return new BigNumber(
+
+            this.value,
+
+            this.exponent
+
+        );
+
+    }
+
+
+
+    /**
+     * 正規化
      */
 
     normalize() {
 
 
-        if (!Number.isFinite(this.value)) {
-
-            this.value = 0;
-
-            this.exponent = 0;
-
-            return this;
-
-        }
-
-
-        if (this.value === ZERO) {
+        if (
+            this.value === 0
+        ) {
 
             this.exponent = 0;
 
@@ -62,7 +139,12 @@ class BigNumber {
         }
 
 
-        while (Math.abs(this.value) >= MAX_MANTISSA) {
+        while (
+            Math.abs(this.value)
+            >=
+            Constants.NORMALIZE_THRESHOLD
+        ) {
+
 
             this.value /= 1000;
 
@@ -72,13 +154,15 @@ class BigNumber {
 
 
         while (
-            Math.abs(this.value) < MIN_MANTISSA &&
-            this.exponent > 0
+            Math.abs(this.value)
+            < 1
         ) {
+
 
             this.value *= 1000;
 
             this.exponent -= 3;
+
 
         }
 
@@ -88,218 +172,62 @@ class BigNumber {
     }
 
 
-    /**
-     * コピー
-     */
-
-    clone() {
-
-        return new BigNumber(
-            this.value,
-            this.exponent
-        );
-
-    }
-
 
     /**
      * 加算
      */
 
-    add(target) {
-
-        const num =
-            BigNumber.from(target);
+    add(value) {
 
 
-        if (num.value === 0) {
-
-            return this;
-
-        }
-
-
-        if (this.value === 0) {
-
-            this.value = num.value;
-
-            this.exponent = num.exponent;
-
-            return this;
-
-        }
-
-
-        const diff =
-            this.exponent - num.exponent;
-
-
-        if (diff >= 12) {
-
-            return this.normalize();
-
-        }
-
-
-        if (diff < 0) {
-
-            const temp = this;
-
-            this.value = num.value;
-
-            this.exponent = num.exponent;
-
-            return this.add(temp);
-
-        }
-
-
-        this.value +=
-            num.value *
-            Math.pow(10, -diff);
-
-
-        return this.normalize();
-
-    }
-
-
-    /**
-     * 減算
-     */
-
-    subtract(target) {
-
-        return this.add(
-            BigNumber.from(target).multiply(-1)
-        );
-
-    }
-
-
-    /**
-     * 乗算
-     */
-
-    multiply(target) {
-
-        const num =
-            BigNumber.from(target);
-
-
-        this.value *= num.value;
-
-        this.exponent += num.exponent;
-
-
-        return this.normalize();
-
-    }
-
-
-    /**
-     * 除算
-     */
-
-    divide(target) {
-
-        const num =
-            BigNumber.from(target);
-
-
-        if (num.value === 0) {
-
-            throw new Error(
-                "Division by zero"
+        const target =
+            BigNumber.from(
+                value
             );
 
-        }
+
+        if (
+            this.exponent ===
+            target.exponent
+        ) {
 
 
-        this.value /= num.value;
+            this.value +=
+                target.value;
 
-        this.exponent -= num.exponent;
-
-
-        return this.normalize();
-
-    }
-
-
-    /**
-     * 通常数値化
-     */
-
-    toNumber() {
-
-        return (
-            this.value *
-            Math.pow(10, this.exponent)
-        );
-
-    }
-
-
-    /**
-     * 文字列化
-     */
-
-    toString() {
-
-        if (this.value === 0) {
-
-            return "0";
 
         }
+        else {
 
 
-        return `${this.value}e${this.exponent}`;
-
-    }
-
-
-    /**
-     * 静的生成
-     */
-
-    static from(value) {
+            const diff =
+                this.exponent -
+                target.exponent;
 
 
-        if (value instanceof BigNumber) {
+            if (
+                diff > 0
+            ) {
 
-            return value.clone();
+                this.value +=
+                    target.value *
+                    Math.pow(
+                        10,
+                        -diff
+                    );
 
-        }
+            }
+            else {
 
-
-        return new BigNumber(value);
-
-    }
-
-
-    /**
-     * ゼロ
-     */
-
-    static zero() {
-
-        return new BigNumber(0);
-
-    }
-
-
-    /**
-     * 1
-     */
-
-    static one() {
-
-        return new BigNumber(ONE);
-
-    }
+                this.value =
+                    this.value *
+                    Math.pow(
+                        10,
+                        diff
+                    )
+                    +
+                    target.value;
 
 
-}
-
-
-export default BigNumber;
+                this.exponent =
+                    target.exponent
