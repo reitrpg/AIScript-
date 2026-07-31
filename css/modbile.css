@@ -1,91 +1,114 @@
+/*
+ World Creator
+ Mobile Style
+*/
+
+
 @media screen and (max-width: 768px) {
 
 
-    /*
-        Base
-    */
 
-    html,
-    body {
+    #app {
 
-        font-size: 14px;
+        padding:
+
+            8px;
 
     }
 
 
-    /*
-        Header
-    */
-
-    #app-header {
-
-        height: 48px;
-
-        padding: 0 12px;
-
-    }
 
 
-    #app-header h1 {
 
-        font-size: 18px;
+    .header {
 
-    }
+        flex-direction:
 
+            column;
 
-    /*
-        Navigation
-    */
+        align-items:
 
-    #app-nav {
+            flex-start;
 
-        overflow-x: auto;
+        gap:
 
-        white-space: nowrap;
+            8px;
 
     }
 
 
-    /*
-        Main
-    */
-
-    #app-main {
-
-        padding: 10px;
-
-    }
 
 
-    /*
-        Footer
-    */
-
-    #app-footer {
-
-        height: 36px;
-
-    }
-
-
-    /*
-        Components
-    */
 
     .panel {
 
-        padding: 12px;
+        padding:
 
-        border-radius: 6px;
+            12px;
+
+        margin-top:
+
+            8px;
 
     }
+
+
+
+
+
+    .resource {
+
+        flex-direction:
+
+            column;
+
+        gap:
+
+            6px;
+
+    }
+
+
+
 
 
     button {
 
-        padding: 10px 14px;
+        width:
 
-        font-size: 14px;
+            100%;
+
+        padding:
+
+            12px;
+
+    }
+
+
+
+
+
+    .tabs {
+
+        overflow-x:
+
+            auto;
+
+        width:
+
+            100%;
+
+    }
+
+
+
+
+
+    .tab {
+
+        flex:
+
+            0 0 auto;
 
     }
 
