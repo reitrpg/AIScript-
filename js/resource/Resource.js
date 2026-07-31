@@ -2,160 +2,157 @@
  * World Creator
  * Resource
  *
- * 資源オブジェクト管理
+ * 個別資源管理
  */
 
 
 import BigNumber from "../number/BigNumber.js";
 
 
+
 class Resource {
 
 
-    constructor(id, name, amount = 0) {
+    constructor(
+        id,
+        name,
+        value = 0
+    ) {
 
-        this.id = id;
 
-        this.name = name;
+        this.id =
+            id;
+
+
+        this.name =
+            name;
+
 
         this.amount =
-            BigNumber.from(amount);
+            BigNumber.from(
+                value
+            );
+
 
     }
+
 
 
     /**
-     * 増加
+     * 追加
      */
 
-    add(value) {
+    add(
+        value
+    ) {
 
-        this.amount.add(value);
 
-        return this.amount;
+        this.amount.add(
+            value
+        );
+
 
     }
+
 
 
     /**
-     * 減少
+     * 消費
      */
 
-    subtract(value) {
-
-        this.amount.subtract(value);
-
-        if (
-            this.amount.value < 0
-        ) {
-
-            this.amount =
-                BigNumber.zero();
-
-        }
+    remove(
+        value
+    ) {
 
 
-        return this.amount;
+        this.amount.subtract(
+            value
+        );
+
 
     }
 
-
-    /**
-     * 設定
-     */
-
-    set(value) {
-
-        this.amount =
-            BigNumber.from(value);
-
-    }
 
 
     /**
      * 取得
      */
 
-    get() {
+    getValue() {
+
 
         return this.amount;
 
     }
 
 
+
     /**
-     * 使用可能確認
+     * 数値表示
      */
 
-    canAfford(value) {
+    display() {
+
 
         return (
-            this.amount.compare
+
+            this.amount.value
+
+            +
+
+            "e"
+
+            +
+
+            this.amount.exponent
+
         );
+
 
     }
 
 
+
     /**
-     * 保存用データ
+     * 保存
      */
 
     toJSON() {
 
+
         return {
 
-            id: this.id,
 
-            name: this.name,
+            id:
+                this.id,
 
-            amount: {
 
-                value:
-                    this.amount.value,
+            name:
+                this.name,
 
-                exponent:
-                    this.amount.exponent
 
-            }
+            amount:
+                this.amount.toJSON()
+
 
         };
 
+
     }
+
 
 
     /**
      * 復元
      */
 
-    load(data) {
-
-        if (!data) {
-
-            return;
-
-        }
+    static fromJSON(data) {
 
 
-        this.id =
-            data.id;
+        return new Resource(
 
-        this.name =
-            data.name;
+            data.id,
 
+            data.name,
 
-        this.amount =
-            new BigNumber(
-
-                data.amount.value,
-
-                data.amount.exponent
-
-            );
-
-    }
-
-
-}
-
-
-export default Resource;
+            BigNumber
