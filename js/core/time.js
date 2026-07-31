@@ -2,7 +2,7 @@
  * World Creator
  * Time System
  *
- * ゲーム時間管理
+ * Stable Tick Version
  */
 
 
@@ -25,9 +25,7 @@ class TimeManager {
         this.tick = 0;
 
 
-        this.lastTime =
-
-            Date.now();
+        this.lastTime = Date.now();
 
 
         this.running = false;
@@ -37,18 +35,18 @@ class TimeManager {
 
 
 
-    /**
-     * 開始
-     */
-
     start() {
 
 
         if (
+
             this.running
+
         ) {
 
+
             return;
+
 
         }
 
@@ -57,36 +55,36 @@ class TimeManager {
         this.running = true;
 
 
-        this.lastTime =
-
-            Date.now();
+        this.lastTime = Date.now();
 
 
 
-        this.interval =
+        this.interval = setInterval(
 
-            setInterval(
-
-                () => {
+            () => {
 
 
-                    this.update();
+                this.update();
 
 
-                },
+            },
 
-                this.tickRate
+            this.tickRate
 
-            );
+        );
+
+
+
+        console.log(
+
+            "[Time] Started"
+
+        );
 
 
     }
 
 
-
-    /**
-     * 停止
-     */
 
     stop() {
 
@@ -96,7 +94,9 @@ class TimeManager {
 
 
         if (
+
             this.interval
+
         ) {
 
 
@@ -117,19 +117,27 @@ class TimeManager {
 
 
 
-    /**
-     * 時間更新
-     */
-
     update() {
+
+
+        if (
+
+            !this.running
+
+        ) {
+
+
+            return;
+
+
+        }
+
 
 
         this.tick++;
 
 
-        this.lastTime =
-
-            Date.now();
+        this.lastTime = Date.now();
 
 
 
@@ -143,7 +151,6 @@ class TimeManager {
 
                     this.tick
 
-
             }
 
         );
@@ -152,32 +159,6 @@ class TimeManager {
     }
 
 
-
-    /**
-     * オフライン時間計算
-     */
-
-    getOfflineTime() {
-
-
-        return (
-
-            Date.now()
-
-            -
-
-            this.lastTime
-
-        );
-
-
-    }
-
-
-
-    /**
-     * 保存用
-     */
 
     toJSON() {
 
@@ -202,16 +183,18 @@ class TimeManager {
 
 
 
-    /**
-     * 復元
-     */
-
     load(data) {
 
 
-        if (!data) {
+        if (
+
+            !data
+
+        ) {
+
 
             return;
+
 
         }
 
@@ -219,9 +202,7 @@ class TimeManager {
 
         this.tick =
 
-            data.tick
-
-            ??
+            data.tick ??
 
             0;
 
@@ -229,14 +210,13 @@ class TimeManager {
 
         this.lastTime =
 
-            data.lastTime
-
-            ??
+            data.lastTime ??
 
             Date.now();
 
 
     }
+
 
 
 }
