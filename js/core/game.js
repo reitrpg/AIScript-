@@ -2,18 +2,22 @@
  * World Creator
  * Game Core
  *
- * ゲーム全体管理
+ * ゲーム進行管理
  */
 
 
 import eventBus from "./eventBus.js";
-import Save from "./save.js";
-import Time from "./time.js";
+import save from "./save.js";
+import time from "./time.js";
 
 import ResourceManager from "../resource/Manager.js";
+import Converter from "../resource/Converter.js";
+
 import WorldManager from "../world/Manager.js";
+
 import UpgradeManager from "../upgrade/Manager.js";
 import ResearchManager from "../research/Manager.js";
+
 
 
 class Game {
@@ -27,14 +31,6 @@ class Game {
         this.running = false;
 
 
-        this.save =
-            Save;
-
-
-        this.time =
-            Time;
-
-
     }
 
 
@@ -46,22 +42,31 @@ class Game {
     init() {
 
 
-        if (this.initialized) {
+        if (
+            this.initialized
+        ) {
 
             return;
 
         }
 
 
+
         ResourceManager.init();
+
+
+        WorldManager.init();
+
 
         UpgradeManager.init();
 
 
-        this.load();
+        ResearchManager.init();
 
 
-        this.bindEvents();
+
+        this.bind();
+
 
 
         this.initialized = true;
@@ -72,6 +77,7 @@ class Game {
             "game:initialized"
         );
 
+
     }
 
 
@@ -80,7 +86,7 @@ class Game {
      * イベント接続
      */
 
-    bindEvents() {
+    bind() {
 
 
         eventBus.on(
@@ -89,11 +95,14 @@ class Game {
 
             () => {
 
+
                 this.update();
+
 
             }
 
         );
+
 
     }
 
@@ -106,29 +115,37 @@ class Game {
     start() {
 
 
-        if (!this.initialized) {
+        if (
+            !this.initialized
+        ) {
 
             this.init();
 
         }
 
 
-        if (this.running) {
+
+        if (
+            this.running
+        ) {
 
             return;
 
         }
 
 
+
         this.running = true;
 
 
-        this.time.start();
+        time.start();
+
 
 
         eventBus.emit(
             "game:start"
         );
+
 
     }
 
@@ -144,40 +161,82 @@ class Game {
         this.running = false;
 
 
-        this.time.stop();
+        time.stop();
 
 
         this.saveGame();
 
-
-        eventBus.emit(
-            "game:stop"
-        );
 
     }
 
 
 
     /**
-     * 更新
+     * Tick更新
      */
 
     update() {
 
 
-        if (!this.running) {
+        if (
+            !this.running
+        ) {
 
             return;
 
         }
 
 
+
+        /*
+            資源生産
+        */
+
+
+        ResourceManager.add(
+
+            "wood",
+
+            1
+
+        );
+
+
+
+        ResourceManager.add(
+
+            "stone",
+
+            1
+
+        );
+
+
+
+        /*
+            変換処理
+        */
+
+
+        Converter.tick();
+
+
+
+        /*
+            世界更新
+        */
+
+
         WorldManager.update();
 
 
+
         eventBus.emit(
+
             "game:update"
+
         );
+
 
     }
 
@@ -190,35 +249,35 @@ class Game {
     saveGame() {
 
 
-        const data = {
-
+        save.save({
 
             resources:
+
                 ResourceManager.toJSON(),
 
 
             worlds:
+
                 WorldManager.toJSON(),
 
 
             upgrades:
+
                 UpgradeManager.toJSON(),
 
 
             research:
+
                 ResearchManager.toJSON(),
 
 
             time:
-                this.time.toJSON()
+
+                time.toJSON()
 
 
-        };
+        });
 
-
-        this.save.save(
-            data
-        );
 
     }
 
@@ -232,7 +291,8 @@ class Game {
 
 
         const data =
-            this.save.load();
+            save.load();
+
 
 
         if (!data) {
@@ -253,40 +313,10 @@ class Game {
         );
 
 
-        UpgradeManager.load(
-            data.upgrades
-        );
-
-
-        ResearchManager.load(
-            data.research
-        );
-
-
-        this.time.load(
+        time.load(
             data.time
         );
 
-    }
-
-
-
-    /**
-     * 状態取得
-     */
-
-    getState() {
-
-
-        return {
-
-            initialized:
-                this.initialized,
-
-            running:
-                this.running
-
-        };
 
     }
 
@@ -296,7 +326,9 @@ class Game {
 
 
 const game =
+
     new Game();
+
 
 
 export default game;
