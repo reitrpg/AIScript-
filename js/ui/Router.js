@@ -1,12 +1,9 @@
 /**
  * World Creator
- * UI Router
+ * Router
  *
- * SPA画面切替管理
+ * 画面切替管理
  */
-
-
-import eventBus from "../core/eventBus.js";
 
 
 class Router {
@@ -14,9 +11,11 @@ class Router {
 
     constructor() {
 
-        this.routes = new Map();
+
+        this.routes = {};
 
         this.current = null;
+
 
     }
 
@@ -26,12 +25,32 @@ class Router {
      * ルート登録
      */
 
-    register(path, callback) {
+    register(
+        path,
+        callback
+    ) {
 
 
-        this.routes.set(
-            path,
-            callback
+        this.routes[path] =
+
+            callback;
+
+
+    }
+
+
+
+    /**
+     * 初期化
+     */
+
+    init(path = "/") {
+
+
+        this.navigate(
+
+            path
+
         );
 
 
@@ -46,95 +65,40 @@ class Router {
     navigate(path) {
 
 
+        this.current =
+
+            path;
+
+
+
         const route =
-            this.routes.get(path);
+
+            this.routes[path];
 
 
-        if (!route) {
 
-            return false;
+        if (route) {
+
+
+            route();
+
 
         }
 
 
-        this.current =
-            path;
-
-
-        route();
-
-
-        eventBus.emit(
-            "router:changed",
-            path
-        );
-
-
-        return true;
-
     }
 
 
 
     /**
-     * 現在取得
+     * 現在ページ
      */
 
     getCurrent() {
 
+
         return this.current;
 
-    }
-
-
-
-    /**
-     * 初期化
-     */
-
-    init(defaultPath = "/") {
-
-
-        window.addEventListener(
-            "hashchange",
-            () => {
-
-                const path =
-                    location.hash.substring(1)
-                    || defaultPath;
-
-
-                this.navigate(
-                    path
-                );
-
-            }
-        );
-
-
-
-        const initial =
-            location.hash.substring(1)
-            || defaultPath;
-
-
-        this.navigate(
-            initial
-        );
-
-    }
-
-
-
-    /**
-     * URL変更
-     */
-
-    go(path) {
-
-
-        location.hash =
-            path;
 
     }
 
@@ -144,7 +108,9 @@ class Router {
 
 
 const router =
+
     new Router();
+
 
 
 export default router;
