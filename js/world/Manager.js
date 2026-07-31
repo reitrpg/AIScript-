@@ -6,9 +6,8 @@
  */
 
 
-import Generator from "./Generator.js";
-import World from "./World.js";
 import eventBus from "../core/eventBus.js";
+import BigNumber from "../number/BigNumber.js";
 
 
 class WorldManager {
@@ -16,27 +15,79 @@ class WorldManager {
 
     constructor() {
 
-        this.worlds = new Map();
+
+        this.worlds = [];
 
         this.activeWorld = null;
+
+        this.initialized = false;
 
     }
 
 
 
     /**
-     * 世界作成
+     * 初期化
      */
 
-    create(type = "normal") {
+    init() {
 
 
-        const world =
-            Generator.generate(type);
+        if (this.initialized) {
+
+            return;
+
+        }
 
 
-        this.worlds.set(
-            world.id,
+        this.initialized = true;
+
+
+    }
+
+
+
+    /**
+     * 世界生成
+     */
+
+    createWorld() {
+
+
+        const world = {
+
+
+            id:
+
+                Date.now()
+                .toString(),
+
+
+            level:
+
+                1,
+
+
+            age:
+
+                BigNumber.from(0),
+
+
+            population:
+
+                0,
+
+
+            created:
+
+                Date.now()
+
+
+        };
+
+
+
+        this.worlds.push(
             world
         );
 
@@ -45,97 +96,17 @@ class WorldManager {
             world;
 
 
+
         eventBus.emit(
-            "world:registered",
+
+            "world:created",
+
             world
+
         );
 
 
         return world;
-
-    }
-
-
-
-    /**
-     * 世界追加
-     */
-
-    add(world) {
-
-
-        if (!(world instanceof World)) {
-
-            return false;
-
-        }
-
-
-        this.worlds.set(
-            world.id,
-            world
-        );
-
-
-        return true;
-
-    }
-
-
-
-    /**
-     * 現在世界取得
-     */
-
-    getActive() {
-
-        return this.activeWorld;
-
-    }
-
-
-
-    /**
-     * 世界切替
-     */
-
-    switch(id) {
-
-
-        const world =
-            this.worlds.get(id);
-
-
-        if (!world) {
-
-            return false;
-
-        }
-
-
-        this.activeWorld =
-            world;
-
-
-        eventBus.emit(
-            "world:changed",
-            world
-        );
-
-
-        return true;
-
-    }
-
-
-
-    /**
-     * 全世界取得
-     */
-
-    getAll() {
-
-        return this.worlds;
 
     }
 
@@ -148,107 +119,15 @@ class WorldManager {
     update() {
 
 
-        if (!this.activeWorld) {
-
-            return;
-
-        }
-
-
-        this.activeWorld.tick();
-
-    }
-
-
-
-    /**
-     * 保存用
-     */
-
-    toJSON() {
-
-
-        const data = {};
-
-
-        for (
-            const [id, world]
-            of this.worlds
+        if (
+            !this.activeWorld
         ) {
 
-            data[id] =
-                world.toJSON();
-
-        }
-
-
-        return {
-
-            worlds: data,
-
-            active:
-                this.activeWorld
-                    ? this.activeWorld.id
-                    : null
-
-        };
-
-    }
-
-
-
-    /**
-     * 復元
-     */
-
-    load(data) {
-
-
-        if (!data) {
-
             return;
 
         }
 
 
-        for (const id in data.worlds) {
-
-
-            const world =
-                new World();
-
-
-            world.load(
-                data.worlds[id]
-            );
-
-
-            this.worlds.set(
-                id,
-                world
-            );
-
-        }
-
-
-
-        if (data.active) {
-
-            this.activeWorld =
-                this.worlds.get(
-                    data.active
-                );
-
-        }
-
-    }
-
-
-}
-
-
-const manager =
-    new WorldManager();
-
-
-export default manager;
+        this.activeWorld.age.add(
+            1
+       
