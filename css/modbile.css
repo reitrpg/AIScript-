@@ -4,12 +4,26 @@
 */
 
 
-@media screen and (max-width: 768px) {
+/*
+ スマホ専用調整
+*/
+
+
+@media screen and (max-width:600px) {
+
+
+    body {
+
+        font-size: 14px;
+
+    }
 
 
 
     #app {
 
+        width: 100%;
+
         padding:
 
             8px;
@@ -18,33 +32,53 @@
 
 
 
+    .header h1 {
 
+        font-size:
 
-    .header {
-
-        flex-direction:
-
-            column;
-
-        align-items:
-
-            flex-start;
-
-        gap:
-
-            8px;
+            22px;
 
     }
-
-
 
 
 
     .panel {
 
+        margin-bottom:
+
+            12px;
+
         padding:
 
             12px;
+
+        border-radius:
+
+            10px;
+
+    }
+
+
+
+    .panel h2 {
+
+        font-size:
+
+            18px;
+
+    }
+
+
+
+    button {
+
+        min-height:
+
+            48px;
+
+        font-size:
+
+            17px;
 
         margin-top:
 
@@ -54,61 +88,35 @@
 
 
 
+    #resource-list div {
 
 
-    .resource {
+        display:
 
-        flex-direction:
-
-            column;
-
-        gap:
-
-            6px;
-
-    }
+            flex;
 
 
+        justify-content:
 
+            space-between;
 
-
-    button {
-
-        width:
-
-            100%;
 
         padding:
 
-            12px;
+            10px 6px;
+
 
     }
 
 
 
+    #world-info {
 
 
-    .tabs {
+        font-size:
 
-        overflow-x:
+            15px;
 
-            auto;
-
-        width:
-
-            100%;
-
-    }
-
-
-
-
-
-    .tab {
-
-        flex:
-
-            0 0 auto;
 
     }
 
