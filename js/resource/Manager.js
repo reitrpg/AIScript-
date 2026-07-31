@@ -2,12 +2,14 @@
  * World Creator
  * Resource Manager
  *
- * 資源管理システム
+ * 資源全体管理
  */
 
 
-import BigNumber from "../number/BigNumber.js";
+import Resource from "./Resource.js";
+
 import eventBus from "../core/eventBus.js";
+
 
 
 class ResourceManager {
@@ -18,7 +20,9 @@ class ResourceManager {
 
         this.resources = {};
 
+
         this.initialized = false;
+
 
     }
 
@@ -31,34 +35,57 @@ class ResourceManager {
     init() {
 
 
-        if (this.initialized) {
+        if (
+            this.initialized
+        ) {
 
             return;
 
         }
 
 
-        this.create(
+
+        this.register(
+
             "wood",
+
+            "Wood",
+
             0
+
         );
 
 
-        this.create(
+        this.register(
+
             "stone",
+
+            "Stone",
+
             0
+
         );
 
 
-        this.create(
+        this.register(
+
             "food",
+
+            "Food",
+
             0
+
         );
 
 
-        this.create(
+        this.register(
+
             "mana",
+
+            "Mana",
+
             0
+
         );
 
 
@@ -71,18 +98,26 @@ class ResourceManager {
 
 
     /**
-     * 資源作成
+     * 資源登録
      */
 
-    create(
+    register(
         id,
+        name,
         value = 0
     ) {
 
 
         this.resources[id] =
-            BigNumber.from(
+
+            new Resource(
+
+                id,
+
+                name,
+
                 value
+
             );
 
 
@@ -94,23 +129,31 @@ class ResourceManager {
      * 取得
      */
 
-    get(
-        id
-    ) {
+    get(id) {
 
 
         if (
             !this.resources[id]
         ) {
 
-            this.create(
-                id
+
+            this.register(
+
+                id,
+
+                id,
+
+                0
+
             );
+
 
         }
 
 
+
         return this.resources[id];
+
 
     }
 
@@ -126,22 +169,35 @@ class ResourceManager {
     ) {
 
 
-        this.get(
-            id
-        )
-        .add(
+        const resource =
+
+            this.get(id);
+
+
+
+        resource.add(
             amount
         );
 
 
+
         eventBus.emit(
+
             "resource:update",
+
             {
+
                 id,
+
                 value:
-                    this.get(id)
+
+                    resource.getValue()
+
+
             }
+
         );
+
 
     }
 
@@ -157,10 +213,13 @@ class ResourceManager {
     ) {
 
 
-        this.get(
-            id
-        )
-        .subtract(
+        const resource =
+
+            this.get(id);
+
+
+
+        resource.remove(
             amount
         );
 
@@ -181,21 +240,15 @@ class ResourceManager {
 
 
         for (
-            const key in this.resources
+            const id in this.resources
         ) {
 
 
-            result[key] =
-                this.resources[key]
-                    .toString
-                    ?
+            result[id] =
 
-                    this.resources[key]
-                        .toString()
+                this.resources[id]
+                    .display();
 
-                    :
-
-                    this.resources[key];
 
         }
 
@@ -203,12 +256,13 @@ class ResourceManager {
 
         return result;
 
+
     }
 
 
 
     /**
-     * 保存用
+     * 保存
      */
 
     toJSON() {
@@ -219,19 +273,22 @@ class ResourceManager {
 
 
         for (
-            const key in this.resources
+            const id in this.resources
         ) {
 
 
-            data[key] =
-                this.resources[key]
+            data[id] =
+
+                this.resources[id]
                     .toJSON();
+
 
         }
 
 
 
         return data;
+
 
     }
 
@@ -252,15 +309,24 @@ class ResourceManager {
 
 
 
+        this.resources = {};
+
+
+
         for (
-            const key in data
+            const id in data
         ) {
 
 
-            this.resources[key] =
-                BigNumber.from(
-                    data[key]
-                );
+            this.resources[id] =
+
+                Resource
+                    .fromJSON(
+
+                        data[id]
+
+                    );
+
 
         }
 
@@ -268,13 +334,14 @@ class ResourceManager {
     }
 
 
-
 }
 
 
 
 const resourceManager =
+
     new ResourceManager();
+
 
 
 export default resourceManager;
