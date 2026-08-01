@@ -2,7 +2,7 @@
  * World Creator
  * Resource Manager
  *
- * World Production Integration
+ * World Resource Integration
  */
 
 
@@ -37,54 +37,6 @@ class ResourceManager {
             return;
 
         }
-
-
-
-        this.create(
-
-            "wood",
-
-            "Wood",
-
-            1
-
-        );
-
-
-
-        this.create(
-
-            "stone",
-
-            "Stone",
-
-            1
-
-        );
-
-
-
-        this.create(
-
-            "food",
-
-            "Food",
-
-            0
-
-        );
-
-
-
-        this.create(
-
-            "mana",
-
-            "Mana",
-
-            0
-
-        );
 
 
 
@@ -130,44 +82,63 @@ class ResourceManager {
 
 
 
-    add(
-
-        id,
-
-        value
-
-    ){
+    syncWorldResources(){
 
 
-        if(this.resources[id]){
+        const world =
+
+        WorldManager.getCurrent();
 
 
-            this.resources[id]
 
-            .add(value);
+        if(!world || !world.resources){
 
+            return;
 
         }
 
 
-    }
+
+        for(
+
+            const id in world.resources
+
+        ){
 
 
-
-    get(id){
-
-
-        return this.resources[id];
+            if(!this.resources[id]){
 
 
-    }
+                this.create(
+
+                    id,
+
+                    id,
+
+                    world.resources[id].base
+
+                );
 
 
+            }
 
-    getAll(){
+
+            else{
 
 
-        return this.resources;
+                this.resources[id]
+
+                .setProduction(
+
+                    world.resources[id].base
+
+                );
+
+
+            }
+
+
+        }
 
 
     }
@@ -185,44 +156,42 @@ class ResourceManager {
 
         if(!world){
 
-
             return 1;
-
 
         }
 
 
 
-        const levelBonus =
+        const level =
 
 
         Math.pow(
 
             1.05,
 
-            world.level - 1
+            world.level-1
 
         );
 
 
 
-        const rarityBonus =
+        const rarity =
 
         world.rarityMultiplier ?? 1;
 
 
 
-        const rebirthBonus =
+        const rebirth =
 
         world.rebirthMultiplier ?? 1;
 
 
 
-        const effectBonus =
+        const effect =
 
         this.getEffectMultiplier(
 
-            world
+            world.effects
 
         );
 
@@ -230,19 +199,19 @@ class ResourceManager {
 
         return (
 
-            levelBonus
+            level
 
             *
 
-            rarityBonus
+            rarity
 
             *
 
-            effectBonus
+            effect
 
             *
 
-            rebirthBonus
+            rebirth
 
         );
 
@@ -251,70 +220,66 @@ class ResourceManager {
 
 
 
-    getEffectMultiplier(world){
+    getEffectMultiplier(effects){
 
 
-        if(
-
-            !world.effects ||
-
-            world.effects.length===0
-
-        ){
+        let value = 1;
 
 
-            return 1;
 
+        if(!effects){
+
+            return value;
 
         }
 
 
 
-        let multiplier = 1;
-
-
-
-        world.effects.forEach(
+        effects.forEach(
 
             effect=>{
 
 
-                if(
-
-                    effect==="豊かな森"
-
-                ){
+                switch(effect){
 
 
-                    multiplier *= 1.2;
+                    case "豊かな森":
 
+                        value*=1.2;
 
-                }
+                        break;
 
 
 
-                if(
+                    case "鉱脈の大地":
 
-                    effect==="神代遺構"
+                        value*=1.3;
 
-                ){
-
-
-                    multiplier *= 1.4;
-
-
-                }
+                        break;
 
 
 
-                if(
+                    case "魔力循環":
 
-                    effect==="世界樹の核"
+                        value*=1.5;
 
-                ){
+                        break;
 
 
-                    multiplier *= 2;
+
+                    case "神代遺構":
+
+                        value*=1.4;
+
+                        break;
+
+
+
+                    case "世界樹の核":
+
+                        value*=2;
+
+                        break;
 
 
                 }
@@ -326,7 +291,7 @@ class ResourceManager {
 
 
 
-        return multiplier;
+        return value;
 
 
     }
@@ -334,6 +299,10 @@ class ResourceManager {
 
 
     update(){
+
+
+        this.syncWorldResources();
+
 
 
         const multiplier =
@@ -381,6 +350,50 @@ class ResourceManager {
 
 
 
+    get(id){
+
+
+        return this.resources[id];
+
+
+    }
+
+
+
+    add(
+
+        id,
+
+        value
+
+    ){
+
+
+        if(this.resources[id]){
+
+
+            this.resources[id]
+
+            .add(value);
+
+
+        }
+
+
+    }
+
+
+
+    getAll(){
+
+
+        return this.resources;
+
+
+    }
+
+
+
     toJSON(){
 
 
@@ -395,7 +408,7 @@ class ResourceManager {
         ){
 
 
-            data[id] =
+            data[id]=
 
             this.resources[id]
 
@@ -456,10 +469,4 @@ class ResourceManager {
 
 
 
-const resourceManager =
-
-new ResourceManager();
-
-
-
-export default resourceManager;
+export default new ResourceManager();
