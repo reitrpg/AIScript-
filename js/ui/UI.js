@@ -2,13 +2,15 @@
  * World Creator
  * Main UI
  *
- * Resource Display System
+ * World / Resource / EP Display
  */
 
 
 import WorldManager from "../world/Manager.js";
 
 import ResourceManager from "../resource/Manager.js";
+
+import EPManager from "../ep/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -84,6 +86,22 @@ class UI {
         );
 
 
+
+        eventBus.on(
+
+            "ep:update",
+
+            ()=>{
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
     }
 
 
@@ -120,33 +138,23 @@ class UI {
 
             "",
 
-
             "K",
-
 
             "M",
 
-
             "B",
-
 
             "T",
 
-
             "Qa",
-
 
             "Qi",
 
-
             "Sx",
-
 
             "Sp",
 
-
             "Oc"
-
 
         ];
 
@@ -227,6 +235,8 @@ class UI {
 
         let html=
 
+
+
         `
 
         <h2>
@@ -255,7 +265,17 @@ class UI {
 
         EXP:
 
-        ${this.formatNumber(world.exp)}
+        ${
+
+            this.formatNumber(
+
+                world.exp
+
+            )
+
+        }
+
+
 
         <br>
 
@@ -265,7 +285,29 @@ class UI {
 
         ${world.rebirthCount}
 
-        回
+
+
+        <hr>
+
+
+
+        <h3>
+
+        EP
+
+        </h3>
+
+
+
+        ${
+
+            this.formatNumber(
+
+                EPManager.get()
+
+            )
+
+        }
 
 
 
