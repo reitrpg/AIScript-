@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * World / Resource / Research / Converter
+ * Full Game Save
  */
 
 
@@ -28,7 +28,7 @@ class SaveManager {
 
 
 
-        this.version=3;
+        this.version=4;
 
 
     }
@@ -44,6 +44,12 @@ class SaveManager {
             version:
 
             this.version,
+
+
+
+            time:
+
+            Date.now(),
 
 
 
@@ -75,17 +81,37 @@ class SaveManager {
 
 
 
-        localStorage.setItem(
+        try{
 
-            this.key,
 
-            JSON.stringify(
+            localStorage.setItem(
 
-                data
+                this.key,
 
-            )
+                JSON.stringify(
 
-        );
+                    data
+
+                )
+
+            );
+
+
+        }
+
+        catch(error){
+
+
+            console.error(
+
+                "Save Error",
+
+                error
+
+            );
+
+
+        }
 
 
     }
@@ -210,7 +236,7 @@ class SaveManager {
 
             console.error(
 
-                "Save Load Error",
+                "Load Error",
 
                 error
 
