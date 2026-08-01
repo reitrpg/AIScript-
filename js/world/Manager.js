@@ -1,116 +1,126 @@
 /**
  * World Creator
- * Rebirth System
+ * World Save Compatibility
  *
- * Lv Based Multiplier
+ * Age Removal Migration
  */
 
 
-import eventBus from "../core/eventBus.js";
-
-import ResearchManager from "../research/Manager.js";
+load(data){
 
 
+    if(!data){
 
-rebirth(){
-
-
-    if(!this.current){
-
-        return false;
+        return;
 
     }
 
 
 
-    const level =
+    // 旧Ageデータ除外
 
-    this.current.level;
+    if(data.Age){
 
-
-
-    let researchBonus = 1;
-
-
-
-    const research =
-
-    ResearchManager
-
-    .getAll()
-
-    .rebirth;
-
-
-
-    if(research){
-
-
-        researchBonus =
-
-        Math.pow(
-
-            research.effect,
-
-            research.level
-
-        );
-
+        delete data.Age;
 
     }
 
 
 
-    const increase =
+    this.current={
 
 
-        (
+        name:
 
-            Math.pow(
+        data.name
 
-                level,
+        ??
 
-                2
-
-            )
-
-            /
-
-            100
-
-        )
-
-        *
-
-        researchBonus;
+        "Unknown World",
 
 
 
-    this.current.rebirthMultiplier *=
+        rarity:
 
+        data.rarity
 
-        increase;
+        ??
 
-
-
-    this.current.rebirthCount++;
-
-
-
-    this.current.level = 1;
-
-
-    this.current.exp = 0;
+        "Normal",
 
 
 
-    eventBus.emit(
+        rarityMultiplier:
 
-        "world:rebirth",
+        data.rarityMultiplier
 
-        this.current
+        ??
 
-    );
+        1,
+
+
+
+        level:
+
+        data.level
+
+        ??
+
+        1,
+
+
+
+        exp:
+
+        data.exp
+
+        ??
+
+        0,
+
+
+
+        rebirthCount:
+
+        data.rebirthCount
+
+        ??
+
+        0,
+
+
+
+        rebirthMultiplier:
+
+        data.rebirthMultiplier
+
+        ??
+
+        1,
+
+
+
+        resources:
+
+        data.resources
+
+        ??
+
+        {},
+
+
+
+        effects:
+
+        data.effects
+
+        ??
+
+        []
+
+
+
+    };
 
 
 
@@ -123,8 +133,79 @@ rebirth(){
     );
 
 
+}
 
-    return true;
+
+
+toJSON(){
+
+
+    if(!this.current){
+
+        return null;
+
+    }
+
+
+
+    return {
+
+
+        name:
+
+        this.current.name,
+
+
+
+        rarity:
+
+        this.current.rarity,
+
+
+
+        rarityMultiplier:
+
+        this.current.rarityMultiplier,
+
+
+
+        level:
+
+        this.current.level,
+
+
+
+        exp:
+
+        this.current.exp,
+
+
+
+        rebirthCount:
+
+        this.current.rebirthCount,
+
+
+
+        rebirthMultiplier:
+
+        this.current.rebirthMultiplier,
+
+
+
+        resources:
+
+        this.current.resources,
+
+
+
+        effects:
+
+        this.current.effects
+
+
+
+    };
 
 
 }
