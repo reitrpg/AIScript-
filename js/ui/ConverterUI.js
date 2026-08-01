@@ -4,9 +4,7 @@
  */
 
 
-import Converter from "../resource/Converter.js";
-
-import eventBus from "../core/eventBus.js";
+import Converter from "../converter/Converter.js";
 
 
 
@@ -28,7 +26,11 @@ class ConverterUI {
 
         this.area=
 
-        document.getElementById(id);
+        document.getElementById(
+
+            id
+
+        );
 
 
 
@@ -40,19 +42,27 @@ class ConverterUI {
 
 
 
-        this.render();
+        this.update();
 
 
     }
 
 
 
-    render(){
+    update(){
 
 
-        const recipes=
+        if(!this.area){
 
-        Converter.getRecipes();
+            return;
+
+        }
+
+
+
+        const list=
+
+        Converter.getAll();
 
 
 
@@ -62,201 +72,33 @@ class ConverterUI {
 
         for(
 
-            const id in recipes
+            const id in list
 
         ){
 
 
-            const recipe=
+            const data=
 
-            recipes[id];
-
-
-
-            html += `
+            list[id];
 
 
-            <div class="converter">
+
+            html+=`
+
+
+            <div class="converter-item">
 
 
             <h3>
 
-            ${id}
+            ${data.name}
 
             </h3>
 
 
-            必要素材
 
-            <br>
+            必要:
+
 
 
             ${
-
-                this.list(
-
-                    recipe.input
-
-                )
-
-            }
-
-
-            ↓
-
-
-            <br>
-
-
-            獲得素材
-
-            <br>
-
-
-            ${
-
-                this.list(
-
-                    recipe.output
-
-                )
-
-            }
-
-
-            <br>
-
-
-            <button
-
-            class="convert-button"
-
-            data-id="${id}">
-
-
-            変換
-
-
-            </button>
-
-
-            </div>
-
-
-            `;
-
-
-        }
-
-
-
-        this.area.innerHTML=
-
-        html;
-
-
-
-        this.bind();
-
-
-    }
-
-
-
-    list(data){
-
-
-        let text="";
-
-
-
-        for(
-
-            const id in data
-
-        ){
-
-
-            text +=
-
-            id
-
-            +
-
-            " : "
-
-            +
-
-            data[id]
-
-            +
-
-            "<br>";
-
-
-        }
-
-
-
-        return text;
-
-
-    }
-
-
-
-    bind(){
-
-
-        document
-
-        .querySelectorAll(
-
-            ".convert-button"
-
-        )
-
-        .forEach(
-
-            button=>{
-
-
-                button.onclick=()=>{
-
-
-                    Converter.convert(
-
-                        button.dataset.id
-
-                    );
-
-
-
-                    eventBus.emit(
-
-                        "resource:update"
-
-                    );
-
-
-
-                    this.render();
-
-
-                };
-
-
-            }
-
-        );
-
-
-    }
-
-
-
-}
-
-
-
-export default new ConverterUI();
