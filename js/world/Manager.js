@@ -2,7 +2,7 @@
  * World Creator
  * World Manager
  *
- * World Generation / Level / Rebirth System
+ * World Control System
  */
 
 
@@ -29,49 +29,37 @@ class WorldManager {
         this.world={
 
 
-            id:
-
-            Date.now(),
-
-
-
             level:1,
-
 
 
             exp:0,
 
 
-
-            rebirthCount:0,
-
-
-
-            rebirthMultiplier:1,
-
-
-
-            rarity:"normal",
-
+            rarity:"Normal",
 
 
             rarityMultiplier:1,
 
 
-
-            effects:[
-
+            effects:[],
 
 
-                "豊かな森"
+            rebirthCount:0,
 
 
-
-            ],
-
+            rebirthMultiplier:1,
 
 
             resources:{
+
+
+                food:{
+
+
+                    base:1
+
+
+                },
 
 
                 wood:{
@@ -83,19 +71,37 @@ class WorldManager {
                 },
 
 
-                stone:{
+                ore:{
 
 
-                    base:1
+                    base:0.5
 
 
                 },
 
 
-                food:{
+                mana:{
 
 
-                    base:1
+                    base:0
+
+
+                },
+
+
+                crystal:{
+
+
+                    base:0
+
+
+                },
+
+
+                worldCore:{
+
+
+                    base:0
 
 
                 }
@@ -104,18 +110,18 @@ class WorldManager {
             }
 
 
-
         };
 
 
 
         eventBus.emit(
 
-            "world:create",
-
-            this.world
+            "world:update"
 
         );
+
+
+        return this.world;
 
 
     }
@@ -146,17 +152,30 @@ class WorldManager {
 
         this.world.exp +=
 
-        value;
+        Number(value)
 
+        ||
+
+        0;
+
+
+
+        this.checkLevel();
+
+
+
+    }
+
+
+
+    checkLevel(){
 
 
         const need=
 
-        this.world.level
+        this.world.level *
 
-        *
-
-        10;
+        100;
 
 
 
@@ -167,7 +186,9 @@ class WorldManager {
         ){
 
 
-            this.world.exp -= need;
+            this.world.exp-=
+
+            need;
 
 
 
@@ -189,39 +210,6 @@ class WorldManager {
 
 
 
-    getRebirthIncrease(){
-
-
-        if(!this.world){
-
-
-            return 1;
-
-        }
-
-
-
-        return (
-
-            Math.pow(
-
-                this.world.level,
-
-                2
-
-            )
-
-            /
-
-            100
-
-        );
-
-
-    }
-
-
-
     rebirth(){
 
 
@@ -234,15 +222,25 @@ class WorldManager {
 
 
 
-        const increase=
+        const bonus=
 
-        this.getRebirthIncrease();
+        1+
+
+        (
+
+            this.world.level
+
+            *
+
+            0.01
+
+        );
 
 
 
         this.world.rebirthMultiplier*=
 
-        increase;
+        bonus;
 
 
 
@@ -253,90 +251,19 @@ class WorldManager {
         this.world.level=1;
 
 
-
         this.world.exp=0;
 
 
 
         eventBus.emit(
 
-            "world:rebirth",
-
-            this.world
+            "world:rebirth"
 
         );
 
 
 
         return true;
-
-
-    }
-
-
-
-    setRarity(
-
-        name,
-
-        multiplier
-
-    ){
-
-
-        if(!this.world){
-
-            return;
-
-        }
-
-
-
-        this.world.rarity=
-
-        name;
-
-
-
-        this.world.rarityMultiplier=
-
-        multiplier;
-
-
-    }
-
-
-
-    addEffect(effect){
-
-
-        if(!this.world){
-
-            return;
-
-        }
-
-
-
-        if(
-
-            !this.world.effects.includes(
-
-                effect
-
-            )
-
-        ){
-
-
-            this.world.effects.push(
-
-                effect
-
-            );
-
-
-        }
 
 
     }
@@ -356,13 +283,16 @@ class WorldManager {
     load(data){
 
 
-        if(data){
+        if(!data){
 
 
-            this.world=data;
-
+            return;
 
         }
+
+
+
+        this.world=data;
 
 
     }
