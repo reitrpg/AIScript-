@@ -1,221 +1,97 @@
-/**
- * World Creator
- * Time System
- *
- * Stable Tick Version
- */
-
-
 import eventBus from "./eventBus.js";
 
 
+class TimeManager{
 
-class TimeManager {
 
+constructor(){
 
-    constructor() {
+this.interval=null;
 
+this.tick=0;
 
-        this.interval = null;
+this.running=false;
 
+}
 
-        this.tickRate = 1000;
 
 
-        this.tick = 0;
+start(){
 
+if(this.running){
 
-        this.lastTime = Date.now();
+return;
 
+}
 
-        this.running = false;
 
+this.running=true;
 
-    }
 
+this.interval=setInterval(
 
+()=>{
 
-    start() {
+this.tick++;
 
+eventBus.emit(
+"time:tick",
+this.tick
+);
 
-        if (
 
-            this.running
+},
 
-        ) {
+1000
 
+);
 
-            return;
 
+}
 
-        }
 
 
+stop(){
 
-        this.running = true;
+this.running=false;
 
 
-        this.lastTime = Date.now();
+if(this.interval){
 
+clearInterval(
+this.interval
+);
 
+this.interval=null;
 
-        this.interval = setInterval(
+}
 
-            () => {
 
+}
 
-                this.update();
 
 
-            },
+toJSON(){
 
-            this.tickRate
+return{
 
-        );
+tick:this.tick
 
+};
 
+}
 
-        console.log(
 
-            "[Time] Started"
 
-        );
+load(data){
 
+if(data){
 
-    }
+this.tick=data.tick ?? 0;
 
+}
 
-
-    stop() {
-
-
-        this.running = false;
-
-
-
-        if (
-
-            this.interval
-
-        ) {
-
-
-            clearInterval(
-
-                this.interval
-
-            );
-
-
-            this.interval = null;
-
-
-        }
-
-
-    }
-
-
-
-    update() {
-
-
-        if (
-
-            !this.running
-
-        ) {
-
-
-            return;
-
-
-        }
-
-
-
-        this.tick++;
-
-
-        this.lastTime = Date.now();
-
-
-
-        eventBus.emit(
-
-            "time:tick",
-
-            {
-
-                tick:
-
-                    this.tick
-
-            }
-
-        );
-
-
-    }
-
-
-
-    toJSON() {
-
-
-        return {
-
-
-            tick:
-
-                this.tick,
-
-
-            lastTime:
-
-                this.lastTime
-
-
-        };
-
-
-    }
-
-
-
-    load(data) {
-
-
-        if (
-
-            !data
-
-        ) {
-
-
-            return;
-
-
-        }
-
-
-
-        this.tick =
-
-            data.tick ??
-
-            0;
-
-
-
-        this.lastTime =
-
-            data.lastTime ??
-
-            Date.now();
-
-
-    }
+}
 
 
 
@@ -223,10 +99,7 @@ class TimeManager {
 
 
 
-const time =
-
-    new TimeManager();
-
+const time=new TimeManager();
 
 
 export default time;
