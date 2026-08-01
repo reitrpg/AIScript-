@@ -1,345 +1,153 @@
-/**
- * World Creator
- * Research Manager
- *
- * 技術研究管理
- */
+class ResearchManager{
 
 
-import eventBus from "../core/eventBus.js";
+constructor(){
 
+this.points=0;
 
 
-class ResearchManager {
+this.data={
 
+agriculture:{
 
-    constructor() {
+name:"Agriculture",
 
+cost:100,
 
-        this.researches = {};
+unlocked:false
 
+},
 
-        this.points = 0;
 
+mining:{
 
-        this.initialized = false;
+name:"Mining",
 
+cost:150,
 
-    }
+unlocked:false
 
+},
 
 
-    /**
-     * 初期化
-     */
+magic:{
 
-    init() {
+name:"Magic",
 
+cost:300,
 
-        if (
+unlocked:false
 
-            this.initialized
+}
 
-        ) {
-
-
-            return;
-
-
-        }
-
-
-
-        this.register(
-
-            "agriculture",
-
-            "Agriculture",
-
-            100
-
-        );
-
-
-        this.register(
-
-            "mining",
-
-            "Mining",
-
-            150
-
-        );
-
-
-        this.register(
-
-            "magic",
-
-            "Magic Research",
-
-            300
-
-        );
-
-
-
-        this.initialized = true;
-
-
-    }
-
-
-
-    /**
-     * 研究登録
-     */
-
-    register(
-        id,
-        name,
-        cost
-    ) {
-
-
-        this.researches[id] = {
-
-
-            id,
-
-            name,
-
-            cost,
-
-            unlocked:
-
-                false
-
-
-        };
-
-
-    }
-
-
-
-    /**
-     * ポイント追加
-     */
-
-    addPoint(value) {
-
-
-        this.points += value;
-
-
-
-        eventBus.emit(
-
-            "research:update"
-
-        );
-
-
-    }
-
-
-
-    /**
-     * 研究解放
-     */
-
-    unlock(id) {
-
-
-        const research =
-
-            this.researches[id];
-
-
-
-        if (!research) {
-
-
-            return false;
-
-
-        }
-
-
-
-        if (
-
-            research.unlocked
-
-        ) {
-
-
-            return false;
-
-
-        }
-
-
-
-        if (
-
-            this.points
-
-            <
-
-            research.cost
-
-        ) {
-
-
-            return false;
-
-
-        }
-
-
-
-        this.points -=
-
-            research.cost;
-
-
-
-        research.unlocked =
-
-            true;
-
-
-
-        eventBus.emit(
-
-            "research:unlock",
-
-            research
-
-        );
-
-
-
-        return true;
-
-
-    }
-
-
-
-    /**
-     * 解放確認
-     */
-
-    isUnlocked(id) {
-
-
-        return (
-
-            this.researches[id]
-
-            &&
-
-            this.researches[id]
-                .unlocked
-
-        );
-
-
-    }
-
-
-
-    /**
-     * 全取得
-     */
-
-    getAll() {
-
-
-        return this.researches;
-
-
-    }
-
-
-
-    /**
-     * 保存
-     */
-
-    toJSON() {
-
-
-        return {
-
-
-            points:
-
-                this.points,
-
-
-            researches:
-
-                this.researches
-
-
-        };
-
-
-    }
-
-
-
-    /**
-     * 復元
-     */
-
-    load(data) {
-
-
-        if (!data) {
-
-
-            return;
-
-
-        }
-
-
-
-        this.points =
-
-            data.points
-
-            ??
-
-            0;
-
-
-
-        this.researches =
-
-            data.researches
-
-            ??
-
-            {};
-
-
-    }
+};
 
 
 }
 
 
 
-const researchManager =
+init(){
 
-    new ResearchManager();
+}
 
 
 
-export default researchManager;
+addPoint(value){
+
+this.points+=value;
+
+
+}
+
+
+
+unlock(id){
+
+
+const research=
+
+this.data[id];
+
+
+if(!research){
+
+return false;
+
+}
+
+
+if(
+this.points<
+research.cost
+){
+
+return false;
+
+}
+
+
+
+this.points-=research.cost;
+
+
+research.unlocked=true;
+
+
+return true;
+
+
+}
+
+
+
+getAll(){
+
+return this.data;
+
+}
+
+
+
+toJSON(){
+
+return {
+
+points:this.points,
+
+data:this.data
+
+};
+
+}
+
+
+
+load(data){
+
+if(!data){
+
+return;
+
+}
+
+
+this.points=data.points ?? 0;
+
+this.data=data.data ?? this.data;
+
+
+}
+
+
+
+}
+
+
+
+const research=
+
+new ResearchManager();
+
+
+export default research;
