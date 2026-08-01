@@ -2,11 +2,9 @@
  * World Creator
  * Resource Manager
  *
- * Resource Production Management
+ * Resource Storage Controller
  */
 
-
-import Resource from "./Resource.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -18,117 +16,55 @@ class ResourceManager {
     constructor(){
 
 
-        this.resources={};
+        this.resources={
 
 
-        this.productionMultiplier=1;
 
+            wood:{
 
 
-        this.initialize();
+                name:
 
+                "木材",
 
-    }
 
+                amount:0
 
 
-    initialize(){
+            },
 
 
-        this.create(
 
-            "food",
+            stone:{
 
-            "食料"
 
-        );
+                name:
 
+                "石材",
 
-        this.create(
 
-            "wood",
+                amount:0
 
-            "木材"
 
-        );
+            },
 
 
-        this.create(
 
-            "ore",
+            ore:{
 
-            "鉱石"
 
-        );
+                name:
 
+                "鉱石",
 
-        this.create(
 
-            "mana",
+                amount:0
 
-            "魔力"
 
-        );
+            }
 
 
-        this.create(
-
-            "crystal",
-
-            "結晶"
-
-        );
-
-
-        this.create(
-
-            "worldCore",
-
-            "世界核"
-
-        );
-
-
-    }
-
-
-
-    create(id,name){
-
-
-        if(
-
-            this.resources[id]
-
-        ){
-
-
-            return this.resources[id];
-
-
-        }
-
-
-
-        const resource=
-
-        new Resource(
-
-            id,
-
-            name
-
-        );
-
-
-
-        this.resources[id]=
-
-        resource;
-
-
-
-        return resource;
+        };
 
 
     }
@@ -155,12 +91,49 @@ class ResourceManager {
 
 
 
-    add(id,value){
+    create(id,name){
+
+
+        if(
+
+            this.resources[id]
+
+        ){
+
+
+            return false;
+
+
+        }
+
+
+
+        this.resources[id]={
+
+
+            name:name,
+
+
+            amount:0
+
+
+        };
+
+
+
+        return true;
+
+
+    }
+
+
+
+    add(id,amount){
 
 
         const resource=
 
-        this.get(id);
+        this.resources[id];
 
 
 
@@ -169,15 +142,18 @@ class ResourceManager {
 
             return false;
 
+
         }
 
 
 
-        resource.add(
+        resource.amount+=
 
-            value
+        Number(amount)
 
-        );
+        ||
+
+        0;
 
 
 
@@ -196,12 +172,12 @@ class ResourceManager {
 
 
 
-    consume(id,value){
+    consume(id,amount){
 
 
         const resource=
 
-        this.get(id);
+        this.resources[id];
 
 
 
@@ -210,42 +186,38 @@ class ResourceManager {
 
             return false;
 
+
         }
 
 
 
-        return resource.consume(
+        if(
 
-            value
+            resource.amount
 
-        );
+            <
 
+            amount
 
-    }
-
-
-
-    setProduction(id,value){
-
-
-        const resource=
-
-        this.get(id);
-
-
-
-        if(!resource){
+        ){
 
 
             return false;
 
+
         }
 
 
 
-        resource.setProduction(
+        resource.amount-=
 
-            value
+        Number(amount);
+
+
+
+        eventBus.emit(
+
+            "resource:update"
 
         );
 
@@ -258,7 +230,51 @@ class ResourceManager {
 
 
 
-    update(){
+    getAmount(id){
+
+
+        const resource=
+
+        this.resources[id];
+
+
+
+        if(!resource){
+
+
+            return 0;
+
+
+        }
+
+
+
+        return resource.amount;
+
+
+    }
+
+
+
+    has(id,amount){
+
+
+        return (
+
+            this.getAmount(id)
+
+            >=
+
+            amount
+
+        );
+
+
+    }
+
+
+
+    clear(){
 
 
         for(
@@ -268,37 +284,7 @@ class ResourceManager {
         ){
 
 
-            const resource=
-
-            this.resources[id];
-
-
-
-            const gain=
-
-            resource.getProduction()
-
-            *
-
-            this.productionMultiplier;
-
-
-
-            if(
-
-                gain > 0
-
-            ){
-
-
-                resource.add(
-
-                    gain
-
-                );
-
-
-            }
+            this.resources[id].amount=0;
 
 
         }
@@ -310,32 +296,6 @@ class ResourceManager {
             "resource:update"
 
         );
-
-
-    }
-
-
-
-    setProductionMultiplier(value){
-
-
-        this.productionMultiplier=
-
-        Number(value)
-
-        ||
-
-        1;
-
-
-    }
-
-
-
-    getProductionMultiplier(){
-
-
-        return this.productionMultiplier;
 
 
     }
@@ -345,40 +305,7 @@ class ResourceManager {
     toJSON(){
 
 
-        const data={};
-
-
-
-        for(
-
-            const id in this.resources
-
-        ){
-
-
-            data[id]=
-
-            this.resources[id].toJSON();
-
-
-        }
-
-
-
-        return {
-
-
-            productionMultiplier:
-
-            this.productionMultiplier,
-
-
-            resources:
-
-            data
-
-
-        };
+        return this.resources;
 
 
     }
@@ -393,37 +320,14 @@ class ResourceManager {
 
             return;
 
+
         }
-
-
-
-        this.productionMultiplier=
-
-        Number(
-
-            data.productionMultiplier
-
-        )
-
-        ||
-
-        1;
-
-
-
-        const resources=
-
-        data.resources
-
-        ??
-
-        data;
 
 
 
         for(
 
-            const id in resources
+            const id in data
 
         ){
 
@@ -435,11 +339,21 @@ class ResourceManager {
             ){
 
 
-                this.resources[id].load(
+                this.resources[id].amount=
 
-                    resources[id]
+                data[id].amount
 
-                );
+                ??
+
+                0;
+
+
+            }
+
+            else{
+
+
+                this.resources[id]=data[id];
 
 
             }
@@ -448,5 +362,12 @@ class ResourceManager {
         }
 
 
+    }
 
-        eventBus.emit(
+
+
+}
+
+
+
+export default new ResourceManager();
