@@ -9,156 +9,43 @@
 class EventBus {
 
 
-    constructor() {
+    constructor(){
 
-
-        this.events = {};
-
+        this.events={};
 
     }
 
 
 
-    /**
-     * イベント登録
-     */
+    on(name,callback){
 
-    on(
-        name,
-        callback
-    ) {
+        if(!this.events[name]){
 
-
-        if (
-            !this.events[name]
-        ) {
-
-
-            this.events[name] = [];
-
+            this.events[name]=[];
 
         }
 
 
-
-        this.events[name].push(
-
-            callback
-
-        );
-
+        this.events[name].push(callback);
 
     }
 
 
 
-    /**
-     * イベント発行
-     */
+    emit(name,data){
 
-    emit(
-        name,
-        data = null
-    ) {
-
-
-        if (
-            !this.events[name]
-        ) {
+        if(!this.events[name]){
 
             return;
 
         }
 
 
-
-        this.events[name].forEach(
-
-            callback => {
-
-
-                try {
-
-
-                    callback(
-                        data
-                    );
-
-
-                }
-
-                catch(error) {
-
-
-                    console.error(
-
-                        "Event Error:",
-
-                        name,
-
-                        error
-
-                    );
-
-
-                }
-
-
-            }
-
+        this.events[name]
+        .forEach(
+            callback=>
+            callback(data)
         );
-
-
-    }
-
-
-
-    /**
-     * イベント削除
-     */
-
-    off(
-        name,
-        callback
-    ) {
-
-
-        if (
-            !this.events[name]
-        ) {
-
-            return;
-
-        }
-
-
-
-        this.events[name] =
-
-            this.events[name]
-
-            .filter(
-
-                event =>
-
-                    event !== callback
-
-            );
-
-
-    }
-
-
-
-    /**
-     * 全削除
-     */
-
-    clear() {
-
-
-        this.events = {};
-
 
     }
 
@@ -166,11 +53,8 @@ class EventBus {
 }
 
 
-
-const eventBus =
-
-    new EventBus();
+const eventBus=new EventBus();
 
 
-
-export default eventBus
+export default eventBus;
+                  
