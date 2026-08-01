@@ -18,17 +18,20 @@ class Converter {
     constructor(){
 
 
-        this.researchMultiplier=1;
-
+        this.multiplier=1;
 
 
         this.recipes={
+
 
 
             woodToPlank:{
 
 
                 name:"木材加工",
+
+
+                unlockEP:0,
 
 
                 input:{
@@ -59,6 +62,9 @@ class Converter {
                 name:"鉱石精錬",
 
 
+                unlockEP:100,
+
+
                 input:{
 
 
@@ -84,7 +90,10 @@ class Converter {
             crystalToMana:{
 
 
-                name:"魔力結晶変換",
+                name:"魔力変換",
+
+
+                unlockEP:1000,
 
 
                 input:{
@@ -105,65 +114,6 @@ class Converter {
                 }
 
 
-            },
-
-
-
-            foodToPreserved:{
-
-
-                name:"保存食加工",
-
-
-                input:{
-
-
-                    food:20
-
-
-                },
-
-
-                output:{
-
-
-                    preservedFood:5
-
-
-                }
-
-
-            },
-
-
-
-            woodOreToMaterial:{
-
-
-                name:"建築素材生成",
-
-
-                input:{
-
-
-                    wood:5,
-
-
-                    ore:5
-
-
-                },
-
-
-                output:{
-
-
-                    material:1
-
-
-                }
-
-
             }
 
 
@@ -174,10 +124,10 @@ class Converter {
 
 
 
-    setResearchMultiplier(value){
+    setMultiplier(value){
 
 
-        this.researchMultiplier=
+        this.multiplier=
 
         Number(value)
 
@@ -193,7 +143,7 @@ class Converter {
     getMultiplier(){
 
 
-        return this.researchMultiplier;
+        return this.multiplier;
 
 
     }
@@ -210,21 +160,65 @@ class Converter {
 
 
 
-    canConvert(recipe){
+    isUnlocked(recipe){
 
 
-        for(
+        return true;
 
-            const id in recipe.input
+
+    }
+
+
+
+    canConvert(id){
+
+
+        const recipe=
+
+        this.recipes[id];
+
+
+
+        if(!recipe){
+
+
+            return false;
+
+
+        }
+
+
+
+        if(
+
+            !this.isUnlocked(
+
+                recipe
+
+            )
 
         ){
 
 
-            const resource=
+            return false;
+
+
+        }
+
+
+
+        for(
+
+            const resource in recipe.input
+
+        ){
+
+
+            const data=
 
             ResourceManager.get(
 
-                id
+                resource
 
             );
 
@@ -232,20 +226,21 @@ class Converter {
 
             if(
 
-                !resource
+                !data
 
                 ||
 
-                resource.getAmount()
+                data.getAmount()
 
                 <
 
-                recipe.input[id]
+                recipe.input[resource]
 
             ){
 
 
                 return false;
+
 
             }
 
@@ -270,21 +265,11 @@ class Converter {
 
 
 
-        if(!recipe){
-
-
-            return false;
-
-
-        }
-
-
-
         if(
 
             !this.canConvert(
 
-                recipe
+                id
 
             )
 
@@ -293,24 +278,25 @@ class Converter {
 
             return false;
 
+
         }
 
 
 
         for(
 
-            const item in recipe.input
+            const resource in recipe.input
 
         ){
 
 
             ResourceManager
 
-            .get(item)
+            .get(resource)
 
             .consume(
 
-                recipe.input[item]
+                recipe.input[resource]
 
             );
 
@@ -321,31 +307,29 @@ class Converter {
 
         for(
 
-            const item in recipe.output
+            const resource in recipe.output
 
         ){
 
 
-            let resource=
+            let target=
 
             ResourceManager.get(
 
-                item
+                resource
 
             );
 
 
 
-            if(!resource){
+            if(!target){
 
 
                 ResourceManager.create(
 
-                    item,
+                    resource,
 
-                    item,
-
-                    0
+                    resource
 
                 );
 
@@ -356,15 +340,15 @@ class Converter {
 
             ResourceManager
 
-            .get(item)
+            .get(resource)
 
             .add(
 
-                recipe.output[item]
+                recipe.output[resource]
 
                 *
 
-                this.researchMultiplier
+                this.multiplier
 
             );
 
@@ -394,9 +378,9 @@ class Converter {
         return {
 
 
-            researchMultiplier:
+            multiplier:
 
-            this.researchMultiplier
+            this.multiplier
 
 
         };
@@ -418,11 +402,15 @@ class Converter {
 
 
 
-        this.researchMultiplier=
+        this.multiplier=
 
-        data.researchMultiplier
+        Number(
 
-        ??
+            data.multiplier
+
+        )
+
+        ||
 
         1;
 
