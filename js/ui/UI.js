@@ -1,8 +1,8 @@
 /**
  * World Creator
- * Main UI System
+ * Main UI
  *
- * World / Resource / System Layout
+ * Resource Display System
  */
 
 
@@ -49,73 +49,8 @@ class UI {
 
 
 
-        this.createLayout();
-
-
-
-        this.bindEvents();
-
-
-
         this.update();
 
-
-    }
-
-
-
-    createLayout(){
-
-
-        this.area.innerHTML=`
-
-        <div id="world-info">
-
-
-        </div>
-
-
-
-        <hr>
-
-
-
-        <div id="resource-info">
-
-
-        </div>
-
-
-
-        <hr>
-
-
-
-        <div id="research-area">
-
-
-        </div>
-
-
-
-        <hr>
-
-
-
-        <div id="converter-area">
-
-
-        </div>
-
-
-        `;
-
-
-    }
-
-
-
-    bindEvents(){
 
 
         eventBus.on(
@@ -125,7 +60,7 @@ class UI {
             ()=>{
 
 
-                this.updateResource();
+                this.update();
 
 
             }
@@ -141,7 +76,7 @@ class UI {
             ()=>{
 
 
-                this.updateWorld();
+                this.update();
 
 
             }
@@ -149,18 +84,106 @@ class UI {
         );
 
 
-
-        eventBus.on(
-
-            "world:rebirth",
-
-            ()=>{
+    }
 
 
-                this.updateWorld();
+
+    formatNumber(value){
 
 
-            }
+        value=
+
+        Number(value)
+
+        ||
+
+        0;
+
+
+
+        if(
+
+            value < 1000
+
+        ){
+
+
+            return value.toFixed(2);
+
+
+        }
+
+
+
+        const units=[
+
+
+            "",
+
+
+            "K",
+
+
+            "M",
+
+
+            "B",
+
+
+            "T",
+
+
+            "Qa",
+
+
+            "Qi",
+
+
+            "Sx",
+
+
+            "Sp",
+
+
+            "Oc"
+
+
+        ];
+
+
+
+        let index=0;
+
+
+
+        while(
+
+            value>=1000
+
+            &&
+
+            index<units.length-1
+
+        ){
+
+
+            value/=1000;
+
+
+            index++;
+
+
+        }
+
+
+
+        return (
+
+            value.toFixed(2)
+
+            +
+
+            units[index]
 
         );
 
@@ -172,30 +195,7 @@ class UI {
     update(){
 
 
-        this.updateWorld();
-
-
-        this.updateResource();
-
-
-    }
-
-
-
-    updateWorld(){
-
-
-        const area=
-
-        document.getElementById(
-
-            "world-info"
-
-        );
-
-
-
-        if(!area){
+        if(!this.area){
 
 
             return;
@@ -211,119 +211,6 @@ class UI {
 
 
         if(!world){
-
-
-            area.innerHTML="";
-
-
-            return;
-
-        }
-
-
-
-        area.innerHTML=
-
-        `
-
-        <h2>
-
-        World Status
-
-        </h2>
-
-
-
-        Lv:
-
-        ${world.level}
-
-
-
-        <br>
-
-
-
-        EXP:
-
-        ${world.exp}
-
-
-
-        <br>
-
-
-
-        Rebirth:
-
-        ${world.rebirthCount}
-
-
-
-        <br>
-
-
-
-        Multiplier:
-
-        ×${
-
-            world.rebirthMultiplier
-
-            .toFixed(2)
-
-        }
-
-
-
-        <br>
-
-
-
-        Rarity:
-
-        ${world.rarity}
-
-
-
-        <br>
-
-
-
-        Effects:
-
-        ${
-
-            world.effects.join(
-
-                ", "
-
-            )
-
-        }
-
-
-        `;
-
-
-    }
-
-
-
-    updateResource(){
-
-
-        const area=
-
-        document.getElementById(
-
-            "resource-info"
-
-        );
-
-
-
-        if(!area){
 
 
             return;
@@ -344,9 +231,53 @@ class UI {
 
         <h2>
 
-        Resources
+        World Creator
 
         </h2>
+
+
+
+        <h3>
+
+        世界情報
+
+        </h3>
+
+
+
+        Lv:
+
+        ${world.level}
+
+        <br>
+
+
+
+        EXP:
+
+        ${this.formatNumber(world.exp)}
+
+        <br>
+
+
+
+        転生:
+
+        ${world.rebirthCount}
+
+        回
+
+
+
+        <hr>
+
+
+
+        <h3>
+
+        資源
+
+        </h3>
 
         `;
 
@@ -367,13 +298,25 @@ class UI {
 
             html+=`
 
+
             ${resource.name}
 
             :
 
-            ${resource.amount.toFixed(2)}
+            ${
+
+                this.formatNumber(
+
+                    resource.getAmount()
+
+                )
+
+            }
+
+
 
             <br>
+
 
             `;
 
@@ -382,7 +325,7 @@ class UI {
 
 
 
-        area.innerHTML=
+        this.area.innerHTML=
 
         html;
 
