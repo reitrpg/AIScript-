@@ -2,17 +2,22 @@
 
 <html lang="ja">
 
+
 <head>
+
 
 <meta charset="UTF-8">
 
+
 <meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+content="width=device-width, initial-scale=1.0">
+
 
 
 <title>
 World Creator
 </title>
+
 
 
 <link rel="stylesheet" href="./css/style.css">
@@ -21,17 +26,21 @@ World Creator
 </head>
 
 
+
 <body>
 
 
 <div id="app">
 
-
 </div>
 
 
 
-<script type="module" src="./js/core/main.js"></script>
+<script 
+type="module"
+src="./js/core/main.js">
+
+</script>
 
 
 
@@ -55,6 +64,24 @@ window.addEventListener(
 navigator.serviceWorker.register(
 
 "./service-worker.js"
+
+)
+
+.catch(
+
+error=>{
+
+
+console.error(
+
+"Service Worker Error",
+
+error
+
+);
+
+
+}
 
 );
 
