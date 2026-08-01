@@ -1,28 +1,26 @@
 /**
  * World Creator
- * Time Manager
+ * Time System
  *
- * Integrated Version
+ * Offline Progress
  */
 
 
-import eventBus from "./eventBus.js";
-
-
-
-class TimeManager {
+class Time {
 
 
     constructor(){
 
 
-        this.interval = null;
-
-
-        this.tick = 0;
+        this.lastTime = null;
 
 
         this.running = false;
+
+
+        this.maxOfflineTime =
+
+            86400;
 
 
     }
@@ -32,13 +30,48 @@ class TimeManager {
     start(){
 
 
-        if(this.running){
+        const now =
+
+        Date.now();
 
 
-            return;
+
+        const saved =
+
+        localStorage.getItem(
+
+            "world_creator_last_time"
+
+        );
+
+
+
+        if(saved){
+
+
+            this.lastTime =
+
+            Number(saved);
+
+
+
+        }else{
+
+
+            this.lastTime = now;
 
 
         }
+
+
+
+        localStorage.setItem(
+
+            "world_creator_last_time",
+
+            now
+
+        );
 
 
 
@@ -46,119 +79,103 @@ class TimeManager {
 
 
 
-        this.interval = setInterval(
-
-            ()=>{
-
-
-                this.tick++;
+    }
 
 
 
-                eventBus.emit(
-
-                    "time:tick",
-
-                    this.tick
-
-                );
+    getOfflineSeconds(){
 
 
-            },
+        const now =
+
+        Date.now();
+
+
+
+        if(!this.lastTime){
+
+
+            return 0;
+
+
+        }
+
+
+
+        let seconds =
+
+        Math.floor(
+
+            (
+
+                now -
+
+                this.lastTime
+
+            )
+
+            /
 
             1000
 
         );
 
 
-    }
+
+        if(
+
+            seconds >
+
+            this.maxOfflineTime
+
+        ){
 
 
+            seconds =
 
-    stop(){
-
-
-        if(this.interval){
-
-
-            clearInterval(
-
-                this.interval
-
-            );
-
-
-            this.interval = null;
+            this.maxOfflineTime;
 
 
         }
 
 
 
-        this.running = false;
+        this.lastTime = now;
+
+
+
+        localStorage.setItem(
+
+            "world_creator_last_time",
+
+            now
+
+        );
+
+
+
+        return seconds;
 
 
     }
 
 
 
-    getTick(){
+    update(){
 
 
-        return this.tick;
+        this.lastTime =
+
+        Date.now();
+
 
 
     }
 
-
-
-    toJSON(){
-
-
-        return {
-
-
-            tick:
-
-                this.tick
-
-
-        };
-
-
-    }
-
-
-
-    load(data){
-
-
-        if(!data){
-
-
-            return;
-
-
-        }
-
-
-
-        this.tick =
-
-            data.tick ?? 0;
-
-
-    }
 
 
 }
 
 
 
-const time =
-
-    new TimeManager();
-
-
-
-export default time;
+export default new Time();
