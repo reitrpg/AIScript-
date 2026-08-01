@@ -1,105 +1,207 @@
+/**
+ * World Creator
+ * Resource Converter
+ *
+ * Integrated Version
+ */
+
+
 import ResourceManager from "./Manager.js";
 
-
-class Converter{
-
-
-constructor(){
-
-this.recipes={};
+import eventBus from "../core/eventBus.js";
 
 
-this.register();
+
+class Converter {
+
+
+    constructor(){
+
+
+        this.recipes = {};
+
+
+        this.init();
+
+
+    }
+
+
+
+    init(){
+
+
+        this.recipes = {
+
+
+            food:{
+
+
+                input:"wood",
+
+
+                cost:2,
+
+
+                output:1
+
+
+
+            },
+
+
+
+            mana:{
+
+
+                input:"stone",
+
+
+                cost:5,
+
+
+                output:1
+
+
+            }
+
+
+        };
+
+
+    }
+
+
+
+    tick(){
+
+
+        for(
+
+            const id in this.recipes
+
+        ){
+
+
+            const recipe =
+
+                this.recipes[id];
+
+
+
+            const source =
+
+                ResourceManager.get(
+
+                    recipe.input
+
+                );
+
+
+
+            if(!source){
+
+
+                continue;
+
+
+            }
+
+
+
+            if(
+
+                source.amount >=
+
+                recipe.cost
+
+            ){
+
+
+                source.remove(
+
+                    recipe.cost
+
+                );
+
+
+
+                ResourceManager.add(
+
+                    id,
+
+                    recipe.output
+
+                );
+
+
+            }
+
+
+        }
+
+
+
+        eventBus.emit(
+
+            "resource:update"
+
+        );
+
+
+    }
+
+
+
+    addRecipe(
+
+        id,
+
+        input,
+
+        cost,
+
+        output
+
+    ){
+
+
+        this.recipes[id] = {
+
+
+            input:input,
+
+
+            cost:cost,
+
+
+            output:output
+
+
+        };
+
+
+    }
+
+
+
+    getRecipes(){
+
+
+        return this.recipes;
+
+
+    }
+
 
 }
 
 
 
-register(){
+const converter =
 
-this.recipes={
+    new Converter();
 
-
-food:{
-
-input:"wood",
-
-cost:2,
-
-output:1
-
-},
-
-
-mana:{
-
-input:"stone",
-
-cost:5,
-
-output:1
-
-}
-
-
-};
-
-
-}
-
-
-
-tick(){
-
-for(
-const id in this.recipes
-){
-
-const recipe=
-
-this.recipes[id];
-
-
-
-const input=
-
-ResourceManager.get(
-recipe.input
-);
-
-
-
-if(
-input.amount>=recipe.cost
-){
-
-input.remove(
-recipe.cost
-);
-
-
-ResourceManager.add(
-id,
-recipe.output
-);
-
-
-}
-
-}
-
-
-}
-
-
-
-}
-
-
-
-const converter=
-
-new Converter();
 
 
 export default converter;
