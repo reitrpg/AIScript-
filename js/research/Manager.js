@@ -2,12 +2,12 @@
  * World Creator
  * Research Manager
  *
- * 研究管理システム
+ * 技術研究管理
  */
 
 
-import Research from "./Research.js";
 import eventBus from "../core/eventBus.js";
+
 
 
 class ResearchManager {
@@ -15,7 +15,77 @@ class ResearchManager {
 
     constructor() {
 
-        this.researches = new Map();
+
+        this.researches = {};
+
+
+        this.points = 0;
+
+
+        this.initialized = false;
+
+
+    }
+
+
+
+    /**
+     * 初期化
+     */
+
+    init() {
+
+
+        if (
+
+            this.initialized
+
+        ) {
+
+
+            return;
+
+
+        }
+
+
+
+        this.register(
+
+            "agriculture",
+
+            "Agriculture",
+
+            100
+
+        );
+
+
+        this.register(
+
+            "mining",
+
+            "Mining",
+
+            150
+
+        );
+
+
+        this.register(
+
+            "magic",
+
+            "Magic Research",
+
+            300
+
+        );
+
+
+
+        this.initialized = true;
+
 
     }
 
@@ -25,85 +95,172 @@ class ResearchManager {
      * 研究登録
      */
 
-    register(id, data) {
+    register(
+        id,
+        name,
+        cost
+    ) {
 
 
-        const research =
-            new Research({
-
-                id,
-
-                ...data
-
-            });
+        this.researches[id] = {
 
 
-        this.researches.set(
             id,
-            research
-        );
+
+            name,
+
+            cost,
+
+            unlocked:
+
+                false
+
+
+        };
+
+
+    }
+
+
+
+    /**
+     * ポイント追加
+     */
+
+    addPoint(value) {
+
+
+        this.points += value;
+
 
 
         eventBus.emit(
-            "research:registered",
-            research
+
+            "research:update"
+
         );
 
 
-        return research;
-
     }
 
 
 
     /**
-     * 研究取得
+     * 研究解放
      */
 
-    get(id) {
-
-        return this.researches.get(id);
-
-    }
-
-
-
-    /**
-     * 研究進行
-     */
-
-    progress(id, value) {
+    unlock(id) {
 
 
         const research =
-            this.get(id);
+
+            this.researches[id];
+
 
 
         if (!research) {
 
+
             return false;
+
 
         }
 
 
-        research.addProgress(
-            value
+
+        if (
+
+            research.unlocked
+
+        ) {
+
+
+            return false;
+
+
+        }
+
+
+
+        if (
+
+            this.points
+
+            <
+
+            research.cost
+
+        ) {
+
+
+            return false;
+
+
+        }
+
+
+
+        this.points -=
+
+            research.cost;
+
+
+
+        research.unlocked =
+
+            true;
+
+
+
+        eventBus.emit(
+
+            "research:unlock",
+
+            research
+
         );
 
 
+
         return true;
+
 
     }
 
 
 
     /**
-     * 全研究取得
+     * 解放確認
+     */
+
+    isUnlocked(id) {
+
+
+        return (
+
+            this.researches[id]
+
+            &&
+
+            this.researches[id]
+                .unlocked
+
+        );
+
+
+    }
+
+
+
+    /**
+     * 全取得
      */
 
     getAll() {
 
+
         return this.researches;
+
 
     }
 
@@ -116,22 +273,21 @@ class ResearchManager {
     toJSON() {
 
 
-        const data = {};
+        return {
 
 
-        for (
-            const [id, research]
-            of this.researches
-        ) {
+            points:
+
+                this.points,
 
 
-            data[id] =
-                research.toJSON();
+            researches:
 
-        }
+                this.researches
 
 
-        return data;
+        };
+
 
     }
 
@@ -146,43 +302,32 @@ class ResearchManager {
 
         if (!data) {
 
+
             return;
 
-        }
-
-
-        for (const id in data) {
-
-
-            let research =
-                this.researches.get(id);
-
-
-
-            if (!research) {
-
-
-                research =
-                    new Research({
-
-                        id
-
-                    });
-
-
-                this.researches.set(
-                    id,
-                    research
-                );
-
-            }
-
-
-            research.load(
-                data[id]
-            );
 
         }
+
+
+
+        this.points =
+
+            data.points
+
+            ??
+
+            0;
+
+
+
+        this.researches =
+
+            data.researches
+
+            ??
+
+            {};
+
 
     }
 
@@ -190,8 +335,11 @@ class ResearchManager {
 }
 
 
-const manager =
+
+const researchManager =
+
     new ResearchManager();
 
 
-export default manager;
+
+export default researchManager;
