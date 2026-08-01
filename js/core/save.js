@@ -29,7 +29,7 @@ class SaveManager {
         "world_creator_save";
 
 
-        this.version=6;
+        this.version=7;
 
 
     }
@@ -47,9 +47,16 @@ class SaveManager {
             this.version,
 
 
+
             time:
 
             Date.now(),
+
+
+
+            settings:
+
+            {},
 
 
 
@@ -267,6 +274,30 @@ class SaveManager {
 
 
 
+            if(
+
+                data.settings
+
+            ){
+
+
+                this.settings=
+
+                data.settings;
+
+
+            }
+
+            else{
+
+
+                this.settings={};
+
+
+            }
+
+
+
             return true;
 
 
@@ -295,6 +326,20 @@ class SaveManager {
 
 
 
+    getSettings(){
+
+
+        return this.settings
+
+        ??
+
+        {};
+
+
+    }
+
+
+
     clear(){
 
 
@@ -303,16 +348,6 @@ class SaveManager {
             this.key
 
         );
-
-
-    }
-
-
-
-    getVersion(){
-
-
-        return this.version;
 
 
     }
