@@ -1,191 +1,90 @@
 /**
  * World Creator
- * World Manager Complete
+ * Resource Manager
+ *
+ * Resource Production System
  */
 
 
+import Resource from "./Resource.js";
+
 import eventBus from "../core/eventBus.js";
 
-import ResearchManager from "../research/Manager.js";
+import WorldManager from "../world/Manager.js";
 
 
 
-class WorldManager {
+class ResourceManager {
 
 
     constructor(){
 
 
-        this.current=null;
+        this.resources={};
 
 
-        this.unlocks={
+        this.initialized=false;
 
-            extraResource1:false,
 
-            extraResource2:false,
-
-            rareResource:false
-
-        };
+        this.researchMultiplier=1;
 
 
     }
 
 
 
-    createWorld(){
+    init(){
 
 
-        const rarityTable=[
+        this.initialized=true;
 
 
-            {
-                name:"Normal",
-                multiplier:1,
-                effects:1,
-                pool:[
-                    "豊かな森",
-                    "肥沃な大地"
-                ]
-            },
-
-
-            {
-                name:"Rare",
-                multiplier:1.5,
-                effects:1,
-                pool:[
-                    "豊かな森",
-                    "鉱脈の大地"
-                ]
-            },
-
-
-            {
-                name:"Epic",
-                multiplier:2.5,
-                effects:2,
-                pool:[
-                    "鉱脈の大地",
-                    "魔力循環"
-                ]
-            },
-
-
-            {
-                name:"Legend",
-                multiplier:5,
-                effects:2,
-                pool:[
-                    "神代遺構",
-                    "星の祝福"
-                ]
-            },
-
-
-            {
-                name:"Mythic",
-                multiplier:10,
-                effects:3,
-                pool:[
-                    "世界樹の核",
-                    "創世の力",
-                    "星海の加護"
-                ]
-            }
-
-
-        ];
+    }
 
 
 
-        const rarity=
+    setResearchMultiplier(value){
 
-        rarityTable[
 
-            Math.floor(
+        this.researchMultiplier=
 
-                Math.random()
+        Number(value)
 
-                *
+        ||1;
 
-                rarityTable.length
 
-            )
-
-        ];
+    }
 
 
 
-        const effects=
+    create(
 
-        this.createEffects(
+        id,
 
-            rarity.pool,
+        name,
 
-            rarity.effects
+        production
+
+    ){
+
+
+        this.resources[id]=
+
+        new Resource(
+
+            id,
+
+            name
 
         );
 
 
 
-        this.current={
+        this.resources[id]
 
+        .setProduction(
 
-            name:
-
-            this.createName(),
-
-
-
-            rarity:
-
-            rarity.name,
-
-
-
-            rarityMultiplier:
-
-            rarity.multiplier,
-
-
-
-            level:1,
-
-
-            exp:0,
-
-
-            rebirthCount:0,
-
-
-            rebirthMultiplier:1,
-
-
-            resources:
-
-            this.createResources(
-
-                rarity.name,
-
-                effects
-
-            ),
-
-
-            effects:effects
-
-
-        };
-
-
-
-        eventBus.emit(
-
-            "world:created",
-
-            this.current
+            production
 
         );
 
@@ -194,199 +93,220 @@ class WorldManager {
 
 
 
-    createName(){
+    get(id){
 
 
-        const list=[
-
-            "アステリア",
-
-            "エルドラ",
-
-            "ネヴァリス",
-
-            "オルビス",
-
-            "アルカディア"
-
-        ];
-
-
-
-        return list[
-
-            Math.floor(
-
-                Math.random()
-
-                *
-
-                list.length
-
-            )
-
-        ];
+        return this.resources[id];
 
 
     }
 
 
 
-    createEffects(pool,count){
+    getAll(){
 
 
-        const result=[];
-
-
-
-        while(
-
-            result.length<count
-
-        ){
-
-
-            const effect=
-
-            pool[
-
-                Math.floor(
-
-                    Math.random()
-
-                    *
-
-                    pool.length
-
-                )
-
-            ];
-
-
-
-            if(
-
-                !result.includes(effect)
-
-            ){
-
-
-                result.push(effect);
-
-
-            }
-
-
-        }
-
-
-
-        return result;
+        return this.resources;
 
 
     }
 
 
 
-    createResources(rarity,effects){
+    syncWorldResources(){
 
 
-        const result={};
+        const world=
 
-
-
-        const base=[
-
-            "wood",
-
-            "stone",
-
-            "food"
-
-        ];
-
-
-
-        let count=2;
-
-
-
-        if(rarity==="Rare")
-
-            count=3;
-
-
-        if(rarity==="Epic")
-
-            count=4;
-
-
-        if(rarity==="Legend")
-
-            count=5;
-
-
-        if(rarity==="Mythic")
-
-            count=6;
-
-
-
-        const pool=[...base];
-
-
-
-        if(rarity!=="Normal"){
-
-
-            pool.push(
-
-                "ore",
-
-                "mana"
-
-            );
-
-
-        }
+        WorldManager.getCurrent();
 
 
 
         if(
 
-            rarity==="Legend"
+            !world
 
             ||
 
-            rarity==="Mythic"
+            !world.resources
 
         ){
 
-
-            pool.push(
-
-                "crystal"
-
-            );
-
+            return;
 
         }
 
 
 
-        while(
+        for(
 
-            Object.keys(result).length<count
+            const id in world.resources
 
         ){
 
 
-            const id=
+            const data=
 
-            pool[
+            world.resources[id];
 
-                Math.floor(
 
-                    Math.random()
 
-                    *
+            if(
+
+                !this.resources[id]
+
+            ){
+
+
+                this.create(
+
+                    id,
+
+                    id,
+
+                    data.base ?? 0
+
+                );
+
+
+            }
+
+            else{
+
+
+                this.resources[id]
+
+                .setProduction(
+
+                    data.base ?? 0
+
+                );
+
+
+            }
+
+
+        }
+
+
+    }
+
+
+
+    getWorldMultiplier(){
+
+
+        const world=
+
+        WorldManager.getCurrent();
+
+
+
+        if(!world){
+
+            return 1;
+
+        }
+
+
+
+        const levelBonus=
+
+        Math.pow(
+
+            1.05,
+
+            world.level-1
+
+        );
+
+
+
+        const rarityBonus=
+
+        world.rarityMultiplier
+
+        ??
+
+        1;
+
+
+
+        const rebirthBonus=
+
+        world.rebirthMultiplier
+
+        ??
+
+        1;
+
+
+
+        const effectBonus=
+
+        this.getEffectMultiplier(
+
+            world.effects
+
+        );
+
+
+
+        return (
+
+            levelBonus
+
+            *
+
+            rarityBonus
+
+            *
+
+            rebirthBonus
+
+            *
+
+            effectBonus
+
+            *
+
+            this.researchMultiplier
+
+        );
+
+
+    }
+
+
+
+    getEffectMultiplier(effects){
+
+
+        let value=1;
+
+
+
+        if(!effects){
+
+            return value;
+
+        }
+
+
+
+        effects.forEach(
+
+            effect=>{
+
+
+                switch(effect){
+
+
+                    case "豊かな森":
+
+                        value*=1.2;
+
+                        break;
+
+
+                   
