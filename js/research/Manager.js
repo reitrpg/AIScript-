@@ -2,11 +2,13 @@
  * World Creator
  * Research System
  *
- * Divine Revelation Research
+ * Research + EP Cost Support
  */
 
 
 import ResourceManager from "../resource/Manager.js";
+
+import EPManager from "../ep/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -40,7 +42,7 @@ class ResearchManager {
                 cost:{
 
 
-                    food:100
+                    ep:10
 
 
                 },
@@ -61,7 +63,7 @@ class ResearchManager {
 
 
                 description:
-                "大地に刻まれた古き流れを読み取り、鉱脈への理解を深める。",
+                "大地に刻まれた流れを読み取り、資源獲得能力を高める。",
 
 
                 level:0,
@@ -73,7 +75,7 @@ class ResearchManager {
                 cost:{
 
 
-                    ore:100
+                    ep:50
 
 
                 },
@@ -94,7 +96,7 @@ class ResearchManager {
 
 
                 description:
-                "世界創生時より存在する魔力の根源へ近づく。",
+                "世界創生時の魔力へ接近する。",
 
 
                 level:0,
@@ -106,7 +108,7 @@ class ResearchManager {
                 cost:{
 
 
-                    mana:100
+                    ep:200
 
 
                 },
@@ -127,7 +129,7 @@ class ResearchManager {
 
 
                 description:
-                "世界そのものが持つ法則の一端を理解する。",
+                "世界法則の一端を理解する。",
 
 
                 level:0,
@@ -139,7 +141,7 @@ class ResearchManager {
                 cost:{
 
 
-                    crystal:10
+                    ep:1000
 
 
                 },
@@ -160,7 +162,7 @@ class ResearchManager {
 
 
                 description:
-                "終わりと始まりを繋ぐ循環の理へ到達する。",
+                "循環する世界の理へ到達する。",
 
 
                 level:0,
@@ -172,7 +174,7 @@ class ResearchManager {
                 cost:{
 
 
-                    worldCore:1
+                    ep:10000
 
 
                 },
@@ -213,9 +215,7 @@ class ResearchManager {
 
         if(
 
-            data.level>=
-
-            data.max
+            data.level >= data.max
 
         ){
 
@@ -282,6 +282,37 @@ class ResearchManager {
         ){
 
 
+            if(
+
+                id === "ep"
+
+            ){
+
+
+                if(
+
+                    !EPManager.canPay(
+
+                        cost[id]
+
+                    )
+
+                ){
+
+
+                    return false;
+
+
+                }
+
+
+                continue;
+
+
+            }
+
+
+
             const resource=
 
             ResourceManager.get(
@@ -332,6 +363,27 @@ class ResearchManager {
             const id in cost
 
         ){
+
+
+            if(
+
+                id === "ep"
+
+            ){
+
+
+                EPManager.consume(
+
+                    cost[id]
+
+                );
+
+
+                continue;
+
+
+            }
+
 
 
             ResourceManager
@@ -395,16 +447,6 @@ class ResearchManager {
 
 
     getProductionMultiplier(){
-
-
-        return this.getMultiplier();
-
-
-    }
-
-
-
-    getConverterMultiplier(){
 
 
         return this.getMultiplier();
