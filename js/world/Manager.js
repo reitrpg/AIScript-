@@ -1,29 +1,105 @@
 /**
  * World Creator
- * World Save Compatibility
- *
- * Age Removal Migration
+ * World Generator Fix
  */
 
 
-load(data){
+createWorld(){
 
 
-    if(!data){
-
-        return;
-
-    }
+    const rarityTable=[
 
 
+        {
+            name:"Normal",
+            multiplier:1,
+            effects:1,
+            pool:[
+                "豊かな森",
+                "肥沃な大地"
+            ]
+        },
 
-    // 旧Ageデータ除外
 
-    if(data.Age){
+        {
+            name:"Rare",
+            multiplier:1.5,
+            effects:1,
+            pool:[
+                "豊かな森",
+                "鉱脈の大地",
+                "肥沃な大地"
+            ]
+        },
 
-        delete data.Age;
 
-    }
+        {
+            name:"Epic",
+            multiplier:2.5,
+            effects:2,
+            pool:[
+                "鉱脈の大地",
+                "魔力循環",
+                "古代遺跡"
+            ]
+        },
+
+
+        {
+            name:"Legend",
+            multiplier:5,
+            effects:2,
+            pool:[
+                "魔力循環",
+                "神代遺構",
+                "星の祝福"
+            ]
+        },
+
+
+        {
+            name:"Mythic",
+            multiplier:10,
+            effects:3,
+            pool:[
+                "世界樹の核",
+                "創世の力",
+                "星海の加護"
+            ]
+        }
+
+
+    ];
+
+
+
+    const rarity =
+
+    rarityTable[
+
+        Math.floor(
+
+            Math.random()
+
+            *
+
+            rarityTable.length
+
+        )
+
+    ];
+
+
+
+    const effects =
+
+    this.createEffects(
+
+        rarity.pool,
+
+        rarity.effects
+
+    );
 
 
 
@@ -32,91 +108,51 @@ load(data){
 
         name:
 
-        data.name
-
-        ??
-
-        "Unknown World",
+        this.createName(),
 
 
 
         rarity:
 
-        data.rarity
-
-        ??
-
-        "Normal",
+        rarity.name,
 
 
 
         rarityMultiplier:
 
-        data.rarityMultiplier
-
-        ??
-
-        1,
+        rarity.multiplier,
 
 
 
-        level:
-
-        data.level
-
-        ??
-
-        1,
+        level:1,
 
 
 
-        exp:
-
-        data.exp
-
-        ??
-
-        0,
+        exp:0,
 
 
 
-        rebirthCount:
-
-        data.rebirthCount
-
-        ??
-
-        0,
+        rebirthCount:0,
 
 
 
-        rebirthMultiplier:
-
-        data.rebirthMultiplier
-
-        ??
-
-        1,
+        rebirthMultiplier:1,
 
 
 
         resources:
 
-        data.resources
+        this.createResources(
 
-        ??
+            rarity.name,
 
-        {},
+            effects
+
+        ),
 
 
 
-        effects:
-
-        data.effects
-
-        ??
-
-        []
+        effects:effects
 
 
 
@@ -126,86 +162,11 @@ load(data){
 
     eventBus.emit(
 
-        "world:update",
+        "world:created",
 
         this.current
 
     );
-
-
-}
-
-
-
-toJSON(){
-
-
-    if(!this.current){
-
-        return null;
-
-    }
-
-
-
-    return {
-
-
-        name:
-
-        this.current.name,
-
-
-
-        rarity:
-
-        this.current.rarity,
-
-
-
-        rarityMultiplier:
-
-        this.current.rarityMultiplier,
-
-
-
-        level:
-
-        this.current.level,
-
-
-
-        exp:
-
-        this.current.exp,
-
-
-
-        rebirthCount:
-
-        this.current.rebirthCount,
-
-
-
-        rebirthMultiplier:
-
-        this.current.rebirthMultiplier,
-
-
-
-        resources:
-
-        this.current.resources,
-
-
-
-        effects:
-
-        this.current.effects
-
-
-
-    };
 
 
 }
