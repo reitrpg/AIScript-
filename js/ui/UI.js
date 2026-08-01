@@ -1,8 +1,8 @@
 /**
  * World Creator
- * Main UI
+ * User Interface
  *
- * Display Component Separation
+ * Main Display Controller
  */
 
 
@@ -11,6 +11,8 @@ import WorldManager from "../world/Manager.js";
 import ResourceManager from "../resource/Manager.js";
 
 import EPManager from "../ep/Manager.js";
+
+import SaveManager from "../core/save.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -23,6 +25,9 @@ class UI {
 
 
         this.area=null;
+
+
+        this.sections={};
 
 
     }
@@ -52,21 +57,29 @@ class UI {
 
 
 
+        this.createLayout();
+
+
+
         this.update();
 
+
+
+        this.registerEvents();
+
+
+    }
+
+
+
+    registerEvents(){
 
 
         eventBus.on(
 
             "resource:update",
 
-            ()=>{
-
-
-                this.update();
-
-
-            }
+            ()=>this.update()
 
         );
 
@@ -76,13 +89,7 @@ class UI {
 
             "world:update",
 
-            ()=>{
-
-
-                this.update();
-
-
-            }
+            ()=>this.update()
 
         );
 
@@ -92,15 +99,99 @@ class UI {
 
             "ep:update",
 
-            ()=>{
-
-
-                this.update();
-
-
-            }
+            ()=>this.update()
 
         );
+
+
+
+        eventBus.on(
+
+            "settings:update",
+
+            ()=>this.update()
+
+        );
+
+
+    }
+
+
+
+    createLayout(){
+
+
+        this.area.innerHTML=`
+
+        <div id="world-section"></div>
+
+        <div id="ep-section"></div>
+
+        <div id="resource-section"></div>
+
+        <div id="system-section"></div>
+
+        `;
+
+
+
+        this.sections.world=
+
+        document.getElementById(
+
+            "world-section"
+
+        );
+
+
+
+        this.sections.ep=
+
+        document.getElementById(
+
+            "ep-section"
+
+        );
+
+
+
+        this.sections.resource=
+
+        document.getElementById(
+
+            "resource-section"
+
+        );
+
+
+
+        this.sections.system=
+
+        document.getElementById(
+
+            "system-section"
+
+        );
+
+
+    }
+
+
+
+    getNumberFormat(){
+
+
+        const settings=
+
+        SaveManager.getSettings();
+
+
+
+        return settings.numberFormat
+
+        ??
+
+        "normal";
 
 
     }
@@ -120,9 +211,33 @@ class UI {
 
 
 
+        const mode=
+
+        this.getNumberFormat();
+
+
+
         if(
 
-            value < 1000
+            mode==="simple"
+
+        ){
+
+
+            return Math.floor(
+
+                value
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            value<1000
 
         ){
 
@@ -155,16 +270,7 @@ class UI {
             "Qa",
 
 
-            "Qi",
-
-
-            "Sx",
-
-
-            "Sp",
-
-
-            "Oc"
+            "Qi"
 
 
         ];
@@ -181,7 +287,7 @@ class UI {
 
             &&
 
-            index < units.length-1
+            index<units.length-1
 
         ){
 
@@ -211,7 +317,7 @@ class UI {
 
 
 
-    createWorldSection(){
+    updateWorld(){
 
 
         const world=
@@ -223,14 +329,14 @@ class UI {
         if(!world){
 
 
-            return "";
+            return;
 
 
         }
 
 
 
-        return `
+        this.sections.world.innerHTML=`
 
         <h3>
 
@@ -272,12 +378,6 @@ class UI {
 
         ${world.rebirthCount}
 
-        回
-
-
-
-        <hr>
-
         `;
 
 
@@ -285,10 +385,10 @@ class UI {
 
 
 
-    createEPSection(){
+    updateEP(){
 
 
-        return `
+        this.sections.ep.innerHTML=`
 
         <h3>
 
@@ -308,10 +408,6 @@ class UI {
 
         }
 
-
-
-        <hr>
-
         `;
 
 
@@ -319,7 +415,7 @@ class UI {
 
 
 
-    createResourceSection(){
+    updateResource(){
 
 
         const resources=
@@ -380,7 +476,43 @@ class UI {
 
 
 
-        return html;
+        this.sections.resource.innerHTML=
+
+        html;
+
+
+    }
+
+
+
+    updateSystem(){
+
+
+        this.sections.system.innerHTML=`
+
+        <h3>
+
+        システム
+
+        </h3>
+
+
+
+        <button>
+
+        設定
+
+        </button>
+
+
+
+        <button>
+
+        デバッグ
+
+        </button>
+
+        `;
 
 
     }
@@ -400,43 +532,16 @@ class UI {
 
 
 
-        this.area.innerHTML=
+        this.updateWorld();
 
 
-
-        `
-
-        <h2>
-
-        World Creator
-
-        </h2>
+        this.updateEP();
 
 
-
-        ${
-
-            this.createWorldSection()
-
-        }
+        this.updateResource();
 
 
-
-        ${
-
-            this.createEPSection()
-
-        }
-
-
-
-        ${
-
-            this.createResourceSection()
-
-        }
-
-        `;
+        this.updateSystem();
 
 
     }
