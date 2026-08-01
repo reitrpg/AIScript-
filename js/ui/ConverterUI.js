@@ -2,7 +2,7 @@
  * World Creator
  * Converter UI
  *
- * Resource Processing Display
+ * Resource Conversion Display
  */
 
 
@@ -40,23 +40,15 @@ class ConverterUI {
 
         if(!this.area){
 
+
             return;
 
         }
 
 
 
-        this.bindEvents();
-
-
         this.update();
 
-
-    }
-
-
-
-    bindEvents(){
 
 
         eventBus.on(
@@ -83,6 +75,7 @@ class ConverterUI {
 
         if(!this.area){
 
+
             return;
 
         }
@@ -95,31 +88,15 @@ class ConverterUI {
 
 
 
-        let html="";
+        let html=
 
-
-
-        html+=`
+        `
 
         <h3>
 
-        資源変換
+        変換
 
         </h3>
-
-
-        変換倍率:
-
-        ×${
-
-            Converter.getMultiplier()
-
-            .toFixed(2)
-
-        }
-
-
-        <br><br>
 
         `;
 
@@ -143,45 +120,31 @@ class ConverterUI {
             <div class="converter-item">
 
 
-            <h4>
+            <b>
 
             ${recipe.name}
 
-            </h4>
+            </b>
 
 
 
-            必要:
+            <br>
+
 
 
             ${recipe.input}
 
-            ×
-
-            ${recipe.inputAmount}
+            x${recipe.inputAmount}
 
 
 
-            <br>
+            →
 
-
-
-            ↓
-
-
-
-            <br>
-
-
-
-            獲得:
-
+            
 
             ${recipe.output}
 
-            ×
-
-            ${recipe.outputAmount}
+            x${recipe.outputAmount}
 
 
 
@@ -191,7 +154,7 @@ class ConverterUI {
 
             <button
 
-            data-converter="${id}">
+            data-convert="${id}">
 
 
             変換
@@ -202,10 +165,6 @@ class ConverterUI {
 
 
             </div>
-
-
-
-            <hr>
 
 
             `;
@@ -235,7 +194,7 @@ class ConverterUI {
 
         .querySelectorAll(
 
-            "[data-converter]"
+            "[data-convert]"
 
         )
 
@@ -251,7 +210,7 @@ class ConverterUI {
 
                     Converter.convert(
 
-                        button.dataset.converter
+                        button.dataset.convert
 
                     );
 
