@@ -2,7 +2,7 @@
  * World Creator
  * Research System
  *
- * Research + EP Cost Support
+ * Divine Revelation Research
  */
 
 
@@ -23,20 +23,24 @@ class ResearchManager {
         this.research={
 
 
-            agriculture:{
+
+            harvest:{
 
 
-                name:"豊穣神の啓示",
+                name:
+
+                "豊穣神の恩寵",
 
 
                 description:
-                "生命を育む神の知識に触れ、世界の実りを高める。",
+
+                "生命の循環を理解し、世界の実りを増幅させる。",
 
 
                 level:0,
 
 
-                max:10,
+                max:null,
 
 
                 cost:{
@@ -48,7 +52,10 @@ class ResearchManager {
                 },
 
 
-                effect:1.05
+                growth:1.05,
+
+
+                infinite:true
 
 
 
@@ -56,20 +63,23 @@ class ResearchManager {
 
 
 
-            mining:{
+            earth:{
 
 
-                name:"大地脈の解読",
+                name:
+
+                "大地脈の啓示",
 
 
                 description:
-                "大地に刻まれた流れを読み取り、資源獲得能力を高める。",
+
+                "地脈に眠る力を読み取り、資源の流れを強化する。",
 
 
                 level:0,
 
 
-                max:10,
+                max:null,
 
 
                 cost:{
@@ -81,7 +91,10 @@ class ResearchManager {
                 },
 
 
-                effect:1.1
+                growth:1.08,
+
+
+                infinite:true
 
 
 
@@ -89,20 +102,23 @@ class ResearchManager {
 
 
 
-            magic:{
+            mana:{
 
 
-                name:"原初魔力への接触",
+                name:
+
+                "原初魔力への接触",
 
 
                 description:
-                "世界創生時の魔力へ接近する。",
+
+                "世界創造以前の魔力構造へ接続する。",
 
 
                 level:0,
 
 
-                max:10,
+                max:null,
 
 
                 cost:{
@@ -114,7 +130,10 @@ class ResearchManager {
                 },
 
 
-                effect:1.15
+                growth:1.1,
+
+
+                infinite:true
 
 
 
@@ -122,20 +141,23 @@ class ResearchManager {
 
 
 
-            world:{
+            creation:{
 
 
-                name:"世界理の開眼",
+                name:
+
+                "創世神の残響",
 
 
                 description:
-                "世界法則の一端を理解する。",
+
+                "世界の根源法則の一部を理解する。",
 
 
                 level:0,
 
 
-                max:5,
+                max:null,
 
 
                 cost:{
@@ -147,40 +169,10 @@ class ResearchManager {
                 },
 
 
-                effect:1.25
+                growth:1.15,
 
 
-
-            },
-
-
-
-            rebirth:{
-
-
-                name:"輪廻門の理解",
-
-
-                description:
-                "循環する世界の理へ到達する。",
-
-
-                level:0,
-
-
-                max:5,
-
-
-                cost:{
-
-
-                    ep:10000
-
-
-                },
-
-
-                effect:1.5
+                infinite:true
 
 
 
@@ -188,6 +180,108 @@ class ResearchManager {
 
 
         };
+
+
+    }
+
+
+
+    get(id){
+
+
+        return this.research[id];
+
+
+    }
+
+
+
+    getAll(){
+
+
+        return this.research;
+
+
+    }
+
+
+
+    getCost(id){
+
+
+        const data=
+
+        this.research[id];
+
+
+
+        if(!data){
+
+
+            return null;
+
+
+        }
+
+
+
+        return {
+
+
+            ep:
+
+            Math.floor(
+
+                data.cost.ep
+
+                *
+
+                Math.pow(
+
+                    1.25,
+
+                    data.level
+
+                )
+
+            )
+
+
+        };
+
+
+    }
+
+
+
+    canResearch(id){
+
+
+        const cost=
+
+        this.getCost(
+
+            id
+
+        );
+
+
+
+        if(!cost){
+
+
+            return false;
+
+
+        }
+
+
+
+        return EPManager.canPay(
+
+            cost.ep
+
+        );
 
 
     }
@@ -213,25 +307,21 @@ class ResearchManager {
 
 
 
-        if(
+        const cost=
 
-            data.level >= data.max
+        this.getCost(
 
-        ){
+            id
 
-
-            return false;
-
-
-        }
+        );
 
 
 
         if(
 
-            !this.canPay(
+            !this.canResearch(
 
-                data.cost
+                id
 
             )
 
@@ -245,9 +335,9 @@ class ResearchManager {
 
 
 
-        this.pay(
+        EPManager.consume(
 
-            data.cost
+            cost.ep
 
         );
 
@@ -272,132 +362,35 @@ class ResearchManager {
 
 
 
-    canPay(cost){
+    getEffect(id){
 
 
-        for(
+        const data=
 
-            const id in cost
-
-        ){
-
-
-            if(
-
-                id === "ep"
-
-            ){
-
-
-                if(
-
-                    !EPManager.canPay(
-
-                        cost[id]
-
-                    )
-
-                ){
-
-
-                    return false;
-
-
-                }
-
-
-                continue;
-
-
-            }
+        this.research[id];
 
 
 
-            const resource=
-
-            ResourceManager.get(
-
-                id
-
-            );
+        if(!data){
 
 
-
-            if(
-
-                !resource
-
-                ||
-
-                resource.getAmount()
-
-                <
-
-                cost[id]
-
-            ){
-
-
-                return false;
-
-
-            }
+            return 1;
 
 
         }
 
 
 
-        return true;
+        return Math.pow(
 
 
-    }
+            data.growth,
 
 
-
-    pay(cost){
-
-
-        for(
-
-            const id in cost
-
-        ){
+            data.level
 
 
-            if(
-
-                id === "ep"
-
-            ){
-
-
-                EPManager.consume(
-
-                    cost[id]
-
-                );
-
-
-                continue;
-
-
-            }
-
-
-
-            ResourceManager
-
-            .get(id)
-
-            .consume(
-
-                cost[id]
-
-            );
-
-
-        }
+        );
 
 
     }
@@ -418,19 +411,11 @@ class ResearchManager {
         ){
 
 
-            const data=
-
-            this.research[id];
-
-
-
             value*=
 
-            Math.pow(
+            this.getEffect(
 
-                data.effect,
-
-                data.level
+                id
 
             );
 
@@ -446,20 +431,44 @@ class ResearchManager {
 
 
 
-    getProductionMultiplier(){
+    getStatus(id){
 
 
-        return this.getMultiplier();
+        const data=
+
+        this.research[id];
 
 
-    }
+
+        if(!data){
+
+
+            return null;
+
+
+        }
 
 
 
-    getAll(){
+        return {
 
 
-        return this.research;
+            name:data.name,
+
+
+            description:data.description,
+
+
+            level:data.level,
+
+
+            cost:this.getCost(id),
+
+
+            canResearch:this.canResearch(id)
+
+
+        };
 
 
     }
