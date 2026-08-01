@@ -1,25 +1,18 @@
 /**
  * World Creator
- * Game Core
+ * Game Loop
  *
- * Integrated Version
+ * Production / EXP System
  */
 
 
-import eventBus from "./eventBus.js";
-
 import time from "./time.js";
-
-import save from "./save.js";
-
 
 import ResourceManager from "../resource/Manager.js";
 
-import Converter from "../resource/Converter.js";
-
 import WorldManager from "../world/Manager.js";
 
-import ResearchManager from "../research/Manager.js";
+import eventBus from "./eventBus.js";
 
 
 
@@ -32,52 +25,7 @@ class Game {
         this.running = false;
 
 
-    }
-
-
-
-    init(){
-
-
-        ResourceManager.init();
-
-
-        WorldManager.init();
-
-
-        ResearchManager.init();
-
-
-
-        eventBus.on(
-
-            "time:tick",
-
-            () => {
-
-
-                this.update();
-
-
-            }
-
-        );
-
-
-
-        eventBus.on(
-
-            "game:save",
-
-            () => {
-
-
-                this.save();
-
-
-            }
-
-        );
+        this.interval = null;
 
 
     }
@@ -89,9 +37,7 @@ class Game {
 
         if(this.running){
 
-
             return;
-
 
         }
 
@@ -100,7 +46,55 @@ class Game {
         this.running = true;
 
 
+
         time.start();
+
+
+
+        this.interval = setInterval(
+
+            ()=>{
+
+
+                this.tick();
+
+
+            },
+
+            1000
+
+        );
+
+
+    }
+
+
+
+    tick(){
+
+
+
+        // 世界経験値取得
+
+        WorldManager.addExp(
+
+            1
+
+        );
+
+
+
+        // 資源生産
+
+        ResourceManager.update();
+
+
+
+        eventBus.emit(
+
+            "game:tick"
+
+        );
 
 
     }
@@ -110,207 +104,30 @@ class Game {
     stop(){
 
 
+        if(this.interval){
+
+
+            clearInterval(
+
+                this.interval
+
+            );
+
+
+        }
+
+
+
         this.running = false;
 
 
-        time.stop();
-
-
-        this.save();
-
 
     }
 
-
-
-    update(){
-
-
-        if(!this.running){
-
-
-            return;
-
-
-        }
-
-
-
-        /*
-            資源生産
-        */
-
-
-        ResourceManager.update();
-
-
-
-        /*
-            資源変換
-        */
-
-
-        Converter.tick();
-
-
-
-        /*
-            研究ポイント
-        */
-
-
-        ResearchManager.addPoint(
-
-            1
-
-        );
-
-
-
-        /*
-            世界更新
-        */
-
-
-        WorldManager.update();
-
-
-
-        /*
-            UI更新通知
-        */
-
-
-        eventBus.emit(
-
-            "resource:update"
-
-        );
-
-
-        eventBus.emit(
-
-            "research:update"
-
-        );
-
-
-        eventBus.emit(
-
-            "world:update"
-
-        );
-
-
-        eventBus.emit(
-
-            "game:update"
-
-        );
-
-
-    }
-
-
-
-    save(){
-
-
-        save.save({
-
-
-            resource:
-
-                ResourceManager.toJSON(),
-
-
-
-            world:
-
-                WorldManager.toJSON(),
-
-
-
-            research:
-
-                ResearchManager.toJSON(),
-
-
-
-            time:
-
-                time.toJSON()
-
-
-
-        });
-
-
-    }
-
-
-
-    load(){
-
-
-        const data =
-
-            save.load();
-
-
-
-        if(!data){
-
-
-            return;
-
-
-        }
-
-
-
-        ResourceManager.load(
-
-            data.resource
-
-        );
-
-
-
-        WorldManager.load(
-
-            data.world
-
-        );
-
-
-
-        ResearchManager.load(
-
-            data.research
-
-        );
-
-
-
-        time.load(
-
-            data.time
-
-        );
-
-
-    }
 
 
 }
 
 
 
-const game =
-
-    new Game();
-
-
-
-export default game;
+export default new Game();
