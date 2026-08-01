@@ -2,7 +2,7 @@
  * World Creator
  * Main UI
  *
- * World / Resource / EP Display
+ * Display Component Separation
  */
 
 
@@ -46,6 +46,7 @@ class UI {
 
 
             return;
+
 
         }
 
@@ -138,23 +139,33 @@ class UI {
 
             "",
 
+
             "K",
+
 
             "M",
 
+
             "B",
+
 
             "T",
 
+
             "Qa",
+
 
             "Qi",
 
+
             "Sx",
+
 
             "Sp",
 
+
             "Oc"
+
 
         ];
 
@@ -170,7 +181,7 @@ class UI {
 
             &&
 
-            index<units.length-1
+            index < units.length-1
 
         ){
 
@@ -200,16 +211,7 @@ class UI {
 
 
 
-    update(){
-
-
-        if(!this.area){
-
-
-            return;
-
-        }
-
+    createWorldSection(){
 
 
         const world=
@@ -221,31 +223,14 @@ class UI {
         if(!world){
 
 
-            return;
+            return "";
+
 
         }
 
 
 
-        const resources=
-
-        ResourceManager.getAll();
-
-
-
-        let html=
-
-
-
-        `
-
-        <h2>
-
-        World Creator
-
-        </h2>
-
-
+        return `
 
         <h3>
 
@@ -258,6 +243,8 @@ class UI {
         Lv:
 
         ${world.level}
+
+
 
         <br>
 
@@ -285,11 +272,23 @@ class UI {
 
         ${world.rebirthCount}
 
+        回
+
 
 
         <hr>
 
+        `;
 
+
+    }
+
+
+
+    createEPSection(){
+
+
+        return `
 
         <h3>
 
@@ -313,7 +312,23 @@ class UI {
 
         <hr>
 
+        `;
 
+
+    }
+
+
+
+    createResourceSection(){
+
+
+        const resources=
+
+        ResourceManager.getAll();
+
+
+
+        let html=`
 
         <h3>
 
@@ -340,7 +355,6 @@ class UI {
 
             html+=`
 
-
             ${resource.name}
 
             :
@@ -359,8 +373,27 @@ class UI {
 
             <br>
 
-
             `;
+
+
+        }
+
+
+
+        return html;
+
+
+    }
+
+
+
+    update(){
+
+
+        if(!this.area){
+
+
+            return;
 
 
         }
@@ -369,7 +402,41 @@ class UI {
 
         this.area.innerHTML=
 
-        html;
+
+
+        `
+
+        <h2>
+
+        World Creator
+
+        </h2>
+
+
+
+        ${
+
+            this.createWorldSection()
+
+        }
+
+
+
+        ${
+
+            this.createEPSection()
+
+        }
+
+
+
+        ${
+
+            this.createResourceSection()
+
+        }
+
+        `;
 
 
     }
