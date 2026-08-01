@@ -14,6 +14,8 @@ import WorldManager from "../world/Manager.js";
 
 import ResourceManager from "../resource/Manager.js";
 
+import ResearchManager from "../research/Manager.js";
+
 import UI from "../ui/UI.js";
 
 import eventBus from "./eventBus.js";
@@ -41,7 +43,7 @@ class Main {
 
 
 
-        // 世界が存在しない場合作成
+        // 世界が存在しない場合生成
 
         if(
 
@@ -61,13 +63,23 @@ class Main {
 
 
 
-        // 世界素材を同期
+        // 世界素材同期
 
         ResourceManager.syncWorldResources();
 
 
 
-        // UI開始
+        // 研究倍率反映
+
+        ResourceManager.setResearchMultiplier(
+
+            ResearchManager.getMultiplier()
+
+        );
+
+
+
+        // UI初期化
 
         UI.init(
 
@@ -77,17 +89,13 @@ class Main {
 
 
 
-        // イベント接続
-
+        // 世界更新
 
         eventBus.on(
 
-            "world:create",
+            "world:update",
 
             ()=>{
-
-
-                WorldManager.createWorld();
 
 
                 ResourceManager.syncWorldResources();
@@ -97,20 +105,8 @@ class Main {
                 SaveManager.save();
 
 
-            }
 
-        );
-
-
-
-        eventBus.on(
-
-            "world:update",
-
-            ()=>{
-
-
-                SaveManager.save();
+                UI.update();
 
 
             }
@@ -118,6 +114,8 @@ class Main {
         );
 
 
+
+        // 資源更新
 
         eventBus.on(
 
@@ -129,11 +127,43 @@ class Main {
                 SaveManager.save();
 
 
+
+                UI.update();
+
+
             }
 
         );
 
 
+
+        // 研究完了
+
+        eventBus.on(
+
+            "research:complete",
+
+            ()=>{
+
+
+                ResourceManager.setResearchMultiplier(
+
+                    ResearchManager.getMultiplier()
+
+                );
+
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        // 転生
 
         eventBus.on(
 
@@ -145,7 +175,12 @@ class Main {
                 ResourceManager.syncWorldResources();
 
 
+
                 SaveManager.save();
+
+
+
+                UI.update();
 
 
             }
@@ -168,7 +203,7 @@ class Main {
 
 
 
-const main =
+const main=
 
 new Main();
 
