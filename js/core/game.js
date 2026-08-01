@@ -2,11 +2,11 @@
  * World Creator
  * Game Loop
  *
- * Offline Progress + EP Integration
+ * Tick Control System
  */
 
 
-import time from "./time.js";
+import TimeManager from "./time.js";
 
 import ResourceManager from "../resource/Manager.js";
 
@@ -24,14 +24,15 @@ class Game {
     constructor(){
 
 
-        this.running = false;
+        this.running=false;
 
 
-        this.interval = null;
+        this.interval=null;
 
 
 
-        this.epPerTick = 1;
+        this.epPerTick=1;
+
 
 
     }
@@ -46,11 +47,12 @@ class Game {
 
             return;
 
+
         }
 
 
 
-        this.running = true;
+        this.running=true;
 
 
 
@@ -58,7 +60,31 @@ class Game {
 
 
 
-        this.interval = setInterval(
+        this.createLoop();
+
+
+    }
+
+
+
+    createLoop(){
+
+
+        if(this.interval){
+
+
+            clearInterval(
+
+                this.interval
+
+            );
+
+
+        }
+
+
+
+        this.interval=setInterval(
 
 
             ()=>{
@@ -70,7 +96,7 @@ class Game {
             },
 
 
-            1000
+            TimeManager.getTickSpeed()
 
 
         );
@@ -80,23 +106,48 @@ class Game {
 
 
 
-    applyOfflineProgress(){
-
-
-        const seconds =
-
-        time.getOfflineSeconds();
-
+    restartLoop(){
 
 
         if(
 
-            seconds <= 0
+            !this.running
 
         ){
 
 
             return;
+
+
+        }
+
+
+
+        this.createLoop();
+
+
+    }
+
+
+
+    applyOfflineProgress(){
+
+
+        const seconds=
+
+        TimeManager.getOfflineSeconds();
+
+
+
+        if(
+
+            seconds<=0
+
+        ){
+
+
+            return;
+
 
         }
 
@@ -104,9 +155,9 @@ class Game {
 
         for(
 
-            let i = 0;
+            let i=0;
 
-            i < seconds;
+            i<seconds;
 
             i++
 
@@ -118,15 +169,6 @@ class Game {
 
         }
 
-
-
-        eventBus.emit(
-
-            "offline:complete",
-
-            seconds
-
-        );
 
 
     }
@@ -143,18 +185,7 @@ class Game {
 
 
 
-    getEPGain(){
-
-
-        return this.epPerTick;
-
-
-    }
-
-
-
     productionTick(){
-
 
 
         WorldManager.addExp(
@@ -188,6 +219,32 @@ class Game {
 
 
 
+    getEPGain(){
+
+
+        return this.epPerTick;
+
+
+    }
+
+
+
+    setEPGain(value){
+
+
+        this.epPerTick=
+
+        Number(value)
+
+        ||
+
+        0;
+
+
+    }
+
+
+
     stop(){
 
 
@@ -203,6 +260,9 @@ class Game {
 
         }
 
+
+
+        this.interval=null;
 
 
         this.running=false;
