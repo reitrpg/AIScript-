@@ -1,58 +1,189 @@
-const KEY=
-
-"world_creator_save";
-
-
-
-class SaveManager{
-
-
-save(data){
+/**
+ * World Creator
+ * Save System
+ *
+ * World Data Integration
+ */
 
 
-localStorage.setItem(
+import WorldManager from "../world/Manager.js";
 
-KEY,
+import ResourceManager from "../resource/Manager.js";
 
-JSON.stringify(data)
 
-);
+
+class SaveManager {
+
+
+    constructor(){
+
+
+        this.key =
+
+        "world_creator_save";
+
+
+    }
+
+
+
+    save(){
+
+
+        const data = {
+
+
+            world:
+
+            WorldManager.toJSON(),
+
+
+
+            resources:
+
+            ResourceManager.toJSON(),
+
+
+
+            version:
+
+            1
+
+
+
+        };
+
+
+
+        localStorage.setItem(
+
+            this.key,
+
+            JSON.stringify(data)
+
+        );
+
+
+    }
+
+
+
+    load(){
+
+
+        const text =
+
+        localStorage.getItem(
+
+            this.key
+
+        );
+
+
+
+        if(!text){
+
+
+            return false;
+
+
+        }
+
+
+
+        try{
+
+
+            const data =
+
+            JSON.parse(
+
+                text
+
+            );
+
+
+
+            if(
+
+                data.world
+
+            ){
+
+
+                WorldManager.load(
+
+                    data.world
+
+                );
+
+
+            }
+
+
+
+            if(
+
+                data.resources
+
+            ){
+
+
+                ResourceManager.load(
+
+                    data.resources
+
+                );
+
+
+            }
+
+
+
+            return true;
+
+
+
+        }
+
+        catch(e){
+
+
+            console.error(
+
+                "Save Load Error",
+
+                e
+
+            );
+
+
+
+            return false;
+
+
+        }
+
+
+    }
+
+
+
+    clear(){
+
+
+        localStorage.removeItem(
+
+            this.key
+
+        );
+
+
+    }
 
 
 }
 
 
 
-load(){
-
-
-const data=
-
-localStorage.getItem(KEY);
-
-
-
-if(!data){
-
-return null;
-
-}
-
-
-
-return JSON.parse(data);
-
-
-
-}
-
-
-
-}
-
-
-
-const save=new SaveManager();
-
-
-export default save;
+export default new SaveManager();
