@@ -7,13 +7,9 @@
 
 
 import EPManager from "../ep/Manager.js";
-
 import ResearchManager from "../research/Manager.js";
-
 import UpgradeManager from "../upgrades/Manager.js";
-
 import SettingsManager from "../settings/Manager.js";
-
 import eventBus from "./eventBus.js";
 
 
@@ -24,16 +20,16 @@ class Game {
     constructor(){
 
 
-        this.running=false;
+        this.running = false;
 
 
-        this.timer=null;
+        this.timer = null;
 
 
-        this.speedMultiplier=1;
+        this.tickCount = 0;
 
 
-        this.tickCount=0;
+        this.speedMultiplier = 1;
 
 
     }
@@ -53,8 +49,7 @@ class Game {
 
 
 
-        this.running=true;
-
+        this.running = true;
 
 
         this.loop();
@@ -67,18 +62,17 @@ class Game {
     stop(){
 
 
-        this.running=false;
+        this.running = false;
 
 
 
         if(this.timer){
 
 
-            clearTimeout(
+            clearTimeout(this.timer);
 
-                this.timer
 
-            );
+            this.timer = null;
 
 
         }
@@ -101,27 +95,25 @@ class Game {
 
 
 
-        this.tick();
+        this.executeTick();
 
 
 
-        const speed=
+        const interval =
 
-        SettingsManager.getTickSpeed();
-
-
-
-        this.timer=
-
-        setTimeout(
-
-            ()=>this.loop(),
-
-            speed
+            SettingsManager.getTickSpeed()
 
             /
 
-            this.speedMultiplier
+            this.speedMultiplier;
+
+
+
+        this.timer = setTimeout(
+
+            ()=>this.loop(),
+
+            interval
 
         );
 
@@ -130,37 +122,13 @@ class Game {
 
 
 
-    tick(){
+    executeTick(){
 
 
-        const research=
-
-        ResearchManager.getMultiplier();
+        this.processProduction();
 
 
-
-        const upgrade=
-
-        UpgradeManager.getTotalMultiplier();
-
-
-
-        const gain=
-
-        research
-
-        *
-
-        upgrade;
-
-
-
-        EPManager.add(
-
-            gain
-
-        );
-
+        this.processResources();
 
 
         this.tickCount++;
@@ -178,64 +146,86 @@ class Game {
 
 
 
-    debugTick(count){
+    processProduction(){
 
 
-        if(
+        const researchMultiplier =
 
-            count<=0
-
-        ){
+            ResearchManager.getMultiplier();
 
 
-            return;
+
+        const upgradeMultiplier =
+
+            UpgradeManager.getTotalMultiplier();
 
 
-        }
+
+        const gain =
+
+            1
+
+            *
+
+            researchMultiplier
+
+            *
+
+            upgradeMultiplier;
+
+
+
+        EPManager.add(gain);
+
+
+    }
+
+
+
+    processResources(){
+
+
+        /*
+         * 将来追加
+         * Resource生成
+         * Converter処理
+         * 実績判定
+         * クエスト判定
+         */
+    }
+
+
+
+    debugTick(count = 1){
+
+
+        const amount =
+
+            Math.max(
+
+                0,
+
+                Number(count) || 0
+
+            );
 
 
 
         for(
 
-            let i=0;
+            let i = 0;
 
-            i<count;
+            i < amount;
 
             i++
 
         ){
 
 
-            this.tick();
+            this.executeTick();
 
 
         }
-
-
-    }
-
-
-
-    setSpeedMultiplier(value){
-
-
-        this.speedMultiplier=
-
-        Number(value)
-
-        ||
-
-        1;
-
-
-    }
-
-
-
-    getSpeedMultiplier(){
-
-
-        return this.speedMultiplier;
 
 
     }
@@ -250,6 +240,37 @@ class Game {
 
     }
 
+
+
+    setSpeedMultiplier(value){
+
+
+        const speed =
+
+            Number(value);
+
+
+
+        if(speed > 0){
+
+
+            this.speedMultiplier = speed;
+
+
+        }
+
+
+    }
+
+
+
+    getSpeedMultiplier(){
+
+
+        return this.speedMultiplier;
+
+
+    }
 
 
 }
