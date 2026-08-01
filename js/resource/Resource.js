@@ -2,7 +2,7 @@
  * World Creator
  * Resource Data
  *
- * Integrated Version
+ * Decimal / Large Number Support
  */
 
 
@@ -32,8 +32,26 @@ class Resource {
         this.production = 0;
 
 
+    }
 
-        this.productionRate = 1;
+
+
+    setProduction(value){
+
+
+        this.production =
+
+        Number(value);
+
+
+    }
+
+
+
+    getProduction(){
+
+
+        return this.production;
 
 
     }
@@ -43,23 +61,29 @@ class Resource {
     add(value){
 
 
-        this.amount += value;
+        if(
 
+            isNaN(value)
 
-        if(this.amount < 0){
+        ){
 
-
-            this.amount = 0;
-
+            return;
 
         }
+
+
+
+        this.amount +=
+
+        Number(value);
+
 
 
     }
 
 
 
-    remove(value){
+    consume(value){
 
 
         if(
@@ -76,7 +100,9 @@ class Resource {
 
 
 
-        this.amount -= value;
+        this.amount -=
+
+        value;
 
 
 
@@ -87,50 +113,10 @@ class Resource {
 
 
 
-    setProduction(value){
+    getAmount(){
 
 
-        this.production = value;
-
-
-    }
-
-
-
-    setProductionRate(value){
-
-
-        this.productionRate = value;
-
-
-    }
-
-
-
-    getProduction(){
-
-
-        return (
-
-            this.production *
-
-            this.productionRate
-
-        );
-
-
-    }
-
-
-
-    update(){
-
-
-        this.add(
-
-            this.getProduction()
-
-        );
+        return this.amount;
 
 
     }
@@ -145,31 +131,22 @@ class Resource {
 
             id:
 
-                this.id,
-
+            this.id,
 
 
             name:
 
-                this.name,
-
+            this.name,
 
 
             amount:
 
-                this.amount,
-
+            this.amount,
 
 
             production:
 
-                this.production,
-
-
-
-            productionRate:
-
-                this.productionRate
+            this.production
 
 
         };
@@ -184,9 +161,7 @@ class Resource {
 
         if(!data){
 
-
             return;
-
 
         }
 
@@ -194,22 +169,26 @@ class Resource {
 
         this.amount =
 
-            data.amount ?? 0;
+        Number(
+
+            data.amount ?? 0
+
+        );
 
 
 
         this.production =
 
-            data.production ?? 0;
+        Number(
 
+            data.production ?? 0
 
+        );
 
-        this.productionRate =
-
-            data.productionRate ?? 1;
 
 
     }
+
 
 
 }
