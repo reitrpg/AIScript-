@@ -2,7 +2,7 @@
  * World Creator
  * Resource Data
  *
- * Decimal / Large Number Support
+ * Resource Object
  */
 
 
@@ -18,18 +18,27 @@ class Resource {
     ){
 
 
-        this.id = id;
+        this.id=
 
-
-        this.name = name;
-
-
-
-        this.amount = 0;
+        id;
 
 
 
-        this.production = 0;
+        this.name=
+
+        name;
+
+
+
+        this.amount=
+
+        0;
+
+
+
+        this.production=
+
+        0;
 
 
     }
@@ -39,9 +48,13 @@ class Resource {
     setProduction(value){
 
 
-        this.production =
+        this.production=
 
-        Number(value);
+        Number(value)
+
+        ||
+
+        0;
 
 
     }
@@ -61,11 +74,18 @@ class Resource {
     add(value){
 
 
+        const number=
+
+        Number(value);
+
+
+
         if(
 
-            isNaN(value)
+            isNaN(number)
 
         ){
+
 
             return;
 
@@ -73,10 +93,9 @@ class Resource {
 
 
 
-        this.amount +=
+        this.amount+=
 
-        Number(value);
-
+        number;
 
 
     }
@@ -86,9 +105,15 @@ class Resource {
     consume(value){
 
 
+        const number=
+
+        Number(value);
+
+
+
         if(
 
-            this.amount < value
+            this.amount < number
 
         ){
 
@@ -100,9 +125,9 @@ class Resource {
 
 
 
-        this.amount -=
+        this.amount-=
 
-        value;
+        number;
 
 
 
@@ -134,9 +159,11 @@ class Resource {
             this.id,
 
 
+
             name:
 
             this.name,
+
 
 
             amount:
@@ -144,9 +171,11 @@ class Resource {
             this.amount,
 
 
+
             production:
 
             this.production
+
 
 
         };
@@ -161,30 +190,38 @@ class Resource {
 
         if(!data){
 
+
             return;
 
         }
 
 
 
-        this.amount =
+        this.amount=
 
         Number(
 
-            data.amount ?? 0
+            data.amount
 
-        );
+        )
+
+        ||
+
+        0;
 
 
 
-        this.production =
+        this.production=
 
         Number(
 
-            data.production ?? 0
+            data.production
 
-        );
+        )
 
+        ||
+
+        0;
 
 
     }
