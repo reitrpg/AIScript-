@@ -223,4 +223,150 @@ class UI {
 
 
 
-        Lv
+        Lv:
+
+        ${world.level}
+
+
+
+        <br>
+
+
+
+        EXP:
+
+        ${world.exp}
+
+
+
+        <br>
+
+
+
+        転生回数:
+
+        ${world.rebirthCount}
+
+
+
+        <br>
+
+
+
+        転生倍率:
+
+        ×${
+
+            world.rebirthMultiplier
+
+            .toFixed(2)
+
+        }
+
+
+
+        <br>
+
+
+
+        レアリティ:
+
+        ${world.rarity}
+
+
+
+        `;
+
+
+    }
+
+
+
+    updateResource(){
+
+
+        const area=
+
+        document.getElementById(
+
+            "resource-info"
+
+        );
+
+
+
+        if(!area){
+
+
+            return;
+
+        }
+
+
+
+        const resources=
+
+        ResourceManager.getAll();
+
+
+
+        let html="";
+
+
+
+        html+=`
+
+        <h2>
+
+        Resources
+
+        </h2>
+
+        `;
+
+
+
+        for(
+
+            const id in resources
+
+        ){
+
+
+            const resource=
+
+            resources[id];
+
+
+
+            html+=`
+
+            ${resource.name}
+
+            :
+
+            ${resource.amount}
+
+            <br>
+
+            `;
+
+
+        }
+
+
+
+        area.innerHTML=
+
+        html;
+
+
+    }
+
+
+
+}
+
+
+
+export default new UI();
