@@ -1,193 +1,58 @@
-/**
- * World Creator
- * Save System
- *
- * LocalStorage管理
- */
+const KEY=
 
+"world_creator_save";
 
-class SaveManager {
 
 
-    constructor() {
+class SaveManager{
 
 
-        this.key =
+save(data){
 
-            "world_creator_save";
 
+localStorage.setItem(
 
-    }
+KEY,
 
+JSON.stringify(data)
 
-
-    /**
-     * 保存
-     */
-
-    save(data) {
-
-
-        try {
-
-
-            const json =
-
-                JSON.stringify(
-                    data
-                );
-
-
-
-            localStorage.setItem(
-
-                this.key,
-
-                json
-
-            );
-
-
-
-            return true;
-
-
-        }
-
-        catch(error) {
-
-
-            console.error(
-
-                "Save Error:",
-
-                error
-
-            );
-
-
-            return false;
-
-
-        }
-
-
-    }
-
-
-
-    /**
-     * 読込
-     */
-
-    load() {
-
-
-        try {
-
-
-            const json =
-
-                localStorage.getItem(
-
-                    this.key
-
-                );
-
-
-
-            if (!json) {
-
-
-                return null;
-
-
-            }
-
-
-
-            return JSON.parse(
-
-                json
-
-            );
-
-
-        }
-
-        catch(error) {
-
-
-            console.error(
-
-                "Load Error:",
-
-                error
-
-            );
-
-
-            return null;
-
-
-        }
-
-
-    }
-
-
-
-    /**
-     * 削除
-     */
-
-    clear() {
-
-
-        localStorage.removeItem(
-
-            this.key
-
-        );
-
-
-    }
-
-
-
-    /**
-     * 存在確認
-     */
-
-    exists() {
-
-
-        return (
-
-            localStorage.getItem(
-
-                this.key
-
-            )
-
-            !==
-
-            null
-
-        );
-
-
-    }
+);
 
 
 }
 
 
 
-const save =
+load(){
 
-    new SaveManager();
 
+const data=
+
+localStorage.getItem(KEY);
+
+
+
+if(!data){
+
+return null;
+
+}
+
+
+
+return JSON.parse(data);
+
+
+
+}
+
+
+
+}
+
+
+
+const save=new SaveManager();
 
 
 export default save;
