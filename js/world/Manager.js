@@ -1,6 +1,8 @@
 /**
  * World Creator
  * World Manager
+ *
+ * World Generation / Level / Rebirth System
  */
 
 
@@ -14,7 +16,7 @@ class WorldManager {
     constructor(){
 
 
-        this.current=null;
+        this.world=null;
 
 
     }
@@ -24,84 +26,12 @@ class WorldManager {
     createWorld(){
 
 
-        const rarityTable=[
+        this.world={
 
 
-            {
-                name:"Normal",
-                multiplier:1,
-                effectCount:1
-            },
+            id:
 
-
-            {
-                name:"Rare",
-                multiplier:1.5,
-                effectCount:2
-            },
-
-
-            {
-                name:"Epic",
-                multiplier:2.5,
-                effectCount:2
-            },
-
-
-            {
-                name:"Legend",
-                multiplier:5,
-                effectCount:3
-            },
-
-
-            {
-                name:"Mythic",
-                multiplier:10,
-                effectCount:4
-            }
-
-
-        ];
-
-
-
-        const rarity=
-
-        rarityTable[
-
-            Math.floor(
-
-                Math.random()
-
-                *
-
-                rarityTable.length
-
-            )
-
-        ];
-
-
-
-        this.current={
-
-
-            name:
-
-            this.randomName(),
-
-
-
-            rarity:
-
-            rarity.name,
-
-
-
-            rarityMultiplier:
-
-            rarity.multiplier,
+            Date.now(),
 
 
 
@@ -121,19 +51,58 @@ class WorldManager {
 
 
 
-            resources:
-
-            this.createResources(),
+            rarity:"normal",
 
 
 
-            effects:
+            rarityMultiplier:1,
 
-            this.createEffects(
 
-                rarity.effectCount
 
-            )
+            effects:[
+
+
+
+                "豊かな森"
+
+
+
+            ],
+
+
+
+            resources:{
+
+
+                wood:{
+
+
+                    base:1
+
+
+                },
+
+
+                stone:{
+
+
+                    base:1
+
+
+                },
+
+
+                food:{
+
+
+                    base:1
+
+
+                }
+
+
+            }
+
 
 
         };
@@ -144,7 +113,7 @@ class WorldManager {
 
             "world:create",
 
-            this.current
+            this.world
 
         );
 
@@ -153,166 +122,10 @@ class WorldManager {
 
 
 
-    randomName(){
+    getCurrent(){
 
 
-        const list=[
-
-
-            "アステリア",
-
-            "エルドラ",
-
-            "ネヴァリス",
-
-            "オルビス",
-
-            "アルカディア"
-
-
-        ];
-
-
-
-        return list[
-
-            Math.floor(
-
-                Math.random()
-
-                *
-
-                list.length
-
-            )
-
-        ];
-
-
-    }
-
-
-
-    createResources(){
-
-
-        return {
-
-
-            wood:{
-
-                base:1
-
-            },
-
-
-            stone:{
-
-                base:1
-
-            },
-
-
-            food:{
-
-                base:1
-
-            },
-
-
-            ore:{
-
-                base:0.5
-
-            },
-
-
-            mana:{
-
-                base:0.2
-
-            }
-
-
-        };
-
-
-    }
-
-
-
-    createEffects(count){
-
-
-        const list=[
-
-
-            "豊かな森",
-
-
-            "鉱脈の大地",
-
-
-            "魔力循環",
-
-
-            "神代遺構",
-
-
-            "世界樹の核"
-
-
-        ];
-
-
-
-        const result=[];
-
-
-
-        while(
-
-            result.length<count
-
-        ){
-
-
-            const effect=
-
-            list[
-
-                Math.floor(
-
-                    Math.random()
-
-                    *
-
-                    list.length
-
-                )
-
-            ];
-
-
-
-            if(
-
-                !result.includes(effect)
-
-            ){
-
-
-                result.push(effect);
-
-
-            }
-
-
-        }
-
-
-
-        return result;
+        return this.world;
 
 
     }
@@ -322,7 +135,8 @@ class WorldManager {
     addExp(value){
 
 
-        if(!this.current){
+        if(!this.world){
+
 
             return;
 
@@ -330,34 +144,40 @@ class WorldManager {
 
 
 
-        this.current.exp+=value;
+        this.world.exp +=
+
+        value;
 
 
 
-        while(
+        const need=
 
-            this.current.exp >=
+        this.world.level
 
-            this.getNeedExp()
+        *
+
+        10;
+
+
+
+        if(
+
+            this.world.exp >= need
 
         ){
 
 
-            this.current.exp-=
-
-            this.getNeedExp();
+            this.world.exp -= need;
 
 
 
-            this.current.level++;
+            this.world.level++;
 
 
 
             eventBus.emit(
 
-                "world:update",
-
-                this.current
+                "world:update"
 
             );
 
@@ -369,24 +189,31 @@ class WorldManager {
 
 
 
-    getNeedExp(){
+    getRebirthIncrease(){
 
 
-        return Math.floor(
+        if(!this.world){
 
 
-            100
+            return 1;
 
-            *
+        }
+
+
+
+        return (
 
             Math.pow(
 
-                1.35,
+                this.world.level,
 
-                this.current.level-1
+                2
 
             )
 
+            /
+
+            100
 
         );
 
@@ -398,7 +225,8 @@ class WorldManager {
     rebirth(){
 
 
-        if(!this.current){
+        if(!this.world){
+
 
             return false;
 
@@ -406,42 +234,27 @@ class WorldManager {
 
 
 
-        const level=
-
-        this.current.level;
-
-
-
         const increase=
 
-        Math.pow(
-
-            level,
-
-            2
-
-        )
-
-        /
-
-        100;
+        this.getRebirthIncrease();
 
 
 
-        this.current.rebirthMultiplier*=
+        this.world.rebirthMultiplier*=
 
         increase;
 
 
 
-        this.current.rebirthCount++;
+        this.world.rebirthCount++;
 
 
 
-        this.current.level=1;
+        this.world.level=1;
 
 
-        this.current.exp=0;
+
+        this.world.exp=0;
 
 
 
@@ -449,9 +262,10 @@ class WorldManager {
 
             "world:rebirth",
 
-            this.current
+            this.world
 
         );
+
 
 
         return true;
@@ -461,10 +275,68 @@ class WorldManager {
 
 
 
-    getCurrent(){
+    setRarity(
+
+        name,
+
+        multiplier
+
+    ){
 
 
-        return this.current;
+        if(!this.world){
+
+            return;
+
+        }
+
+
+
+        this.world.rarity=
+
+        name;
+
+
+
+        this.world.rarityMultiplier=
+
+        multiplier;
+
+
+    }
+
+
+
+    addEffect(effect){
+
+
+        if(!this.world){
+
+            return;
+
+        }
+
+
+
+        if(
+
+            !this.world.effects.includes(
+
+                effect
+
+            )
+
+        ){
+
+
+            this.world.effects.push(
+
+                effect
+
+            );
+
+
+        }
 
 
     }
@@ -474,7 +346,7 @@ class WorldManager {
     toJSON(){
 
 
-        return this.current;
+        return this.world;
 
 
     }
@@ -484,4 +356,21 @@ class WorldManager {
     load(data){
 
 
-       
+        if(data){
+
+
+            this.world=data;
+
+
+        }
+
+
+    }
+
+
+
+}
+
+
+
+export default new WorldManager();
