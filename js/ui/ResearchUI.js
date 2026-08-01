@@ -1,6 +1,8 @@
 /**
  * World Creator
  * Research UI
+ *
+ * Research Display System
  */
 
 
@@ -38,13 +40,55 @@ class ResearchUI {
 
         if(!this.area){
 
+
             return;
 
         }
 
 
 
+        this.bindEvents();
+
+
+
         this.update();
+
+
+    }
+
+
+
+    bindEvents(){
+
+
+        eventBus.on(
+
+            "resource:update",
+
+            ()=>{
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+        eventBus.on(
+
+            "research:update",
+
+            ()=>{
+
+
+                this.update();
+
+
+            }
+
+        );
 
 
     }
@@ -56,13 +100,14 @@ class ResearchUI {
 
         if(!this.area){
 
+
             return;
 
         }
 
 
 
-        const data=
+        const list=
 
         ResearchManager.getAll();
 
@@ -72,29 +117,42 @@ class ResearchUI {
 
 
 
+        html+=`
+
+        <h3>
+
+        研究
+
+        </h3>
+
+        `;
+
+
+
         for(
 
-            const id in data
+            const id in list
 
         ){
 
 
             const research=
 
-            data[id];
+            list[id];
 
 
 
             html+=`
 
+
             <div class="research-item">
 
 
-            <h3>
+            <h4>
 
             ${research.name}
 
-            </h3>
+            </h4>
 
 
 
@@ -116,13 +174,7 @@ class ResearchUI {
 
             ×${
 
-                Math.pow(
-
-                    research.effect,
-
-                    research.level
-
-                )
+                research.getMultiplier()
 
                 .toFixed(2)
 
@@ -134,17 +186,67 @@ class ResearchUI {
 
 
 
+            種類:
+
+            ${research.type}
+
+
+
+            <br>
+
+
+
+            必要素材:
+
+            `;
+
+
+
+            for(
+
+                const cost in research.cost
+
+            ){
+
+
+                html+=`
+
+                ${cost}
+
+                :
+
+                ${research.cost[cost]}
+
+                `;
+
+
+            }
+
+
+
+            html+=`
+
+
+            <br><br>
+
+
+
             <button
 
             data-research="${id}">
 
+
             研究する
+
 
             </button>
 
 
 
             </div>
+
+
+            <hr>
 
 
             `;
@@ -160,14 +262,14 @@ class ResearchUI {
 
 
 
-        this.bind();
+        this.bindButtons();
 
 
     }
 
 
 
-    bind(){
+    bindButtons(){
 
 
         this.area
@@ -205,12 +307,9 @@ class ResearchUI {
                     ){
 
 
-                        this.update();
-
-
                         eventBus.emit(
 
-                            "research:complete"
+                            "research:update"
 
                         );
 
