@@ -2,11 +2,13 @@
  * World Creator
  * Converter System
  *
- * Resource Conversion Management
+ * Resource Conversion Controller
  */
 
 
 import ResourceManager from "../resource/Manager.js";
+
+import EPManager from "../ep/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -21,23 +23,31 @@ class Converter {
         this.multiplier=1;
 
 
+
         this.recipes={
 
 
 
-            woodToPlank:{
+            essenceExtraction:{
 
 
-                name:"木材加工",
+                name:
+
+                "原初の変換",
 
 
-                unlockEP:0,
+                description:
+
+                "集めた素材を世界力へ変換する。",
 
 
                 input:{
 
 
-                    wood:10
+                    wood:10,
+
+
+                    ore:5
 
 
                 },
@@ -46,29 +56,37 @@ class Converter {
                 output:{
 
 
-                    plank:1
+                    ep:10
 
 
-                }
+                },
+
+
+                unlockEP:0
+
 
 
             },
 
 
 
-            oreToMetal:{
+            manaConversion:{
 
 
-                name:"鉱石精錬",
+                name:
+
+                "魔力循環式",
 
 
-                unlockEP:100,
+                description:
+
+                "魔力を効率的な世界力へ変換する。",
 
 
                 input:{
 
 
-                    ore:10
+                    mana:10
 
 
                 },
@@ -77,23 +95,31 @@ class Converter {
                 output:{
 
 
-                    metal:1
+                    ep:50
 
 
-                }
+                },
+
+
+                unlockEP:100
+
 
 
             },
 
 
 
-            crystalToMana:{
+            crystalConversion:{
 
 
-                name:"魔力変換",
+                name:
+
+                "結晶昇華式",
 
 
-                unlockEP:1000,
+                description:
+
+                "結晶に宿る力を解放する。",
 
 
                 input:{
@@ -108,16 +134,40 @@ class Converter {
                 output:{
 
 
-                    mana:10
+                    ep:500
 
 
-                }
+                },
+
+
+                unlockEP:1000
+
 
 
             }
 
 
         };
+
+
+    }
+
+
+
+    getAll(){
+
+
+        return this.recipes;
+
+
+    }
+
+
+
+    get(id){
+
+
+        return this.recipes[id];
 
 
     }
@@ -150,17 +200,23 @@ class Converter {
 
 
 
-    getAll(){
+    isUnlocked(id){
 
 
-        return this.recipes;
+        const recipe=
+
+        this.recipes[id];
 
 
-    }
+
+        if(!recipe){
 
 
+            return false;
 
-    isUnlocked(recipe){
+
+        }
+
 
 
         return true;
@@ -191,11 +247,7 @@ class Converter {
 
         if(
 
-            !this.isUnlocked(
-
-                recipe
-
-            )
+            !this.isUnlocked(id)
 
         ){
 
@@ -267,11 +319,7 @@ class Converter {
 
         if(
 
-            !this.canConvert(
-
-                id
-
-            )
+            !this.canConvert(id)
 
         ){
 
@@ -307,29 +355,61 @@ class Converter {
 
         for(
 
-            const resource in recipe.output
+            const output in recipe.output
 
         ){
 
 
-            let target=
+
+            const amount=
+
+            recipe.output[output]
+
+            *
+
+            this.multiplier;
+
+
+
+            if(
+
+                output==="ep"
+
+            ){
+
+
+                EPManager.add(
+
+                    amount
+
+                );
+
+
+                continue;
+
+
+            }
+
+
+
+            let resource=
 
             ResourceManager.get(
 
-                resource
+                output
 
             );
 
 
 
-            if(!target){
+            if(!resource){
 
 
                 ResourceManager.create(
 
-                    resource,
+                    output,
 
-                    resource
+                    output
 
                 );
 
@@ -340,15 +420,11 @@ class Converter {
 
             ResourceManager
 
-            .get(resource)
+            .get(output)
 
             .add(
 
-                recipe.output[resource]
-
-                *
-
-                this.multiplier
+                amount
 
             );
 
@@ -359,7 +435,7 @@ class Converter {
 
         eventBus.emit(
 
-            "resource:update"
+            "converter:update"
 
         );
 
@@ -372,55 +448,4 @@ class Converter {
 
 
 
-    toJSON(){
-
-
-        return {
-
-
-            multiplier:
-
-            this.multiplier
-
-
-        };
-
-
-    }
-
-
-
-    load(data){
-
-
-        if(!data){
-
-
-            return;
-
-        }
-
-
-
-        this.multiplier=
-
-        Number(
-
-            data.multiplier
-
-        )
-
-        ||
-
-        1;
-
-
-    }
-
-
-
-}
-
-
-
-export default new Converter();
+   
