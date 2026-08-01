@@ -2,60 +2,68 @@
  * World Creator
  * Service Worker
  *
- * Cache Update System
+ * Offline Support
  */
 
 
-const CACHE_NAME =
+const CACHE_NAME=
 
-"world-creator-v2";
-
-
-
-const FILES = [
-
-
-"./",
-
-"./index.html",
-
-
-"./css/style.css",
-
-"./css/mobile.css",
+"world-creator-v1";
 
 
 
-"./js/core/main.js",
-
-"./js/core/game.js",
-
-"./js/core/time.js",
-
-"./js/core/save.js",
-
-"./js/core/eventBus.js",
+const FILES=[
 
 
-
-"./js/world/Manager.js",
-
+    "./",
 
 
-"./js/resource/Resource.js",
-
-"./js/resource/Manager.js",
-
-"./js/resource/Converter.js",
+    "./index.html",
 
 
-
-"./js/research/Manager.js",
-
+    "./css/style.css",
 
 
-"./js/ui/UI.js"
+    "./js/core/main.js",
 
+
+    "./js/core/game.js",
+
+
+    "./js/core/save.js",
+
+
+    "./js/core/time.js",
+
+
+    "./js/core/eventBus.js",
+
+
+    "./js/world/Manager.js",
+
+
+    "./js/resource/Manager.js",
+
+
+    "./js/resource/Resource.js",
+
+
+    "./js/research/Manager.js",
+
+
+    "./js/research/Research.js",
+
+
+    "./js/converter/Converter.js",
+
+
+    "./js/ui/UI.js",
+
+
+    "./js/ui/ConverterUI.js",
+
+
+    "./js/number/BigNumber.js"
 
 
 ];
@@ -98,14 +106,9 @@ event=>{
     );
 
 
+}
 
-    self.skipWaiting();
-
-
-
-});
-
-
+);
 
 
 
@@ -128,7 +131,6 @@ event=>{
 
                 return Promise.all(
 
-
                     keys.map(
 
                         key=>{
@@ -136,7 +138,7 @@ event=>{
 
                             if(
 
-                                key !== CACHE_NAME
+                                key!==CACHE_NAME
 
                             ){
 
@@ -153,15 +155,12 @@ event=>{
 
                         }
 
-
                     )
-
 
                 );
 
 
             }
-
 
         )
 
@@ -169,14 +168,9 @@ event=>{
     );
 
 
+}
 
-    self.clients.claim();
-
-
-
-});
-
-
+);
 
 
 
@@ -190,7 +184,7 @@ event=>{
     event.respondWith(
 
 
-        fetch(
+        caches.match(
 
             event.request
 
@@ -201,51 +195,11 @@ event=>{
             response=>{
 
 
-                const copy =
+                return response
 
-                response.clone();
+                ||
 
-
-
-                caches.open(
-
-                    CACHE_NAME
-
-                )
-
-                .then(
-
-                    cache=>{
-
-
-                        cache.put(
-
-                            event.request,
-
-                            copy
-
-                        );
-
-
-                    }
-
-                );
-
-
-
-                return response;
-
-
-            }
-
-        )
-
-        .catch(
-
-            ()=>{
-
-
-                return caches.match(
+                fetch(
 
                     event.request
 
@@ -260,4 +214,6 @@ event=>{
     );
 
 
-});
+}
+
+);
