@@ -1,156 +1,267 @@
+/**
+ * World Creator
+ * Research UI
+ *
+ * Integrated Version
+ */
+
+
+import eventBus from "../core/eventBus.js";
+
 import ResearchManager from "../research/Manager.js";
 
 
 
-class ResearchUI{
+class ResearchUI {
 
 
-init(){
+    constructor(){
 
 
-this.update();
+        this.initialized = false;
+
+
+    }
+
+
+
+    init(){
+
+
+        if(this.initialized){
+
+
+            return;
+
+
+        }
+
+
+
+        this.bind();
+
+
+        this.update();
+
+
+
+        this.initialized = true;
+
+
+    }
+
+
+
+    bind(){
+
+
+        eventBus.on(
+
+            "research:update",
+
+            () => {
+
+
+                this.update();
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    update(){
+
+
+        this.updatePoint();
+
+
+        this.updateList();
+
+
+    }
+
+
+
+    updatePoint(){
+
+
+        const area =
+
+            document.getElementById(
+
+                "research-point"
+
+            );
+
+
+
+        if(!area){
+
+
+            return;
+
+
+        }
+
+
+
+        area.textContent =
+
+
+            "Research Point : "
+
+            +
+
+            ResearchManager.points;
+
+
+    }
+
+
+
+    updateList(){
+
+
+        const area =
+
+            document.getElementById(
+
+                "research-list"
+
+            );
+
+
+
+        if(!area){
+
+
+            return;
+
+
+        }
+
+
+
+        area.innerHTML = "";
+
+
+
+        const data =
+
+            ResearchManager.getAll();
+
+
+
+        for(
+
+            const id in data
+
+        ){
+
+
+            const research =
+
+                data[id];
+
+
+
+            const button =
+
+                document.createElement(
+
+                    "button"
+
+                );
+
+
+
+            button.textContent =
+
+
+                research.name
+
+                +
+
+                " "
+
+                +
+
+                (
+
+                    research.unlocked
+
+                    ?
+
+                    "Unlocked"
+
+                    :
+
+                    "Cost "
+
+                    +
+
+                    research.cost
+
+                );
+
+
+
+            button.disabled =
+
+                research.unlocked;
+
+
+
+            button.onclick = () => {
+
+
+                if(
+
+                    ResearchManager.unlock(
+
+                        id
+
+                    )
+
+                ){
+
+
+                    this.update();
+
+
+                }
+
+
+            };
+
+
+
+            area.appendChild(
+
+                button
+
+            );
+
+
+        }
+
+
+    }
 
 
 }
 
 
 
-update(){
+const researchUI =
 
+    new ResearchUI();
 
-const point=
-
-document.getElementById(
-
-"research-point"
-
-);
-
-
-
-if(point){
-
-point.textContent=
-
-"Research Point : "
-
-+
-
-ResearchManager.points;
-
-}
-
-
-
-const list=
-
-document.getElementById(
-
-"research-list"
-
-);
-
-
-
-if(!list){
-
-return;
-
-}
-
-
-
-list.innerHTML="";
-
-
-
-const data=
-
-ResearchManager.getAll();
-
-
-
-for(
-
-const id in data
-
-){
-
-
-const item=data[id];
-
-
-
-const button=
-
-document.createElement(
-
-"button"
-
-);
-
-
-
-button.textContent=
-
-item.name
-
-+
-
-" "
-
-+
-
-(
-
-item.unlocked
-
-?
-
-"Unlocked"
-
-:
-
-"Cost "
-
-+
-
-item.cost
-
-);
-
-
-
-button.onclick=()=>{
-
-
-ResearchManager.unlock(id);
-
-
-this.update();
-
-
-};
-
-
-
-list.appendChild(button);
-
-
-}
-
-
-
-}
-
-
-}
-
-
-
-const researchUI=
-
-new ResearchUI();
 
 
 export default researchUI;
