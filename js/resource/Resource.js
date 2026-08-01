@@ -1,18 +1,39 @@
+/**
+ * World Creator
+ * Resource Data
+ *
+ * Integrated Version
+ */
+
+
 class Resource {
 
 
     constructor(
+
         id,
+
         name
+
     ){
 
-        this.id=id;
 
-        this.name=name;
+        this.id = id;
 
-        this.amount=0;
 
-        this.production=0;
+        this.name = name;
+
+
+
+        this.amount = 0;
+
+
+
+        this.production = 0;
+
+
+
+        this.productionRate = 1;
 
 
     }
@@ -21,7 +42,18 @@ class Resource {
 
     add(value){
 
-        this.amount+=value;
+
+        this.amount += value;
+
+
+        if(this.amount < 0){
+
+
+            this.amount = 0;
+
+
+        }
+
 
     }
 
@@ -29,16 +61,27 @@ class Resource {
 
     remove(value){
 
-        if(this.amount<value){
+
+        if(
+
+            this.amount < value
+
+        ){
+
 
             return false;
+
 
         }
 
 
-        this.amount-=value;
+
+        this.amount -= value;
+
+
 
         return true;
+
 
     }
 
@@ -46,7 +89,35 @@ class Resource {
 
     setProduction(value){
 
-        this.production=value;
+
+        this.production = value;
+
+
+    }
+
+
+
+    setProductionRate(value){
+
+
+        this.productionRate = value;
+
+
+    }
+
+
+
+    getProduction(){
+
+
+        return (
+
+            this.production *
+
+            this.productionRate
+
+        );
+
 
     }
 
@@ -54,9 +125,13 @@ class Resource {
 
     update(){
 
+
         this.add(
-            this.production
+
+            this.getProduction()
+
         );
+
 
     }
 
@@ -64,17 +139,41 @@ class Resource {
 
     toJSON(){
 
+
         return {
 
-            id:this.id,
 
-            name:this.name,
+            id:
 
-            amount:this.amount,
+                this.id,
 
-            production:this.production
+
+
+            name:
+
+                this.name,
+
+
+
+            amount:
+
+                this.amount,
+
+
+
+            production:
+
+                this.production,
+
+
+
+            productionRate:
+
+                this.productionRate
+
 
         };
+
 
     }
 
@@ -82,14 +181,39 @@ class Resource {
 
     load(data){
 
-        this.amount=data.amount ?? 0;
 
-        this.production=data.production ?? 0;
+        if(!data){
+
+
+            return;
+
+
+        }
+
+
+
+        this.amount =
+
+            data.amount ?? 0;
+
+
+
+        this.production =
+
+            data.production ?? 0;
+
+
+
+        this.productionRate =
+
+            data.productionRate ?? 1;
+
 
     }
 
 
 }
+
 
 
 export default Resource;
