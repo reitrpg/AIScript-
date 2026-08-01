@@ -1,512 +1,212 @@
 /**
  * World Creator
- * UI Rebirth Integration
+ * World Status UI
+ *
+ * Rebirth Display Update
  */
 
 
-import eventBus from "../core/eventBus.js";
-
 import WorldManager from "../world/Manager.js";
+
+import ResearchManager from "../research/Manager.js";
 
 
 
 class UI {
 
 
-constructor(){
+    updateRebirth(){
 
-this.root=null;
 
-}
+        const area =
 
+        document.getElementById(
 
+            "rebirth-info"
 
-init(id){
+        );
 
 
-this.root=document.getElementById(id);
 
+        if(!area){
 
-if(!this.root){
+            return;
 
-return;
+        }
 
-}
 
 
-this.render();
+        const world =
 
-this.bind();
+        WorldManager.getCurrent();
 
-this.update();
 
 
-}
+        if(!world){
 
 
+            area.innerHTML="";
 
-render(){
 
+            return;
 
-this.root.innerHTML=`
 
-<h1>
-World Creator
-</h1>
+        }
 
 
-<section id="world-info">
 
-</section>
+        const level =
 
+        world.level;
 
-<section id="rebirth-info">
 
-</section>
 
+        let researchBonus = 1;
 
-<button id="create-world">
-Create World
-</button>
 
 
-<button id="rebirth-world">
-Rebirth
-</button>
+        const research =
 
+        ResearchManager
 
-`;
+        .getAll()
 
+        .rebirth;
 
 
-}
 
+        if(research){
 
 
-bind(){
+            researchBonus =
 
+            Math.pow(
 
-document
+                research.effect,
 
-.getElementById(
+                research.level
 
-"create-world"
+            );
 
-)
 
-.onclick=()=>{
+        }
 
 
-eventBus.emit(
 
-"world:create"
+        const increase =
 
-);
 
+        (
 
-};
+            Math.pow(
 
+                level,
 
+                2
 
-document
+            )
 
-.getElementById(
+            /
 
-"rebirth-world"
+            100
 
-)
+        )
 
-.onclick=()=>{
+        *
 
+        researchBonus;
 
-const world=
 
-WorldManager.getCurrent();
 
+        const next =
 
 
-if(!world){
+        world.rebirthMultiplier
 
-return;
+        *
 
-}
+        increase;
 
 
 
-if(
+        area.innerHTML=`
 
-confirm(
+        <h3>
 
-"この世界を転生しますか？\n現在Lv："+
+        転生情報
 
-world.level
+        </h3>
 
-)
 
-){
+        現在Lv:
 
+        ${level}
 
-WorldManager.rebirth();
 
+        <br>
 
 
-this.update();
+        現在転生倍率:
 
+        ×${
 
-}
+            world.rebirthMultiplier
 
+            .toFixed(2)
 
+        }
 
-};
 
+        <br><br>
 
 
-eventBus.on(
+        転生倍率増加:
 
-"world:update",
 
-()=>{
+        ×${
 
+            increase
 
-this.update();
+            .toFixed(2)
 
+        }
 
-}
 
-);
+        <br>
 
 
+        転生後倍率:
 
-eventBus.on(
 
-"world:created",
+        ×${
 
-()=>{
+            next
 
+            .toFixed(2)
 
-this.update();
+        }
 
 
-}
+        <br>
 
-);
 
+        転生回数:
 
 
-eventBus.on(
+        ${world.rebirthCount}
 
-"world:rebirth",
 
-()=>{
+        回
 
 
-this.update();
+        `;
 
 
-}
-
-);
+    }
 
 
 
 }
-
-
-
-update(){
-
-
-this.updateWorld();
-
-
-this.updateRebirth();
-
-
-}
-
-
-
-updateWorld(){
-
-
-const area=
-
-document.getElementById(
-
-"world-info"
-
-);
-
-
-
-if(!area){
-
-return;
-
-}
-
-
-
-const world=
-
-WorldManager.getCurrent();
-
-
-
-if(!world){
-
-
-area.textContent=
-
-"No World";
-
-
-return;
-
-
-}
-
-
-
-area.innerHTML=`
-
-<h2>
-World
-</h2>
-
-
-名前：
-${world.name}
-
-<br>
-
-
-レアリティ：
-${world.rarity}
-
-<br>
-
-
-Lv：
-${world.level}
-
-<br>
-
-
-EXP：
-${world.exp}
-
-/
-
-${WorldManager.getNeedExp()}
-
-
-<br>
-
-
-転生回数：
-${world.rebirthCount}
-
-回
-
-
-<br>
-
-
-転生倍率：
-${world.rebirthMultiplier.toFixed(2)}
-倍
-
-
-<br><br>
-
-
-素材産出種類
-
-
-<br>
-
-
-${this.renderResource(world)}
-
-
-<br>
-
-
-固有効果
-
-
-<br>
-
-
-${
-
-world.effects.length
-
-?
-
-world.effects.join("<br>")
-
-:
-
-"なし"
-
-}
-
-`;
-
-
-
-}
-
-
-
-renderResource(world){
-
-
-let text="";
-
-
-for(
-
-const id in world.resources
-
-){
-
-
-text +=
-
-id
-
-+
-
-" : "
-
-+
-
-world.resources[id].base
-
-+
-
-"<br>";
-
-
-}
-
-
-
-return text;
-
-
-}
-
-
-
-updateRebirth(){
-
-
-const area=
-
-document.getElementById(
-
-"rebirth-info"
-
-);
-
-
-
-if(!area){
-
-return;
-
-}
-
-
-
-const world=
-
-WorldManager.getCurrent();
-
-
-
-if(!world){
-
-area.textContent="";
-
-return;
-
-}
-
-
-
-const next=
-
-(
-
-Math.pow(
-
-world.level,
-
-2
-
-)
-
-/
-
-100
-
-);
-
-
-
-area.innerHTML=`
-
-転生後倍率増加：
-
-×
-
-${next.toFixed(2)}
-
-<br>
-
-現在倍率：
-
-×
-
-${world.rebirthMultiplier.toFixed(2)}
-
-<br>
-
-転生後倍率：
-
-×
-
-${
-
-(
-
-world.rebirthMultiplier
-
-*
-
-next
-
-)
-
-.toFixed(2)
-
-}
-
-`;
-
-
-
-}
-
-
-
-}
-
 
 
 export default new UI();
