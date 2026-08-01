@@ -1,12 +1,10 @@
 /**
  * World Creator
- * Research System
+ * Research Manager
  *
- * World Development Research
+ * Research System
  */
 
-
-import WorldManager from "../world/Manager.js";
 
 import ResourceManager from "../resource/Manager.js";
 
@@ -42,11 +40,7 @@ class ResearchManager {
                 },
 
 
-                effect:
-
-
-                1.05
-
+                effect:1.05
 
 
             },
@@ -74,11 +68,7 @@ class ResearchManager {
                 },
 
 
-                effect:
-
-
-                1.1
-
+                effect:1.1
 
 
             },
@@ -106,11 +96,7 @@ class ResearchManager {
                 },
 
 
-                effect:
-
-
-                1.15
-
+                effect:1.15
 
 
             },
@@ -138,11 +124,7 @@ class ResearchManager {
                 },
 
 
-                effect:
-
-
-                1.25
-
+                effect:1.25
 
 
             },
@@ -170,11 +152,7 @@ class ResearchManager {
                 },
 
 
-                effect:
-
-
-                1.5
-
+                effect:1.5
 
 
             }
@@ -190,7 +168,7 @@ class ResearchManager {
     researchUp(id){
 
 
-        const data =
+        const data=
 
         this.research[id];
 
@@ -198,9 +176,7 @@ class ResearchManager {
 
         if(!data){
 
-
             return false;
-
 
         }
 
@@ -214,9 +190,7 @@ class ResearchManager {
 
         ){
 
-
             return false;
-
 
         }
 
@@ -232,9 +206,7 @@ class ResearchManager {
 
         ){
 
-
             return false;
-
 
         }
 
@@ -269,7 +241,7 @@ class ResearchManager {
         ){
 
 
-            const resource =
+            const resource=
 
             ResourceManager.get(
 
@@ -293,9 +265,7 @@ class ResearchManager {
 
             ){
 
-
                 return false;
-
 
             }
 
@@ -321,15 +291,27 @@ class ResearchManager {
         ){
 
 
-            ResourceManager
+            const resource=
 
-            .get(id)
+            ResourceManager.get(
 
-            .consume(
-
-                cost[id]
+                id
 
             );
+
+
+
+            if(resource){
+
+
+                resource.consume(
+
+                    cost[id]
+
+                );
+
+
+            }
 
 
         }
@@ -381,6 +363,36 @@ class ResearchManager {
 
 
 
+    getRebirthBonus(){
+
+
+        const data=
+
+        this.research.rebirth;
+
+
+
+        if(!data){
+
+            return 1;
+
+        }
+
+
+
+        return Math.pow(
+
+            data.effect,
+
+            data.level
+
+        );
+
+
+    }
+
+
+
     getAll(){
 
 
@@ -404,10 +416,34 @@ class ResearchManager {
     load(data){
 
 
-        if(data){
+        if(!data){
+
+            return;
+
+        }
 
 
-            this.research=data;
+
+        for(
+
+            const id in data
+
+        ){
+
+
+            if(
+
+                this.research[id]
+
+            ){
+
+
+                this.research[id]=
+
+                data[id];
+
+
+            }
 
 
         }
