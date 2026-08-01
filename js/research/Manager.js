@@ -1,12 +1,14 @@
 /**
  * World Creator
- * Research Manager
+ * Research System
  *
- * Integrated Version
+ * World Development Research
  */
 
 
-import eventBus from "../core/eventBus.js";
+import WorldManager from "../world/Manager.js";
+
+import ResourceManager from "../resource/Manager.js";
 
 
 
@@ -16,23 +18,35 @@ class ResearchManager {
     constructor(){
 
 
-        this.points = 0;
-
-
-
-        this.data = {
+        this.research = {
 
 
             agriculture:{
 
 
-                name:"Agriculture",
+                name:"農業技術",
 
 
-                cost:100,
+                level:0,
 
 
-                unlocked:false
+                max:10,
+
+
+                cost:{
+
+
+                    food:100
+
+
+                },
+
+
+                effect:
+
+
+                1.05
+
 
 
             },
@@ -42,13 +56,29 @@ class ResearchManager {
             mining:{
 
 
-                name:"Mining",
+                name:"採掘技術",
 
 
-                cost:150,
+                level:0,
 
 
-                unlocked:false
+                max:10,
+
+
+                cost:{
+
+
+                    ore:100
+
+
+                },
+
+
+                effect:
+
+
+                1.1
+
 
 
             },
@@ -58,13 +88,93 @@ class ResearchManager {
             magic:{
 
 
-                name:"Magic",
+                name:"魔力研究",
 
 
-                cost:300,
+                level:0,
 
 
-                unlocked:false
+                max:10,
+
+
+                cost:{
+
+
+                    mana:100
+
+
+                },
+
+
+                effect:
+
+
+                1.15
+
+
+
+            },
+
+
+
+            world:{
+
+
+                name:"世界解析",
+
+
+                level:0,
+
+
+                max:5,
+
+
+                cost:{
+
+
+                    crystal:10
+
+
+                },
+
+
+                effect:
+
+
+                1.25
+
+
+
+            },
+
+
+
+            rebirth:{
+
+
+                name:"転生理論",
+
+
+                level:0,
+
+
+                max:5,
+
+
+                cost:{
+
+
+                    worldCore:1
+
+
+                },
+
+
+                effect:
+
+
+                1.5
+
 
 
             }
@@ -77,53 +187,16 @@ class ResearchManager {
 
 
 
-    init(){
+    researchUp(id){
 
 
-    }
+        const data =
 
-
-
-    addPoint(value){
-
-
-        this.points += value;
+        this.research[id];
 
 
 
-        eventBus.emit(
-
-            "research:update",
-
-            this.points
-
-        );
-
-
-    }
-
-
-
-    unlock(id){
-
-
-        const research =
-
-            this.data[id];
-
-
-
-        if(!research){
-
-
-            return false;
-
-
-        }
-
-
-
-        if(research.unlocked){
+        if(!data){
 
 
             return false;
@@ -135,9 +208,9 @@ class ResearchManager {
 
         if(
 
-            this.points <
+            data.level >=
 
-            research.cost
+            data.max
 
         ){
 
@@ -149,33 +222,33 @@ class ResearchManager {
 
 
 
-        this.points -=
+        if(
 
-            research.cost;
+            !this.canPay(
+
+                data.cost
+
+            )
+
+        ){
 
 
-
-        research.unlocked = true;
-
+            return false;
 
 
-        eventBus.emit(
-
-            "research:update",
-
-            research
-
-        );
+        }
 
 
 
-        eventBus.emit(
+        this.pay(
 
-            "research:unlock",
-
-            research
+            data.cost
 
         );
+
+
+
+        data.level++;
 
 
 
@@ -186,22 +259,122 @@ class ResearchManager {
 
 
 
-    isUnlocked(id){
+    canPay(cost){
 
 
-        if(!this.data[id]){
+        for(
+
+            const id in cost
+
+        ){
 
 
-            return false;
+            const resource =
+
+            ResourceManager.get(
+
+                id
+
+            );
+
+
+
+            if(
+
+                !resource
+
+                ||
+
+                resource.getAmount()
+
+                <
+
+                cost[id]
+
+            ){
+
+
+                return false;
+
+
+            }
 
 
         }
 
 
 
-        return this.data[id]
+        return true;
 
-        .unlocked;
+
+    }
+
+
+
+    pay(cost){
+
+
+        for(
+
+            const id in cost
+
+        ){
+
+
+            ResourceManager
+
+            .get(id)
+
+            .consume(
+
+                cost[id]
+
+            );
+
+
+        }
+
+
+    }
+
+
+
+    getMultiplier(){
+
+
+        let value=1;
+
+
+
+        for(
+
+            const id in this.research
+
+        ){
+
+
+            const data=
+
+            this.research[id];
+
+
+
+            value *=
+
+            Math.pow(
+
+                data.effect,
+
+                data.level
+
+            );
+
+
+        }
+
+
+
+        return value;
 
 
     }
@@ -211,7 +384,7 @@ class ResearchManager {
     getAll(){
 
 
-        return this.data;
+        return this.research;
 
 
     }
@@ -221,61 +394,31 @@ class ResearchManager {
     toJSON(){
 
 
-        return {
-
-
-            points:
-
-                this.points,
-
-
-            data:
-
-                this.data
-
-
-        };
+        return this.research;
 
 
     }
 
 
 
-    load(saveData){
+    load(data){
 
 
-        if(!saveData){
+        if(data){
 
 
-            return;
+            this.research=data;
 
 
         }
 
 
-
-        this.points =
-
-            saveData.points ?? 0;
-
-
-
-        this.data =
-
-            saveData.data ?? this.data;
-
-
     }
+
 
 
 }
 
 
 
-const researchManager =
-
-    new ResearchManager();
-
-
-
-export default researchManager;
+export default new ResearchManager();
