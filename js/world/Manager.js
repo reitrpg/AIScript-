@@ -1,438 +1,321 @@
 /**
  * World Creator
- * World Effect System
+ * World Resource Generation
  */
 
 
-import eventBus from "../core/eventBus.js";
+// 既存WorldManager内の
+// createResources()
+// を以下へ置換
+
+
+createResources(rarity, effects){
+
+
+    const resources = {};
+
+
+    const basic = [
+
+        "wood",
+
+        "stone",
+
+        "food"
+
+    ];
 
 
 
-class WorldManager {
+    const advanced = [
+
+        "ore",
+
+        "mana"
+
+    ];
 
 
-constructor(){
+
+    const rare = [
+
+        "crystal",
+
+        "starCrystal"
+
+    ];
 
 
-this.current=null;
+
+    let count = 2;
+
+
+
+    switch(rarity){
+
+
+        case "Rare":
+
+            count = 3;
+
+            break;
+
+
+        case "Epic":
+
+            count = 4;
+
+            break;
+
+
+        case "Legend":
+
+            count = 5;
+
+            break;
+
+
+        case "Mythic":
+
+            count = 6;
+
+            break;
+
+
+    }
+
+
+
+    const pool = [
+
+        ...basic
+
+    ];
+
+
+
+    if(
+
+        rarity !== "Normal"
+
+    ){
+
+        pool.push(
+
+            ...advanced
+
+        );
+
+    }
+
+
+
+    if(
+
+        rarity === "Legend"
+
+        ||
+
+        rarity === "Mythic"
+
+    ){
+
+        pool.push(
+
+            ...rare
+
+        );
+
+    }
+
+
+
+    while(
+
+        Object.keys(resources).length
+
+        <
+
+        count
+
+    ){
+
+
+        const id =
+
+        pool[
+
+            Math.floor(
+
+                Math.random()
+
+                *
+
+                pool.length
+
+            )
+
+        ];
+
+
+
+        if(
+
+            !resources[id]
+
+        ){
+
+
+            resources[id]={
+
+
+                base:
+
+                this.getBaseProduction(
+
+                    rarity,
+
+                    id
+
+                )
+
+
+            };
+
+
+        }
+
+
+    }
+
+
+
+    // 固有効果による追加素材
+
+
+    if(
+
+        effects.includes(
+
+            "世界樹の核"
+
+        )
+
+    ){
+
+
+        resources.worldCore={
+
+
+            base:1
+
+
+        };
+
+
+    }
+
+
+
+    if(
+
+        effects.includes(
+
+            "星の祝福"
+
+        )
+
+    ){
+
+
+        resources.starCrystal={
+
+
+            base:1
+
+
+        };
+
+
+    }
+
+
+
+    return resources;
 
 
 }
 
 
 
-init(){
 
+getBaseProduction(
 
+    rarity,
 
-}
-
-
-
-createWorld(){
-
-
-
-const rarityTable=[
-
-
-{
-
-name:"Normal",
-
-multiplier:1,
-
-effects:1,
-
-pool:[
-
-"豊かな森",
-
-"肥沃な大地"
-
-]
-
-},
-
-
-
-{
-
-name:"Rare",
-
-multiplier:1.5,
-
-effects:1,
-
-pool:[
-
-"豊かな森",
-
-"鉱脈の大地",
-
-"肥沃な大地"
-
-]
-
-},
-
-
-
-{
-
-name:"Epic",
-
-multiplier:2.5,
-
-effects:2,
-
-pool:[
-
-"鉱脈の大地",
-
-"魔力循環",
-
-"古代遺跡"
-
-]
-
-},
-
-
-
-{
-
-name:"Legend",
-
-multiplier:5,
-
-effects:2,
-
-pool:[
-
-"魔力循環",
-
-"神代遺構",
-
-"星の祝福"
-
-]
-
-},
-
-
-
-{
-
-name:"Mythic",
-
-multiplier:10,
-
-effects:3,
-
-pool:[
-
-"世界樹の核",
-
-"創世の力",
-
-"星海の加護"
-
-]
-
-}
-
-
-
-];
-
-
-
-const rarity=
-
-rarityTable[
-
-Math.floor(
-
-Math.random()
-
-*
-
-rarityTable.length
-
-)
-
-];
-
-
-
-this.current={
-
-
-name:
-
-this.createName(),
-
-
-rarity:
-
-rarity.name,
-
-
-rarityMultiplier:
-
-rarity.multiplier,
-
-
-level:1,
-
-
-exp:0,
-
-
-rebirthCount:0,
-
-
-rebirthMultiplier:1,
-
-
-resources:
-
-this.createResources(),
-
-
-effects:
-
-this.createEffects(
-
-rarity.pool,
-
-rarity.effects
-
-)
-
-
-};
-
-
-
-eventBus.emit(
-
-"world:created",
-
-this.current
-
-);
-
-
-
-}
-
-
-
-createName(){
-
-
-const names=[
-
-
-"アステリア",
-
-"エルドラ",
-
-"ネヴァリス",
-
-"オルビス",
-
-"ミストラ",
-
-"アルカディア"
-
-
-];
-
-
-return names[
-
-Math.floor(
-
-Math.random()
-
-*
-
-names.length
-
-)
-
-];
-
-
-}
-
-
-
-createResources(){
-
-
-const list=[
-
-
-"wood",
-
-"stone",
-
-"food",
-
-"mana",
-
-"ore",
-
-"crystal"
-
-];
-
-
-
-const result={};
-
-
-
-const count=
-
-2+
-
-Math.floor(
-
-Math.random()*3
-
-);
-
-
-
-while(
-
-Object.keys(result).length
-
-<count
+    resource
 
 ){
 
 
-const id=
-
-list[
-
-Math.floor(
-
-Math.random()
-
-*
-
-list.length
-
-)
-
-];
+    let value = 1;
 
 
 
-result[id]={
+    switch(rarity){
 
 
-base:
+        case "Rare":
 
-1+
+            value*=2;
 
-Math.floor(
-
-Math.random()*10
-
-)
+            break;
 
 
-};
+        case "Epic":
+
+            value*=4;
+
+            break;
 
 
+        case "Legend":
 
-}
+            value*=8;
 
-
-
-return result;
-
-
-}
+            break;
 
 
+        case "Mythic":
 
-createEffects(pool,count){
+            value*=15;
 
-
-const result=[];
-
-
-
-while(
-
-result.length<count
-
-){
+            break;
 
 
-const effect=
-
-pool[
-
-Math.floor(
-
-Math.random()
-
-*
-
-pool.length
-
-)
-
-];
+    }
 
 
 
-if(
+    if(
 
-!result.includes(effect)
+        resource==="crystal"
 
-){
+        ||
+
+        resource==="worldCore"
+
+    ){
 
 
-result.push(effect);
+        value*=0.2;
+
+
+    }
+
+
+
+    return value;
 
 
 }
-
-
-}
-
-
-
-return result;
-
-
-}
-
-
-
-getCurrent(){
-
-
-return this.current;
-
-
-}
-
-
-
-}
-
-
-
-export default new World
