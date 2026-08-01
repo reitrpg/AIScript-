@@ -1,18 +1,30 @@
+/**
+ * World Creator
+ * Service Worker
+ *
+ * Cache Update System
+ */
+
+
 const CACHE_NAME =
-"world-creator-v1";
+
+"world-creator-v2";
 
 
-const CACHE_FILES = [
+
+const FILES = [
+
 
 "./",
 
 "./index.html",
 
+
 "./css/style.css",
 
 "./css/mobile.css",
 
-"./manifest.json",
+
 
 "./js/core/main.js",
 
@@ -24,7 +36,11 @@ const CACHE_FILES = [
 
 "./js/core/eventBus.js",
 
-"./js/number/BigNumber.js",
+
+
+"./js/world/Manager.js",
+
+
 
 "./js/resource/Resource.js",
 
@@ -32,108 +48,216 @@ const CACHE_FILES = [
 
 "./js/resource/Converter.js",
 
-"./js/world/Manager.js",
+
 
 "./js/research/Manager.js",
 
-"./js/ui/UI.js",
 
-"./js/ui/Research.js",
 
-"./js/ui/Tabs.js",
+"./js/ui/UI.js"
 
-"./js/ui/Router.js"
+
 
 ];
 
 
 
 self.addEventListener(
+
 "install",
+
 event=>{
 
-event.waitUntil(
 
-caches.open(
-CACHE_NAME
-)
-.then(
-cache=>
-cache.addAll(
-CACHE_FILES
-)
-)
+    event.waitUntil(
 
-);
 
-}
-);
+        caches.open(
+
+            CACHE_NAME
+
+        )
+
+        .then(
+
+            cache=>{
+
+
+                return cache.addAll(
+
+                    FILES
+
+                );
+
+
+            }
+
+        )
+
+
+    );
+
+
+
+    self.skipWaiting();
+
+
+
+});
+
+
 
 
 
 self.addEventListener(
+
 "activate",
+
 event=>{
 
-event.waitUntil(
 
-caches.keys()
-.then(
-keys=>
+    event.waitUntil(
 
-Promise.all(
 
-keys.map(
+        caches.keys()
 
-key=>{
+        .then(
 
-if(
-key!==CACHE_NAME
-){
+            keys=>{
 
-return caches.delete(
-key
-);
 
-}
+                return Promise.all(
 
-}
 
-)
+                    keys.map(
 
-)
+                        key=>{
 
-)
 
-);
+                            if(
 
-}
-);
+                                key !== CACHE_NAME
+
+                            ){
+
+
+                                return caches.delete(
+
+                                    key
+
+                                );
+
+
+                            }
+
+
+                        }
+
+
+                    )
+
+
+                );
+
+
+            }
+
+
+        )
+
+
+    );
+
+
+
+    self.clients.claim();
+
+
+
+});
+
+
 
 
 
 self.addEventListener(
+
 "fetch",
+
 event=>{
 
-event.respondWith(
 
-caches.match(
-event.request
-)
-.then(
+    event.respondWith(
 
-response=>
 
-response ||
+        fetch(
 
-fetch(
-event.request
-)
+            event.request
 
-)
+        )
 
-);
+        .then(
 
-}
-);
+            response=>{
+
+
+                const copy =
+
+                response.clone();
+
+
+
+                caches.open(
+
+                    CACHE_NAME
+
+                )
+
+                .then(
+
+                    cache=>{
+
+
+                        cache.put(
+
+                            event.request,
+
+                            copy
+
+                        );
+
+
+                    }
+
+                );
+
+
+
+                return response;
+
+
+            }
+
+        )
+
+        .catch(
+
+            ()=>{
+
+
+                return caches.match(
+
+                    event.request
+
+                );
+
+
+            }
+
+        )
+
+
+    );
+
+
+});
