@@ -1,124 +1,43 @@
-/*
- World Creator
- Mobile Style
-*/
+@media screen and (max-width:600px){
 
 
-/*
- スマホ専用調整
-*/
+#app{
 
+padding:10px;
 
-@media screen and (max-width:600px) {
+}
 
 
-    body {
+button{
 
-        font-size: 14px;
+min-height:48px;
 
-    }
+font-size:17px;
 
+}
 
 
-    #app {
+.panel{
 
-        width: 100%;
+padding:12px;
 
-        padding:
+}
 
-            8px;
 
-    }
+.header h1{
 
+font-size:24px;
 
+}
 
-    .header h1 {
 
-        font-size:
+.tabs button{
 
-            22px;
+font-size:15px;
 
-    }
+padding:12px;
 
-
-
-    .panel {
-
-        margin-bottom:
-
-            12px;
-
-        padding:
-
-            12px;
-
-        border-radius:
-
-            10px;
-
-    }
-
-
-
-    .panel h2 {
-
-        font-size:
-
-            18px;
-
-    }
-
-
-
-    button {
-
-        min-height:
-
-            48px;
-
-        font-size:
-
-            17px;
-
-        margin-top:
-
-            8px;
-
-    }
-
-
-
-    #resource-list div {
-
-
-        display:
-
-            flex;
-
-
-        justify-content:
-
-            space-between;
-
-
-        padding:
-
-            10px 6px;
-
-
-    }
-
-
-
-    #world-info {
-
-
-        font-size:
-
-            15px;
-
-
-    }
+}
 
 
 }
