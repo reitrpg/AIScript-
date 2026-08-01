@@ -2,13 +2,11 @@
  * World Creator
  * Resource Converter
  *
- * Integrated Version
+ * Material Processing System
  */
 
 
 import ResourceManager from "./Manager.js";
-
-import eventBus from "../core/eventBus.js";
 
 
 
@@ -18,49 +16,91 @@ class Converter {
     constructor(){
 
 
-        this.recipes = {};
-
-
-        this.init();
-
-
-    }
-
-
-
-    init(){
-
-
         this.recipes = {
 
 
-            food:{
+            stoneToOre:{
 
 
-                input:"wood",
+                input:{
+
+                    stone:10
+
+                },
 
 
-                cost:2,
+                output:{
 
+                    ore:1
 
-                output:1
-
+                }
 
 
             },
 
 
 
-            mana:{
+            oreToCrystal:{
 
 
-                input:"stone",
+                input:{
+
+                    ore:100,
+
+                    mana:20
+
+                },
 
 
-                cost:5,
+                output:{
+
+                    crystal:1
+
+                }
 
 
-                output:1
+            },
+
+
+
+            crystalToStar:{
+
+
+                input:{
+
+                    crystal:100,
+
+                    mana:100
+
+                },
+
+
+                output:{
+
+                    starCrystal:1
+
+                }
+
+
+            },
+
+
+
+            starToCore:{
+
+
+                input:{
+
+                    starCrystal:100
+
+                },
+
+
+                output:{
+
+                    worldCore:1
+
+                }
 
 
             }
@@ -73,66 +113,102 @@ class Converter {
 
 
 
-    tick(){
+    convert(recipeId){
 
 
-        for(
+        const recipe =
 
-            const id in this.recipes
+        this.recipes[recipeId];
+
+
+
+        if(!recipe){
+
+
+            return false;
+
+
+        }
+
+
+
+        if(
+
+            !this.canConvert(
+
+                recipe
+
+            )
 
         ){
 
 
-            const recipe =
-
-                this.recipes[id];
+            return false;
 
 
-
-            const source =
-
-                ResourceManager.get(
-
-                    recipe.input
-
-                );
+        }
 
 
 
-            if(!source){
+        this.consume(
+
+            recipe.input
+
+        );
 
 
-                continue;
+
+        this.add(
+
+            recipe.output
+
+        );
 
 
-            }
+
+        return true;
+
+
+    }
+
+
+
+    canConvert(recipe){
+
+
+        for(
+
+            const id in recipe.input
+
+        ){
+
+
+            const resource =
+
+            ResourceManager.get(
+
+                id
+
+            );
 
 
 
             if(
 
-                source.amount >=
+                !resource
 
-                recipe.cost
+                ||
+
+                resource.getAmount()
+
+                <
+
+                recipe.input[id]
 
             ){
 
 
-                source.remove(
-
-                    recipe.cost
-
-                );
-
-
-
-                ResourceManager.add(
-
-                    id,
-
-                    recipe.output
-
-                );
+                return false;
 
 
             }
@@ -142,43 +218,98 @@ class Converter {
 
 
 
-        eventBus.emit(
-
-            "resource:update"
-
-        );
+        return true;
 
 
     }
 
 
 
-    addRecipe(
-
-        id,
-
-        input,
-
-        cost,
-
-        output
-
-    ){
+    consume(input){
 
 
-        this.recipes[id] = {
+        for(
+
+            const id in input
+
+        ){
 
 
-            input:input,
+            ResourceManager
+
+            .get(id)
+
+            .consume(
+
+                input[id]
+
+            );
 
 
-            cost:cost,
+        }
 
 
-            output:output
+    }
 
 
-        };
+
+    add(output){
+
+
+        for(
+
+            const id in output
+
+        ){
+
+
+
+            let resource =
+
+            ResourceManager.get(
+
+                id
+
+            );
+
+
+
+            if(!resource){
+
+
+                ResourceManager.create(
+
+                    id,
+
+                    id,
+
+                    0
+
+                );
+
+
+
+                resource =
+
+                ResourceManager.get(
+
+                    id
+
+                );
+
+
+            }
+
+
+
+            resource.add(
+
+                output[id]
+
+            );
+
+
+        }
 
 
     }
@@ -198,10 +329,4 @@ class Converter {
 
 
 
-const converter =
-
-    new Converter();
-
-
-
-export default converter;
+export default new Converter();
