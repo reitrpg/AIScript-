@@ -1,136 +1,328 @@
 /**
  * World Creator
- * Resource Manager
- *
- * Resource Production System
+ * World Manager
  */
 
 
-import Resource from "./Resource.js";
-
 import eventBus from "../core/eventBus.js";
 
-import WorldManager from "../world/Manager.js";
 
 
-
-class ResourceManager {
+class WorldManager {
 
 
     constructor(){
 
 
-        this.resources={};
-
-
-        this.initialized=false;
-
-
-        this.researchMultiplier=1;
+        this.current=null;
 
 
     }
 
 
 
-    init(){
+    createWorld(){
 
 
-        this.initialized=true;
+        const rarityTable=[
 
 
-    }
+            {
+                name:"Normal",
+                multiplier:1,
+                effectCount:1
+            },
+
+
+            {
+                name:"Rare",
+                multiplier:1.5,
+                effectCount:2
+            },
+
+
+            {
+                name:"Epic",
+                multiplier:2.5,
+                effectCount:2
+            },
+
+
+            {
+                name:"Legend",
+                multiplier:5,
+                effectCount:3
+            },
+
+
+            {
+                name:"Mythic",
+                multiplier:10,
+                effectCount:4
+            }
+
+
+        ];
 
 
 
-    setResearchMultiplier(value){
+        const rarity=
+
+        rarityTable[
+
+            Math.floor(
+
+                Math.random()
+
+                *
+
+                rarityTable.length
+
+            )
+
+        ];
 
 
-        this.researchMultiplier=
 
-        Number(value)
-
-        ||1;
+        this.current={
 
 
-    }
+            name:
+
+            this.randomName(),
 
 
 
-    create(
+            rarity:
 
-        id,
-
-        name,
-
-        production
-
-    ){
+            rarity.name,
 
 
-        this.resources[id]=
 
-        new Resource(
+            rarityMultiplier:
 
-            id,
+            rarity.multiplier,
 
-            name
+
+
+            level:1,
+
+
+
+            exp:0,
+
+
+
+            rebirthCount:0,
+
+
+
+            rebirthMultiplier:1,
+
+
+
+            resources:
+
+            this.createResources(),
+
+
+
+            effects:
+
+            this.createEffects(
+
+                rarity.effectCount
+
+            )
+
+
+        };
+
+
+
+        eventBus.emit(
+
+            "world:create",
+
+            this.current
 
         );
 
 
+    }
 
-        this.resources[id]
 
-        .setProduction(
 
-            production
+    randomName(){
 
-        );
+
+        const list=[
+
+
+            "アステリア",
+
+            "エルドラ",
+
+            "ネヴァリス",
+
+            "オルビス",
+
+            "アルカディア"
+
+
+        ];
+
+
+
+        return list[
+
+            Math.floor(
+
+                Math.random()
+
+                *
+
+                list.length
+
+            )
+
+        ];
 
 
     }
 
 
 
-    get(id){
+    createResources(){
 
 
-        return this.resources[id];
+        return {
+
+
+            wood:{
+
+                base:1
+
+            },
+
+
+            stone:{
+
+                base:1
+
+            },
+
+
+            food:{
+
+                base:1
+
+            },
+
+
+            ore:{
+
+                base:0.5
+
+            },
+
+
+            mana:{
+
+                base:0.2
+
+            }
+
+
+        };
 
 
     }
 
 
 
-    getAll(){
+    createEffects(count){
 
 
-        return this.resources;
+        const list=[
 
 
-    }
+            "豊かな森",
+
+
+            "鉱脈の大地",
+
+
+            "魔力循環",
+
+
+            "神代遺構",
+
+
+            "世界樹の核"
+
+
+        ];
 
 
 
-    syncWorldResources(){
-
-
-        const world=
-
-        WorldManager.getCurrent();
+        const result=[];
 
 
 
-        if(
+        while(
 
-            !world
-
-            ||
-
-            !world.resources
+            result.length<count
 
         ){
+
+
+            const effect=
+
+            list[
+
+                Math.floor(
+
+                    Math.random()
+
+                    *
+
+                    list.length
+
+                )
+
+            ];
+
+
+
+            if(
+
+                !result.includes(effect)
+
+            ){
+
+
+                result.push(effect);
+
+
+            }
+
+
+        }
+
+
+
+        return result;
+
+
+    }
+
+
+
+    addExp(value){
+
+
+        if(!this.current){
 
             return;
 
@@ -138,52 +330,36 @@ class ResourceManager {
 
 
 
-        for(
+        this.current.exp+=value;
 
-            const id in world.resources
+
+
+        while(
+
+            this.current.exp >=
+
+            this.getNeedExp()
 
         ){
 
 
-            const data=
+            this.current.exp-=
 
-            world.resources[id];
-
-
-
-            if(
-
-                !this.resources[id]
-
-            ){
+            this.getNeedExp();
 
 
-                this.create(
 
-                    id,
-
-                    id,
-
-                    data.base ?? 0
-
-                );
+            this.current.level++;
 
 
-            }
 
-            else{
+            eventBus.emit(
 
+                "world:update",
 
-                this.resources[id]
+                this.current
 
-                .setProduction(
-
-                    data.base ?? 0
-
-                );
-
-
-            }
+            );
 
 
         }
@@ -193,120 +369,119 @@ class ResourceManager {
 
 
 
-    getWorldMultiplier(){
+    getNeedExp(){
 
 
-        const world=
-
-        WorldManager.getCurrent();
+        return Math.floor(
 
 
+            100
 
-        if(!world){
+            *
 
-            return 1;
+            Math.pow(
+
+                1.35,
+
+                this.current.level-1
+
+            )
+
+
+        );
+
+
+    }
+
+
+
+    rebirth(){
+
+
+        if(!this.current){
+
+            return false;
 
         }
 
 
 
-        const levelBonus=
+        const level=
+
+        this.current.level;
+
+
+
+        const increase=
 
         Math.pow(
 
-            1.05,
+            level,
 
-            world.level-1
+            2
 
-        );
+        )
 
+        /
 
-
-        const rarityBonus=
-
-        world.rarityMultiplier
-
-        ??
-
-        1;
+        100;
 
 
 
-        const rebirthBonus=
+        this.current.rebirthMultiplier*=
 
-        world.rebirthMultiplier
-
-        ??
-
-        1;
+        increase;
 
 
 
-        const effectBonus=
-
-        this.getEffectMultiplier(
-
-            world.effects
-
-        );
+        this.current.rebirthCount++;
 
 
 
-        return (
+        this.current.level=1;
 
-            levelBonus
 
-            *
+        this.current.exp=0;
 
-            rarityBonus
 
-            *
 
-            rebirthBonus
+        eventBus.emit(
 
-            *
+            "world:rebirth",
 
-            effectBonus
-
-            *
-
-            this.researchMultiplier
+            this.current
 
         );
+
+
+        return true;
 
 
     }
 
 
 
-    getEffectMultiplier(effects){
+    getCurrent(){
 
 
-        let value=1;
+        return this.current;
 
 
-
-        if(!effects){
-
-            return value;
-
-        }
+    }
 
 
 
-        effects.forEach(
-
-            effect=>{
+    toJSON(){
 
 
-                switch(effect){
+        return this.current;
 
 
-                    case "豊かな森":
-
-                        value*=1.2;
-
-                        break;
+    }
 
 
-                   
+
+    load(data){
+
+
+       
