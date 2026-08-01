@@ -2,7 +2,7 @@
  * World Creator
  * Main UI System
  *
- * World / Resource Display
+ * World / Resource / System Layout
  */
 
 
@@ -60,7 +60,6 @@ class UI {
         this.update();
 
 
-
     }
 
 
@@ -82,6 +81,17 @@ class UI {
 
 
         <div id="resource-info">
+
+
+        </div>
+
+
+
+        <hr>
+
+
+
+        <div id="research-area">
 
 
         </div>
@@ -115,7 +125,7 @@ class UI {
             ()=>{
 
 
-                this.update();
+                this.updateResource();
 
 
             }
@@ -131,7 +141,7 @@ class UI {
             ()=>{
 
 
-                this.update();
+                this.updateWorld();
 
 
             }
@@ -147,7 +157,7 @@ class UI {
             ()=>{
 
 
-                this.update();
+                this.updateWorld();
 
 
             }
@@ -163,7 +173,6 @@ class UI {
 
 
         this.updateWorld();
-
 
 
         this.updateResource();
@@ -213,7 +222,9 @@ class UI {
 
 
 
-        area.innerHTML=`
+        area.innerHTML=
+
+        `
 
         <h2>
 
@@ -243,7 +254,7 @@ class UI {
 
 
 
-        転生回数:
+        Rebirth:
 
         ${world.rebirthCount}
 
@@ -253,7 +264,7 @@ class UI {
 
 
 
-        転生倍率:
+        Multiplier:
 
         ×${
 
@@ -269,10 +280,27 @@ class UI {
 
 
 
-        レアリティ:
+        Rarity:
 
         ${world.rarity}
 
+
+
+        <br>
+
+
+
+        Effects:
+
+        ${
+
+            world.effects.join(
+
+                ", "
+
+            )
+
+        }
 
 
         `;
@@ -310,63 +338,8 @@ class UI {
 
 
 
-        let html="";
+        let html=
 
+        `
 
-
-        html+=`
-
-        <h2>
-
-        Resources
-
-        </h2>
-
-        `;
-
-
-
-        for(
-
-            const id in resources
-
-        ){
-
-
-            const resource=
-
-            resources[id];
-
-
-
-            html+=`
-
-            ${resource.name}
-
-            :
-
-            ${resource.amount}
-
-            <br>
-
-            `;
-
-
-        }
-
-
-
-        area.innerHTML=
-
-        html;
-
-
-    }
-
-
-
-}
-
-
-
-export default new UI();
+        <h
