@@ -233,4 +233,43 @@ class UI{
     simpleFormat(value){
 
         const units=[
-           
+            "",
+            "K",
+            "M",
+            "B",
+            "T",
+            "Qa",
+            "Qi",
+            "Sx",
+            "Sp",
+            "Oc",
+            "No"
+        ];
+
+        let number=value;
+
+        let index=0;
+
+        while(
+            number>=1000 &&
+            index<units.length-1
+        ){
+
+            number/=1000;
+            index++;
+
+        }
+
+        return (
+
+            Math.floor(number*100)
+
+            /100
+
+        )+units[index];
+
+    }
+
+}
+
+export default new UI();
