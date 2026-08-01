@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * World + Resource + Research
+ * Compatible Save Loader
  */
 
 
@@ -25,7 +25,7 @@ class SaveManager {
         "world_creator_save";
 
 
-        this.version=2;
+        this.version=3;
 
 
     }
@@ -76,7 +76,6 @@ class SaveManager {
         );
 
 
-
     }
 
 
@@ -117,11 +116,11 @@ class SaveManager {
 
 
 
-            if(
+            if(data.world){
 
-                data.world
 
-            ){
+                delete data.world.Age;
+
 
 
                 WorldManager.load(
@@ -135,11 +134,7 @@ class SaveManager {
 
 
 
-            if(
-
-                data.resources
-
-            ){
+            if(data.resources){
 
 
                 ResourceManager.load(
@@ -153,11 +148,7 @@ class SaveManager {
 
 
 
-            if(
-
-                data.research
-
-            ){
+            if(data.research){
 
 
                 ResearchManager.load(
@@ -174,7 +165,6 @@ class SaveManager {
             return true;
 
 
-
         }
 
         catch(error){
@@ -188,6 +178,10 @@ class SaveManager {
                 error
 
             );
+
+
+
+            this.clear();
 
 
 
