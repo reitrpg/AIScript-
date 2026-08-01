@@ -16,6 +16,8 @@ import Converter from "../converter/Converter.js";
 
 import EPManager from "../ep/Manager.js";
 
+import UpgradeManager from "../upgrades/Manager.js";
+
 
 
 class SaveManager {
@@ -29,9 +31,7 @@ class SaveManager {
         "world_creator_save";
 
 
-
-        this.version=10;
-
+        this.version=11;
 
 
         this.data={};
@@ -47,43 +47,17 @@ class SaveManager {
         return {
 
 
-            version:
-
-            this.version,
+            version:this.version,
 
 
+            created:Date.now(),
 
-            created:
 
-            Date.now(),
+            updated:Date.now(),
 
 
 
-            updated:
-
-            Date.now(),
-
-
-
-            settings:{
-
-
-                tickSpeed:1000,
-
-
-                autoSave:300000,
-
-
-                numberFormat:"normal",
-
-
-                language:"ja",
-
-
-                speedRun:false
-
-
-            },
+            settings:{},
 
 
 
@@ -129,7 +103,6 @@ class SaveManager {
             }
 
 
-
         };
 
 
@@ -140,94 +113,65 @@ class SaveManager {
     save(){
 
 
-        const current=
-
-        this.data
-
-        ||
-
-        this.createDefault();
-
-
-
-        current.version=
+        this.data.version=
 
         this.version;
 
 
 
-        current.updated=
+        this.data.updated=
 
         Date.now();
 
 
 
-        current.world=
+        this.data.world=
 
         WorldManager.toJSON();
 
 
 
-        current.resources=
+        this.data.resources=
 
         ResourceManager.toJSON();
 
 
 
-        current.research=
+        this.data.research=
 
         ResearchManager.toJSON();
 
 
 
-        current.converter=
+        this.data.converter=
 
         Converter.toJSON();
 
 
 
-        current.ep=
+        this.data.ep=
 
         EPManager.toJSON();
 
 
 
-        try{
+        this.data.upgrades=
 
-
-            localStorage.setItem(
-
-                this.key,
-
-                JSON.stringify(
-
-                    current
-
-                )
-
-            );
+        UpgradeManager.toJSON();
 
 
 
-            this.data=current;
+        localStorage.setItem(
 
+            this.key,
 
+            JSON.stringify(
 
-        }
+                this.data
 
-        catch(error){
+            )
 
-
-            console.error(
-
-                "Save Error",
-
-                error
-
-            );
-
-
-        }
+        );
 
 
     }
@@ -253,7 +197,6 @@ class SaveManager {
             this.data=
 
             this.createDefault();
-
 
 
             return false;
@@ -294,12 +237,9 @@ class SaveManager {
 
             console.error(
 
-                "Load Error",
-
                 error
 
             );
-
 
 
             this.data=
@@ -365,94 +305,51 @@ class SaveManager {
     applyData(){
 
 
-
-        if(
+        WorldManager.load(
 
             this.data.world
 
-        ){
-
-
-            WorldManager.load(
-
-                this.data.world
-
-            );
-
-
-        }
+        );
 
 
 
-        if(
+        ResourceManager.load(
 
             this.data.resources
 
-        ){
-
-
-            ResourceManager.load(
-
-                this.data.resources
-
-            );
-
-
-        }
+        );
 
 
 
-        if(
+        ResearchManager.load(
 
             this.data.research
 
-        ){
-
-
-            ResearchManager.load(
-
-                this.data.research
-
-            );
-
-
-        }
+        );
 
 
 
-        if(
+        Converter.load(
 
             this.data.converter
 
-        ){
-
-
-            Converter.load(
-
-                this.data.converter
-
-            );
-
-
-        }
+        );
 
 
 
-        if(
+        EPManager.load(
 
             this.data.ep
 
-        ){
+        );
 
 
-            EPManager.load(
 
-                this.data.ep
+        UpgradeManager.load(
 
-            );
+            this.data.upgrades
 
-
-        }
+        );
 
 
     }
@@ -469,7 +366,7 @@ class SaveManager {
 
 
 
-    setSettings(settings){
+    setSettings(data){
 
 
         this.data.settings=
@@ -482,7 +379,7 @@ class SaveManager {
 
             ...
 
-            settings
+            data
 
         };
 
@@ -501,7 +398,7 @@ class SaveManager {
 
 
 
-    setDebug(debug){
+    setDebug(data){
 
 
         this.data.debug=
@@ -514,7 +411,7 @@ class SaveManager {
 
             ...
 
-            debug
+            data
 
         };
 
@@ -526,4 +423,25 @@ class SaveManager {
     clear(){
 
 
-        localStorage
+        localStorage.removeItem(
+
+            this.key
+
+        );
+
+
+
+        this.data=
+
+        this.createDefault();
+
+
+    }
+
+
+
+}
+
+
+
+export default new SaveManager();
