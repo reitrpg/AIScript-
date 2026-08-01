@@ -20,6 +20,8 @@ import Converter from "../converter/Converter.js";
 
 import UI from "../ui/UI.js";
 
+import ResearchUI from "../ui/ResearchUI.js";
+
 import ConverterUI from "../ui/ConverterUI.js";
 
 import eventBus from "./eventBus.js";
@@ -86,21 +88,13 @@ class Main {
 
 
         /*
-         * Research反映
+         * Converter補正反映
          */
-
-
-        const researchMultiplier=
-
-        ResearchManager
-
-        .getConverterMultiplier();
-
 
 
         Converter.setResearchMultiplier(
 
-            researchMultiplier
+            ResearchManager.getConverterMultiplier()
 
         );
 
@@ -114,6 +108,14 @@ class Main {
         UI.init(
 
             "app"
+
+        );
+
+
+
+        ResearchUI.init(
+
+            "research-area"
 
         );
 
@@ -134,39 +136,17 @@ class Main {
 
         eventBus.on(
 
-            "research:complete",
+            "research:update",
 
             ()=>{
 
 
                 Converter.setResearchMultiplier(
 
-                    ResearchManager
-
-                    .getConverterMultiplier()
+                    ResearchManager.getConverterMultiplier()
 
                 );
 
-
-                SaveManager.save();
-
-
-            }
-
-        );
-
-
-
-        /*
-         * World更新
-         */
-
-
-        eventBus.on(
-
-            "world:update",
-
-            ()=>{
 
 
                 SaveManager.save();
@@ -200,6 +180,27 @@ class Main {
 
 
         /*
+         * World更新
+         */
+
+
+        eventBus.on(
+
+            "world:update",
+
+            ()=>{
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        /*
          * 転生
          */
 
@@ -211,9 +212,7 @@ class Main {
             ()=>{
 
 
-                ResourceManager
-
-                .syncWorldResources();
+                ResourceManager.syncWorldResources();
 
 
 
