@@ -2,13 +2,15 @@
  * World Creator
  * Save System
  *
- * World Data Integration
+ * World + Resource + Research
  */
 
 
 import WorldManager from "../world/Manager.js";
 
 import ResourceManager from "../resource/Manager.js";
+
+import ResearchManager from "../research/Manager.js";
 
 
 
@@ -18,9 +20,12 @@ class SaveManager {
     constructor(){
 
 
-        this.key =
+        this.key=
 
         "world_creator_save";
+
+
+        this.version=2;
 
 
     }
@@ -30,7 +35,14 @@ class SaveManager {
     save(){
 
 
-        const data = {
+
+        const data={
+
+
+            version:
+
+            this.version,
+
 
 
             world:
@@ -45,9 +57,9 @@ class SaveManager {
 
 
 
-            version:
+            research:
 
-            1
+            ResearchManager.toJSON()
 
 
 
@@ -64,6 +76,7 @@ class SaveManager {
         );
 
 
+
     }
 
 
@@ -71,7 +84,7 @@ class SaveManager {
     load(){
 
 
-        const text =
+        const text=
 
         localStorage.getItem(
 
@@ -94,7 +107,7 @@ class SaveManager {
         try{
 
 
-            const data =
+            const data=
 
             JSON.parse(
 
@@ -140,20 +153,39 @@ class SaveManager {
 
 
 
+            if(
+
+                data.research
+
+            ){
+
+
+                ResearchManager.load(
+
+                    data.research
+
+                );
+
+
+            }
+
+
+
             return true;
 
 
 
         }
 
-        catch(e){
+        catch(error){
+
 
 
             console.error(
 
                 "Save Load Error",
 
-                e
+                error
 
             );
 
@@ -180,6 +212,7 @@ class SaveManager {
 
 
     }
+
 
 
 }
