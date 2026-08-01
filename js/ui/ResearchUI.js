@@ -8,7 +8,7 @@
 
 import ResearchManager from "../research/Manager.js";
 
-import ResourceManager from "../resource/Manager.js";
+import EPManager from "../ep/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -45,27 +45,12 @@ class ResearchUI {
 
             return;
 
+
         }
 
 
 
         this.update();
-
-
-
-        eventBus.on(
-
-            "resource:update",
-
-            ()=>{
-
-
-                this.update();
-
-
-            }
-
-        );
 
 
 
@@ -84,162 +69,20 @@ class ResearchUI {
         );
 
 
-    }
+
+        eventBus.on(
+
+            "ep:update",
+
+            ()=>{
 
 
-
-    canResearch(data){
-
-
-        for(
-
-            const id in data.cost
-
-        ){
-
-
-            const resource=
-
-            ResourceManager.get(
-
-                id
-
-            );
-
-
-
-            if(
-
-                !resource
-
-                ||
-
-                resource.getAmount()
-
-                <
-
-                data.cost[id]
-
-            ){
-
-
-                return false;
+                this.update();
 
 
             }
 
-
-        }
-
-
-
-        return true;
-
-
-    }
-
-
-
-    getCostText(cost){
-
-
-        let text="";
-
-
-
-        for(
-
-            const id in cost
-
-        ){
-
-
-            const resource=
-
-            ResourceManager.get(
-
-                id
-
-            );
-
-
-
-            const amount=
-
-            resource
-
-            ?
-
-            resource.getAmount()
-
-            :
-
-            0;
-
-
-
-            const need=
-
-            cost[id];
-
-
-
-            const shortage=
-
-            Math.max(
-
-                need-amount,
-
-                0
-
-            );
-
-
-
-            text+=`
-
-            ${id}
-
-            :
-
-            ${amount}
-
-            /
-
-            ${need}
-
-
-
-            `;
-
-
-
-            if(shortage>0){
-
-
-                text+=`
-
-                <span>
-
-                不足 ${shortage}
-
-                </span>
-
-
-                `;
-
-
-            }
-
-
-            text+="<br>";
-
-
-        }
-
-
-
-        return text;
+        );
 
 
     }
@@ -254,23 +97,22 @@ class ResearchUI {
 
             return;
 
+
         }
 
 
 
-        const research=
+        const researches=
 
         ResearchManager.getAll();
 
 
 
-        let html=
-
-        `
+        let html=`
 
         <h2>
 
-        神託
+        神託研究
 
         </h2>
 
@@ -280,30 +122,39 @@ class ResearchUI {
 
         for(
 
-            const id in research
+            const id in researches
 
         ){
 
 
             const data=
 
-            research[id];
+            ResearchManager.getStatus(
 
-
-
-            const available=
-
-            this.canResearch(
-
-                data
+                id
 
             );
 
 
 
+            const cost=
+
+            data.cost.ep;
+
+
+
+            const can=
+
+            data.canResearch;
+
+
+
             html+=`
 
-            <div class="research-item">
+
+
+            <div class="research-card">
+
 
 
             <h3>
@@ -316,7 +167,7 @@ class ResearchUI {
 
             <p>
 
-            ${data.description ?? ""}
+            ${data.description}
 
             </p>
 
@@ -326,17 +177,15 @@ class ResearchUI {
 
             ${data.level}
 
-            /
-
-            ${data.max}
 
 
-
-            <br><br>
+            <br>
 
 
 
-            必要:
+            必要EP:
+
+            ${cost}
 
 
 
@@ -344,74 +193,46 @@ class ResearchUI {
 
 
 
-            ${
-
-                this.getCostText(
-
-                    data.cost
-
-                )
-
-            }
-
-
-
             <button
 
-            data-research="${id}"
+            class="research-button"
 
-            ${
+            data-id="${id}"
 
-                data.level>=data.max
+            style="
 
-                ?
+            background:
 
-                "disabled"
+            ${can ? "#55aa55" : "#777"};
 
-                :
-
-                ""
-
-            }
-
-            class="${
-
-                available
-
-                ?
-
-                "available"
-
-                :
-
-                "unavailable"
-
-            }"
-
+            "
 
             >
 
+
+
             ${
 
-                data.level>=data.max
+                can
 
                 ?
 
-                "到達済み"
+                "啓示を受ける"
 
                 :
 
-                "天啓を受ける"
+                "EP不足"
 
             }
+
 
 
             </button>
 
 
+
             </div>
 
-            <hr>
 
 
             `;
@@ -437,27 +258,27 @@ class ResearchUI {
     bind(){
 
 
-        this.area
+        const buttons=
 
-        .querySelectorAll(
+        this.area.querySelectorAll(
 
-            "[data-research]"
+            ".research-button"
 
-        )
+        );
 
-        .forEach(
+
+
+        buttons.forEach(
 
             button=>{
 
 
-                button.onclick=
-
-                ()=>{
+                button.onclick=()=>{
 
 
                     ResearchManager.researchUp(
 
-                        button.dataset.research
+                        button.dataset.id
 
                     );
 
