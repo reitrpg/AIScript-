@@ -2,15 +2,15 @@
  * World Creator
  * Main UI
  *
- * Integrated Version
+ * World Information Update
  */
 
 
 import eventBus from "../core/eventBus.js";
 
-import ResourceManager from "../resource/Manager.js";
-
 import WorldManager from "../world/Manager.js";
+
+import ResourceManager from "../resource/Manager.js";
 
 
 
@@ -32,19 +32,13 @@ class UI {
 
         this.root =
 
-            document.getElementById(
-
-                id
-
-            );
+            document.getElementById(id);
 
 
 
         if(!this.root){
 
-
             return;
-
 
         }
 
@@ -52,9 +46,7 @@ class UI {
 
         this.render();
 
-
         this.bind();
-
 
         this.update();
 
@@ -70,15 +62,12 @@ class UI {
 
 
         <h1>
-
         World Creator
-
         </h1>
 
 
 
         <div class="tabs">
-
 
             <button data-tab="world">
 
@@ -100,26 +89,22 @@ class UI {
 
             </button>
 
-
         </div>
 
 
 
-        <section id="world-section"
-
-        class="panel">
+        <section id="world-section">
 
 
             <h2>
-
             World
-
             </h2>
 
 
             <div id="world-info">
 
             </div>
+
 
 
             <button id="create-world">
@@ -129,19 +114,23 @@ class UI {
             </button>
 
 
+
+            <button id="rebirth-world">
+
+            Rebirth
+
+            </button>
+
+
         </section>
 
 
 
-        <section id="resource-section"
-
-        class="panel">
+        <section id="resource-section">
 
 
             <h2>
-
             Resource
-
             </h2>
 
 
@@ -152,39 +141,6 @@ class UI {
 
         </section>
 
-
-
-        <section id="research-section"
-
-        class="panel">
-
-
-            <h2>
-
-            Research
-
-            </h2>
-
-
-            <div id="research-point">
-
-            </div>
-
-
-            <div id="research-list">
-
-            </div>
-
-
-        </section>
-
-
-
-        <button id="save-game">
-
-        Save
-
-        </button>
 
 
         `;
@@ -199,18 +155,18 @@ class UI {
 
         const create =
 
-            document.getElementById(
+        document.getElementById(
 
-                "create-world"
+            "create-world"
 
-            );
+        );
 
 
 
         if(create){
 
 
-            create.onclick = () => {
+            create.onclick = ()=>{
 
 
                 eventBus.emit(
@@ -227,27 +183,27 @@ class UI {
 
 
 
-        const save =
+        const rebirth =
 
-            document.getElementById(
+        document.getElementById(
 
-                "save-game"
+            "rebirth-world"
 
-            );
-
-
-
-        if(save){
+        );
 
 
-            save.onclick = () => {
+
+        if(rebirth){
 
 
-                eventBus.emit(
+            rebirth.onclick = ()=>{
 
-                    "game:save"
 
-                );
+                WorldManager.rebirth();
+
+
+
+                this.update();
 
 
             };
@@ -259,25 +215,9 @@ class UI {
 
         eventBus.on(
 
-            "resource:update",
-
-            () => {
-
-
-                this.updateResources();
-
-
-            }
-
-        );
-
-
-
-        eventBus.on(
-
             "world:update",
 
-            () => {
+            ()=>{
 
 
                 this.updateWorld();
@@ -293,7 +233,7 @@ class UI {
 
             "world:created",
 
-            () => {
+            ()=>{
 
 
                 this.updateWorld();
@@ -305,6 +245,21 @@ class UI {
 
 
 
+        eventBus.on(
+
+            "resource:update",
+
+            ()=>{
+
+
+                this.updateResource();
+
+
+            }
+
+        );
+
+
     }
 
 
@@ -314,8 +269,7 @@ class UI {
 
         this.updateWorld();
 
-
-        this.updateResources();
+        this.updateResource();
 
 
     }
@@ -327,19 +281,17 @@ class UI {
 
         const area =
 
-            document.getElementById(
+        document.getElementById(
 
-                "world-info"
+            "world-info"
 
-            );
+        );
 
 
 
         if(!area){
 
-
             return;
-
 
         }
 
@@ -347,7 +299,7 @@ class UI {
 
         const world =
 
-            WorldManager.getCurrent();
+        WorldManager.getCurrent();
 
 
 
@@ -356,7 +308,7 @@ class UI {
 
             area.textContent =
 
-                "No World";
+            "No World";
 
 
             return;
@@ -368,107 +320,83 @@ class UI {
 
         area.innerHTML = `
 
-        Level : ${world.level}
 
-        <br>
+        <p>
 
-        Age : ${world.age}
+        名前：
 
-        `;
+        ${world.name}
 
+        </p>
 
-    }
 
 
+        <p>
 
-    updateResources(){
+        レアリティ：
 
+        ${world.rarity}
 
-        const area =
+        </p>
 
-            document.getElementById(
 
-                "resource-list"
 
-            );
+        <p>
 
+        Lv：
 
+        ${world.level}
 
-        if(!area){
+        </p>
 
 
-            return;
 
+        <p>
 
-        }
+        EXP：
 
+        ${world.exp}
 
+        /
 
-        area.innerHTML = "";
+        ${WorldManager.getNeedExp()}
 
+        </p>
 
 
-        const resources =
 
-            ResourceManager.getAll();
+        <p>
 
+        転生倍率：
 
+        ${world.rebirthMultiplier.toFixed(2)}
 
-        Object.values(resources)
+        倍
 
-        .forEach(
+        </p>
 
-            resource => {
 
 
-                const row =
+        <p>
 
-                    document.createElement(
+        素材産出種類
 
-                        "div"
+        </p>
 
-                    );
 
 
+        ${this.renderResources(world)}
 
-                row.textContent =
 
 
-                    resource.name
+        <p>
 
-                    +
+        固有効果
 
-                    " : "
+        </p>
 
-                    +
 
-                    resource.amount;
 
+        ${
 
-
-                area.appendChild(
-
-                    row
-
-                );
-
-
-            }
-
-        );
-
-
-    }
-
-
-}
-
-
-
-const ui =
-
-    new UI();
-
-
-
-export default ui;
+           
