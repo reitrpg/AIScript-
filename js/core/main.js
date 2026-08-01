@@ -1,131 +1,68 @@
-/**
- * World Creator
- * Main Entry
- *
- * Research Final Connect
- */
-
-
 import game from "./game.js";
 
 import ui from "../ui/UI.js";
 
 import researchUI from "../ui/Research.js";
 
-import router from "../ui/Router.js";
-
 import tabs from "../ui/Tabs.js";
 
-import ResourceManager from "../resource/Manager.js";
-
-import WorldManager from "../world/Manager.js";
-
-import ResearchManager from "../research/Manager.js";
+import router from "../ui/Router.js";
 
 
 
-function initialize() {
+function start(){
 
 
-    console.log(
+ui.init(
 
-        "[World Creator] Boot"
+"app"
 
-    );
-
-
-
-    /*
-        Data Initialize
-    */
-
-
-    ResourceManager.init();
-
-
-    WorldManager.init();
-
-
-    ResearchManager.init();
+);
 
 
 
-    /*
-        UI Initialize
-    */
-
-
-    ui.init(
-
-        "app"
-
-    );
+researchUI.init();
 
 
 
-    researchUI.init();
+tabs.init();
+
+
+router.init();
 
 
 
-    router.init(
-
-        "/"
-
-    );
+game.init();
 
 
+game.start();
 
-    tabs.init();
-
-
-
-    /*
-        Game Initialize
-    */
-
-
-    game.init();
-
-
-    game.start();
-
-
-
-    console.log(
-
-        "[World Creator] Running"
-
-    );
 
 
 }
 
 
 
-if (
+if(
 
-    document.readyState ===
+document.readyState==="loading"
 
-    "loading"
-
-) {
+){
 
 
-    document.addEventListener(
+document.addEventListener(
 
-        "DOMContentLoaded",
+"DOMContentLoaded",
 
-        initialize
+start
 
-    );
-
-
-}
-
-else {
+);
 
 
-    initialize();
+}else{
+
+
+start();
 
 
 }
