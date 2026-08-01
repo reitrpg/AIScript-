@@ -2,15 +2,17 @@
  * World Creator
  * Game Loop
  *
- * Production / Offline Progress System
+ * Main Processing System
  */
 
 
 import time from "./time.js";
 
+import WorldManager from "../world/Manager.js";
+
 import ResourceManager from "../resource/Manager.js";
 
-import WorldManager from "../world/Manager.js";
+import ResearchManager from "../research/Manager.js";
 
 import SaveManager from "./save.js";
 
@@ -30,7 +32,7 @@ class Game {
         this.interval=null;
 
 
-        this.tickTime=1000;
+        this.tickRate=1000;
 
 
     }
@@ -69,8 +71,7 @@ class Game {
 
             },
 
-
-            this.tickTime
+            this.tickRate
 
         );
 
@@ -92,17 +93,24 @@ class Game {
     productionTick(){
 
 
-        if(
+        const world=
 
-            !WorldManager.getCurrent()
+        WorldManager.getCurrent();
 
-        ){
+
+
+        if(!world){
 
 
             return;
 
         }
 
+
+
+        /*
+         * 世界経験値
+         */
 
 
         WorldManager.addExp(
@@ -113,7 +121,30 @@ class Game {
 
 
 
+        /*
+         * 資源生産
+         */
+
+
         ResourceManager.update();
+
+
+
+        /*
+         * 研究進行
+         */
+
+
+        this.updateResearch();
+
+
+
+        /*
+         * 保存
+         */
+
+
+        SaveManager.save();
 
 
 
@@ -124,7 +155,50 @@ class Game {
         );
 
 
-        SaveManager.save();
+    }
+
+
+
+    updateResearch(){
+
+
+        const research=
+
+        ResearchManager.getAll();
+
+
+
+        Object.values(
+
+            research
+
+        )
+
+        .forEach(
+
+            item=>{
+
+
+                if(
+
+                    item.level < item.max
+
+                ){
+
+
+                    item.addProgress(
+
+                        1
+
+                    );
+
+
+                }
+
+
+            }
+
+        );
 
 
     }
@@ -199,11 +273,7 @@ class Game {
     stop(){
 
 
-        if(
-
-            this.interval
-
-        ){
+        if(this.interval){
 
 
             clearInterval(
@@ -211,6 +281,7 @@ class Game {
                 this.interval
 
             );
+
 
 
             this.interval=null;
