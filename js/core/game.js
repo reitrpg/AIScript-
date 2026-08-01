@@ -2,7 +2,7 @@
  * World Creator
  * Game Loop
  *
- * Production / EXP System
+ * Offline Progress Integration
  */
 
 
@@ -47,11 +47,12 @@ class Game {
 
 
 
-        time.start();
+        this.applyOfflineProgress();
 
 
 
         this.interval = setInterval(
+
 
             ()=>{
 
@@ -61,7 +62,62 @@ class Game {
 
             },
 
+
             1000
+
+
+        );
+
+
+    }
+
+
+
+    applyOfflineProgress(){
+
+
+        const seconds =
+
+        time.getOfflineSeconds();
+
+
+
+        if(
+
+            seconds <= 0
+
+        ){
+
+            return;
+
+        }
+
+
+
+        for(
+
+            let i = 0;
+
+            i < seconds;
+
+            i++
+
+        ){
+
+
+            this.productionTick();
+
+
+
+        }
+
+
+
+        eventBus.emit(
+
+            "offline:complete",
+
+            seconds
 
         );
 
@@ -73,8 +129,16 @@ class Game {
     tick(){
 
 
+        this.productionTick();
 
-        // 世界経験値取得
+
+    }
+
+
+
+    productionTick(){
+
+
 
         WorldManager.addExp(
 
@@ -83,8 +147,6 @@ class Game {
         );
 
 
-
-        // 資源生産
 
         ResourceManager.update();
 
@@ -118,12 +180,10 @@ class Game {
 
 
 
-        this.running = false;
-
+        this.running=false;
 
 
     }
-
 
 
 }
