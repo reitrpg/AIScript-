@@ -22,10 +22,13 @@ class Game {
     constructor(){
 
 
-        this.running = false;
+        this.running=false;
 
 
-        this.interval = null;
+        this.interval=null;
+
+
+        this.offlineLimit=3600;
 
 
     }
@@ -43,7 +46,7 @@ class Game {
 
 
 
-        this.running = true;
+        this.running=true;
 
 
 
@@ -51,8 +54,9 @@ class Game {
 
 
 
-        this.interval = setInterval(
+        this.interval=
 
+        setInterval(
 
             ()=>{
 
@@ -62,9 +66,7 @@ class Game {
 
             },
 
-
             1000
-
 
         );
 
@@ -76,7 +78,7 @@ class Game {
     applyOfflineProgress(){
 
 
-        const seconds =
+        const seconds=
 
         time.getOfflineSeconds();
 
@@ -84,7 +86,7 @@ class Game {
 
         if(
 
-            seconds <= 0
+            seconds<=0
 
         ){
 
@@ -94,11 +96,23 @@ class Game {
 
 
 
+        const executeSeconds=
+
+        Math.min(
+
+            seconds,
+
+            this.offlineLimit
+
+        );
+
+
+
         for(
 
-            let i = 0;
+            let i=0;
 
-            i < seconds;
+            i<executeSeconds;
 
             i++
 
@@ -106,7 +120,6 @@ class Game {
 
 
             this.productionTick();
-
 
 
         }
@@ -117,7 +130,7 @@ class Game {
 
             "offline:complete",
 
-            seconds
+            executeSeconds
 
         );
 
@@ -137,7 +150,6 @@ class Game {
 
 
     productionTick(){
-
 
 
         WorldManager.addExp(
@@ -180,10 +192,14 @@ class Game {
 
 
 
+        this.interval=null;
+
+
         this.running=false;
 
 
     }
+
 
 
 }
