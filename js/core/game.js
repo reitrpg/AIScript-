@@ -2,7 +2,7 @@
  * World Creator
  * Game Core
  *
- * Operation Check Version
+ * Research Connect Version
  */
 
 
@@ -18,6 +18,8 @@ import ResourceManager from "../resource/Manager.js";
 import WorldManager from "../world/Manager.js";
 
 import Converter from "../resource/Converter.js";
+
+import ResearchManager from "../research/Manager.js";
 
 
 
@@ -54,18 +56,21 @@ class Game {
 
 
 
+        ResourceManager.init();
+
+
+        WorldManager.init();
+
+
+        ResearchManager.init();
+
+
+
         this.bind();
 
 
+
         this.initialized = true;
-
-
-
-        console.log(
-
-            "[Game] Ready"
-
-        );
 
 
     }
@@ -130,16 +135,7 @@ class Game {
         this.running = true;
 
 
-
         time.start();
-
-
-
-        console.log(
-
-            "[Game] Running"
-
-        );
 
 
     }
@@ -180,7 +176,7 @@ class Game {
 
 
         /*
-         基本生産
+            資源生産
         */
 
 
@@ -204,6 +200,19 @@ class Game {
 
 
         Converter.tick();
+
+
+
+        /*
+            研究ポイント
+        */
+
+
+        ResearchManager.addPoint(
+
+            1
+
+        );
 
 
 
@@ -240,6 +249,12 @@ class Game {
 
 
 
+            research:
+
+                ResearchManager.toJSON(),
+
+
+
             time:
 
                 time.toJSON()
@@ -249,10 +264,56 @@ class Game {
         });
 
 
+    }
 
-        console.log(
 
-            "[Game] Saved"
+
+    load() {
+
+
+        const data =
+
+            save.load();
+
+
+
+        if (!data) {
+
+
+            return;
+
+
+        }
+
+
+
+        ResourceManager.load(
+
+            data.resources
+
+        );
+
+
+
+        WorldManager.load(
+
+            data.world
+
+        );
+
+
+
+        ResearchManager.load(
+
+            data.research
+
+        );
+
+
+
+        time.load(
+
+            data.time
 
         );
 
