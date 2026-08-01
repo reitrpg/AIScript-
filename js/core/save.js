@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * Save / Load Management
+ * Universal Save Data Controller
  */
 
 
@@ -29,7 +29,108 @@ class SaveManager {
         "world_creator_save";
 
 
-        this.version=7;
+
+        this.version=10;
+
+
+
+        this.data={};
+
+
+    }
+
+
+
+    createDefault(){
+
+
+        return {
+
+
+            version:
+
+            this.version,
+
+
+
+            created:
+
+            Date.now(),
+
+
+
+            updated:
+
+            Date.now(),
+
+
+
+            settings:{
+
+
+                tickSpeed:1000,
+
+
+                autoSave:300000,
+
+
+                numberFormat:"normal",
+
+
+                language:"ja",
+
+
+                speedRun:false
+
+
+            },
+
+
+
+            debug:{
+
+
+                enabled:false
+
+
+            },
+
+
+
+            upgrades:{},
+
+
+
+            world:{},
+
+
+
+            resources:{},
+
+
+
+            research:{},
+
+
+
+            converter:{},
+
+
+
+            ep:{
+
+
+                amount:0,
+
+
+                totalEarned:0
+
+
+            }
+
+
+
+        };
 
 
     }
@@ -39,58 +140,55 @@ class SaveManager {
     save(){
 
 
-        const data={
+        const current=
 
+        this.data
 
-            version:
+        ||
 
-            this.version,
-
-
-
-            time:
-
-            Date.now(),
+        this.createDefault();
 
 
 
-            settings:
+        current.version=
 
-            {},
-
-
-
-            world:
-
-            WorldManager.toJSON(),
+        this.version;
 
 
 
-            resources:
+        current.updated=
 
-            ResourceManager.toJSON(),
-
-
-
-            research:
-
-            ResearchManager.toJSON(),
+        Date.now();
 
 
 
-            converter:
+        current.world=
 
-            Converter.toJSON(),
-
-
-
-            ep:
-
-            EPManager.toJSON()
+        WorldManager.toJSON();
 
 
 
-        };
+        current.resources=
+
+        ResourceManager.toJSON();
+
+
+
+        current.research=
+
+        ResearchManager.toJSON();
+
+
+
+        current.converter=
+
+        Converter.toJSON();
+
+
+
+        current.ep=
+
+        EPManager.toJSON();
 
 
 
@@ -103,11 +201,16 @@ class SaveManager {
 
                 JSON.stringify(
 
-                    data
+                    current
 
                 )
 
             );
+
+
+
+            this.data=current;
+
 
 
         }
@@ -134,7 +237,7 @@ class SaveManager {
     load(){
 
 
-        const text=
+        const save=
 
         localStorage.getItem(
 
@@ -144,7 +247,13 @@ class SaveManager {
 
 
 
-        if(!text){
+        if(!save){
+
+
+            this.data=
+
+            this.createDefault();
+
 
 
             return false;
@@ -157,144 +266,21 @@ class SaveManager {
         try{
 
 
-            const data=
+            this.data=
 
             JSON.parse(
 
-                text
+                save
 
             );
 
 
 
-            if(
+            this.migrate();
 
-                data.world
 
-            ){
 
-
-                WorldManager.load(
-
-                    data.world
-
-                );
-
-
-            }
-
-
-
-            if(
-
-                data.resources
-
-            ){
-
-
-                ResourceManager.load(
-
-                    data.resources
-
-                );
-
-
-            }
-
-
-
-            if(
-
-                data.research
-
-            ){
-
-
-                ResearchManager.load(
-
-                    data.research
-
-                );
-
-
-            }
-
-
-
-            if(
-
-                data.converter
-
-            ){
-
-
-                Converter.load(
-
-                    data.converter
-
-                );
-
-
-            }
-
-
-
-            if(
-
-                data.ep
-
-            ){
-
-
-                EPManager.load(
-
-                    data.ep
-
-                );
-
-
-            }
-
-            else{
-
-
-                EPManager.load({
-
-
-                    amount:0,
-
-
-                    totalEarned:0
-
-
-                });
-
-
-            }
-
-
-
-            if(
-
-                data.settings
-
-            ){
-
-
-                this.settings=
-
-                data.settings;
-
-
-            }
-
-            else{
-
-
-                this.settings={};
-
-
-            }
+            this.applyData();
 
 
 
@@ -316,7 +302,154 @@ class SaveManager {
 
 
 
+            this.data=
+
+            this.createDefault();
+
+
+
             return false;
+
+
+        }
+
+
+    }
+
+
+
+    migrate(){
+
+
+        const defaultData=
+
+        this.createDefault();
+
+
+
+        for(
+
+            const key in defaultData
+
+        ){
+
+
+            if(
+
+                this.data[key]===undefined
+
+            ){
+
+
+                this.data[key]=
+
+                defaultData[key];
+
+
+            }
+
+
+        }
+
+
+
+        this.data.version=
+
+        this.version;
+
+
+    }
+
+
+
+    applyData(){
+
+
+
+        if(
+
+            this.data.world
+
+        ){
+
+
+            WorldManager.load(
+
+                this.data.world
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            this.data.resources
+
+        ){
+
+
+            ResourceManager.load(
+
+                this.data.resources
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            this.data.research
+
+        ){
+
+
+            ResearchManager.load(
+
+                this.data.research
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            this.data.converter
+
+        ){
+
+
+            Converter.load(
+
+                this.data.converter
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            this.data.ep
+
+        ){
+
+
+            EPManager.load(
+
+                this.data.ep
+
+            );
 
 
         }
@@ -329,11 +462,61 @@ class SaveManager {
     getSettings(){
 
 
-        return this.settings
+        return this.data.settings;
 
-        ??
 
-        {};
+    }
+
+
+
+    setSettings(settings){
+
+
+        this.data.settings=
+
+        {
+
+            ...
+
+            this.data.settings,
+
+            ...
+
+            settings
+
+        };
+
+
+    }
+
+
+
+    getDebug(){
+
+
+        return this.data.debug;
+
+
+    }
+
+
+
+    setDebug(debug){
+
+
+        this.data.debug=
+
+        {
+
+            ...
+
+            this.data.debug,
+
+            ...
+
+            debug
+
+        };
 
 
     }
@@ -343,19 +526,4 @@ class SaveManager {
     clear(){
 
 
-        localStorage.removeItem(
-
-            this.key
-
-        );
-
-
-    }
-
-
-
-}
-
-
-
-export default new SaveManager();
+        localStorage
