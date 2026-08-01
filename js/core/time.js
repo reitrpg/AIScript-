@@ -2,81 +2,45 @@
  * World Creator
  * Time System
  *
- * Offline Progress
+ * Offline Time Management
  */
 
 
-class Time {
+class TimeManager {
 
 
     constructor(){
 
 
-        this.lastTime = null;
+        this.key=
 
-
-        this.running = false;
-
-
-        this.maxOfflineTime =
-
-            86400;
+        "world_creator_last_time";
 
 
     }
 
 
 
-    start(){
+    getNow(){
 
 
-        const now =
-
-        Date.now();
+        return Date.now();
 
 
-
-        const saved =
-
-        localStorage.getItem(
-
-            "world_creator_last_time"
-
-        );
+    }
 
 
 
-        if(saved){
-
-
-            this.lastTime =
-
-            Number(saved);
-
-
-
-        }else{
-
-
-            this.lastTime = now;
-
-
-        }
-
+    update(){
 
 
         localStorage.setItem(
 
-            "world_creator_last_time",
+            this.key,
 
-            now
+            this.getNow()
 
         );
-
-
-
-        this.running = true;
-
 
 
     }
@@ -86,13 +50,34 @@ class Time {
     getOfflineSeconds(){
 
 
-        const now =
+        const last=
 
-        Date.now();
+        Number(
+
+            localStorage.getItem(
+
+                this.key
+
+            )
+
+        );
 
 
 
-        if(!this.lastTime){
+        const now=
+
+        this.getNow();
+
+
+
+        if(
+
+            !last
+
+        ){
+
+
+            this.update();
 
 
             return 0;
@@ -102,15 +87,13 @@ class Time {
 
 
 
-        let seconds =
+        let seconds=
 
         Math.floor(
 
             (
 
-                now -
-
-                this.lastTime
+                now-last
 
             )
 
@@ -122,35 +105,21 @@ class Time {
 
 
 
+        this.update();
+
+
+
         if(
 
-            seconds >
-
-            this.maxOfflineTime
+            seconds<0
 
         ){
 
 
-            seconds =
-
-            this.maxOfflineTime;
+            seconds=0;
 
 
         }
-
-
-
-        this.lastTime = now;
-
-
-
-        localStorage.setItem(
-
-            "world_creator_last_time",
-
-            now
-
-        );
 
 
 
@@ -161,21 +130,8 @@ class Time {
 
 
 
-    update(){
-
-
-        this.lastTime =
-
-        Date.now();
-
-
-
-    }
-
-
-
 }
 
 
 
-export default new Time();
+export default new TimeManager();
