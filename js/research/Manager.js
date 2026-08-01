@@ -1,153 +1,281 @@
-class ResearchManager{
+/**
+ * World Creator
+ * Research Manager
+ *
+ * Integrated Version
+ */
 
 
-constructor(){
-
-this.points=0;
+import eventBus from "../core/eventBus.js";
 
 
-this.data={
 
-agriculture:{
-
-name:"Agriculture",
-
-cost:100,
-
-unlocked:false
-
-},
+class ResearchManager {
 
 
-mining:{
-
-name:"Mining",
-
-cost:150,
-
-unlocked:false
-
-},
+    constructor(){
 
 
-magic:{
+        this.points = 0;
 
-name:"Magic",
 
-cost:300,
 
-unlocked:false
+        this.data = {
+
+
+            agriculture:{
+
+
+                name:"Agriculture",
+
+
+                cost:100,
+
+
+                unlocked:false
+
+
+            },
+
+
+
+            mining:{
+
+
+                name:"Mining",
+
+
+                cost:150,
+
+
+                unlocked:false
+
+
+            },
+
+
+
+            magic:{
+
+
+                name:"Magic",
+
+
+                cost:300,
+
+
+                unlocked:false
+
+
+            }
+
+
+        };
+
+
+    }
+
+
+
+    init(){
+
+
+    }
+
+
+
+    addPoint(value){
+
+
+        this.points += value;
+
+
+
+        eventBus.emit(
+
+            "research:update",
+
+            this.points
+
+        );
+
+
+    }
+
+
+
+    unlock(id){
+
+
+        const research =
+
+            this.data[id];
+
+
+
+        if(!research){
+
+
+            return false;
+
+
+        }
+
+
+
+        if(research.unlocked){
+
+
+            return false;
+
+
+        }
+
+
+
+        if(
+
+            this.points <
+
+            research.cost
+
+        ){
+
+
+            return false;
+
+
+        }
+
+
+
+        this.points -=
+
+            research.cost;
+
+
+
+        research.unlocked = true;
+
+
+
+        eventBus.emit(
+
+            "research:update",
+
+            research
+
+        );
+
+
+
+        eventBus.emit(
+
+            "research:unlock",
+
+            research
+
+        );
+
+
+
+        return true;
+
+
+    }
+
+
+
+    isUnlocked(id){
+
+
+        if(!this.data[id]){
+
+
+            return false;
+
+
+        }
+
+
+
+        return this.data[id]
+
+        .unlocked;
+
+
+    }
+
+
+
+    getAll(){
+
+
+        return this.data;
+
+
+    }
+
+
+
+    toJSON(){
+
+
+        return {
+
+
+            points:
+
+                this.points,
+
+
+            data:
+
+                this.data
+
+
+        };
+
+
+    }
+
+
+
+    load(saveData){
+
+
+        if(!saveData){
+
+
+            return;
+
+
+        }
+
+
+
+        this.points =
+
+            saveData.points ?? 0;
+
+
+
+        this.data =
+
+            saveData.data ?? this.data;
+
+
+    }
+
 
 }
 
-};
 
 
-}
+const researchManager =
 
+    new ResearchManager();
 
 
-init(){
 
-}
-
-
-
-addPoint(value){
-
-this.points+=value;
-
-
-}
-
-
-
-unlock(id){
-
-
-const research=
-
-this.data[id];
-
-
-if(!research){
-
-return false;
-
-}
-
-
-if(
-this.points<
-research.cost
-){
-
-return false;
-
-}
-
-
-
-this.points-=research.cost;
-
-
-research.unlocked=true;
-
-
-return true;
-
-
-}
-
-
-
-getAll(){
-
-return this.data;
-
-}
-
-
-
-toJSON(){
-
-return {
-
-points:this.points,
-
-data:this.data
-
-};
-
-}
-
-
-
-load(data){
-
-if(!data){
-
-return;
-
-}
-
-
-this.points=data.points ?? 0;
-
-this.data=data.data ?? this.data;
-
-
-}
-
-
-
-}
-
-
-
-const research=
-
-new ResearchManager();
-
-
-export default research;
+export default researchManager;
