@@ -1,8 +1,8 @@
 /**
  * World Creator
- * UI System
+ * Main UI
  *
- * Display Stable Version
+ * Tab Layout Version
  */
 
 
@@ -43,15 +43,6 @@ class UI {
         if (!this.root) {
 
 
-            console.error(
-
-                "UI root not found:",
-
-                id
-
-            );
-
-
             return;
 
 
@@ -65,15 +56,7 @@ class UI {
         this.bind();
 
 
-
         this.update();
-
-
-        console.log(
-
-            "[UI] Render Complete"
-
-        );
 
 
     }
@@ -86,7 +69,7 @@ class UI {
         this.root.innerHTML = `
 
 
-        <section class="header">
+        <div class="header">
 
 
             <h1>
@@ -96,28 +79,55 @@ class UI {
             </h1>
 
 
-            <p>
-
-                Create and evolve your world
-
-            </p>
-
-
-        </section>
+        </div>
 
 
 
-        <section class="panel">
+        <nav class="tabs">
 
 
-            <h2>
+            <button data-tab="world">
 
-                Resources
+                World
 
-            </h2>
+            </button>
 
 
-            <div id="resource-list">
+            <button data-tab="resource">
+
+                Resource
+
+            </button>
+
+
+            <button data-tab="research">
+
+                Research
+
+            </button>
+
+
+        </nav>
+
+
+
+        <section id="world-tab">
+
+
+            <div class="panel">
+
+
+                <h2>
+
+                    World Status
+
+                </h2>
+
+
+                <div id="world-info">
+
+                </div>
+
 
             </div>
 
@@ -126,17 +136,53 @@ class UI {
 
 
 
-        <section class="panel">
+        <section id="resource-tab">
 
 
-            <h2>
-
-                World Status
-
-            </h2>
+            <div class="panel">
 
 
-            <div id="world-info">
+                <h2>
+
+                    Resources
+
+                </h2>
+
+
+                <div id="resource-list">
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <section id="research-tab">
+
+
+            <div class="panel">
+
+
+                <h2>
+
+                    Research
+
+                </h2>
+
+
+                <div id="research-point">
+
+                </div>
+
+
+                <div id="research-list">
+
+                </div>
+
 
             </div>
 
@@ -175,63 +221,47 @@ class UI {
     bind() {
 
 
-        const create =
+        document
 
-            document.getElementById(
+        .getElementById(
 
-                "create-world"
+            "create-world"
 
-            );
+        )
 
-
-
-        if (create) {
+        .onclick = () => {
 
 
-            create.onclick = () => {
+            eventBus.emit(
 
-
-                eventBus.emit(
-
-                    "world:create"
-
-                );
-
-
-            };
-
-
-        }
-
-
-
-        const save =
-
-            document.getElementById(
-
-                "save-game"
+                "world:create"
 
             );
 
 
-
-        if (save) {
-
-
-            save.onclick = () => {
+        };
 
 
-                eventBus.emit(
 
-                    "game:save"
+        document
 
-                );
+        .getElementById(
+
+            "save-game"
+
+        )
+
+        .onclick = () => {
 
 
-            };
+            eventBus.emit(
+
+                "game:save"
+
+            );
 
 
-        }
+        };
 
 
 
@@ -326,45 +356,42 @@ class UI {
 
 
 
-        const resources =
+        const data =
 
             ResourceManager.getAll();
 
 
 
-        Object.entries(resources)
+        for (
 
-        .forEach(
+            const id in data
 
-            ([id,value]) => {
-
-
-                const row =
-
-                    document.createElement(
-
-                        "div"
-
-                    );
+        ) {
 
 
+            const row =
 
-                row.textContent =
+                document.createElement(
 
-                    `${id} : ${value}`;
-
-
-
-                area.appendChild(
-
-                    row
+                    "div"
 
                 );
 
 
-            }
+            row.textContent =
 
-        );
+                `${id} : ${data[id]}`;
+
+
+
+            area.appendChild(
+
+                row
+
+            );
+
+
+        }
 
 
     }
@@ -417,15 +444,17 @@ class UI {
 
         area.innerHTML = `
 
-            Level : ${world.level}
+        Level : ${world.level}
 
-            <br>
+        <br>
 
-            Age : ${world.age.toString()}
+        Age : ${world.age}
 
-            <br>
+        <br>
 
-            Population : ${world.population}
+        Population :
+
+        ${world.population}
 
         `;
 
