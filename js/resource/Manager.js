@@ -2,7 +2,7 @@
  * World Creator
  * Resource Manager
  *
- * World Resource Integration
+ * Research Integration
  */
 
 
@@ -12,6 +12,8 @@ import eventBus from "../core/eventBus.js";
 
 import WorldManager from "../world/Manager.js";
 
+import ResearchManager from "../research/Manager.js";
+
 
 
 class ResourceManager {
@@ -20,9 +22,10 @@ class ResourceManager {
     constructor(){
 
 
-        this.resources = {};
+        this.resources={};
 
-        this.initialized = false;
+
+        this.initialized=false;
 
 
     }
@@ -32,15 +35,7 @@ class ResourceManager {
     init(){
 
 
-        if(this.initialized){
-
-            return;
-
-        }
-
-
-
-        this.initialized = true;
+        this.initialized=true;
 
 
     }
@@ -58,7 +53,7 @@ class ResourceManager {
     ){
 
 
-        this.resources[id] =
+        this.resources[id]=
 
         new Resource(
 
@@ -67,6 +62,7 @@ class ResourceManager {
             name
 
         );
+
 
 
         this.resources[id]
@@ -82,16 +78,44 @@ class ResourceManager {
 
 
 
+    get(id){
+
+
+        return this.resources[id];
+
+
+    }
+
+
+
+    getAll(){
+
+
+        return this.resources;
+
+
+    }
+
+
+
     syncWorldResources(){
 
 
-        const world =
+        const world=
 
         WorldManager.getCurrent();
 
 
 
-        if(!world || !world.resources){
+        if(
+
+            !world
+
+            ||
+
+            !world.resources
+
+        ){
 
             return;
 
@@ -106,7 +130,11 @@ class ResourceManager {
         ){
 
 
-            if(!this.resources[id]){
+            if(
+
+                !this.resources[id]
+
+            ){
 
 
                 this.create(
@@ -121,6 +149,7 @@ class ResourceManager {
 
 
             }
+
 
 
             else{
@@ -148,7 +177,8 @@ class ResourceManager {
     getWorldMultiplier(){
 
 
-        const world =
+
+        const world=
 
         WorldManager.getCurrent();
 
@@ -156,14 +186,15 @@ class ResourceManager {
 
         if(!world){
 
+
             return 1;
+
 
         }
 
 
 
-        const level =
-
+        const levelBonus=
 
         Math.pow(
 
@@ -175,19 +206,19 @@ class ResourceManager {
 
 
 
-        const rarity =
+        const rarityBonus=
 
         world.rarityMultiplier ?? 1;
 
 
 
-        const rebirth =
+        const rebirthBonus=
 
         world.rebirthMultiplier ?? 1;
 
 
 
-        const effect =
+        const effectBonus=
 
         this.getEffectMultiplier(
 
@@ -197,21 +228,33 @@ class ResourceManager {
 
 
 
+        const researchBonus=
+
+        ResearchManager
+
+        .getMultiplier();
+
+
+
         return (
 
-            level
+            levelBonus
 
             *
 
-            rarity
+            rarityBonus
 
             *
 
-            effect
+            rebirthBonus
 
             *
 
-            rebirth
+            effectBonus
+
+            *
+
+            researchBonus
 
         );
 
@@ -223,7 +266,7 @@ class ResourceManager {
     getEffectMultiplier(effects){
 
 
-        let value = 1;
+        let value=1;
 
 
 
@@ -241,6 +284,7 @@ class ResourceManager {
 
 
                 switch(effect){
+
 
 
                     case "豊かな森":
@@ -282,6 +326,7 @@ class ResourceManager {
                         break;
 
 
+
                 }
 
 
@@ -305,7 +350,7 @@ class ResourceManager {
 
 
 
-        const multiplier =
+        const multiplier=
 
         this.getWorldMultiplier();
 
@@ -344,50 +389,6 @@ class ResourceManager {
             "resource:update"
 
         );
-
-
-    }
-
-
-
-    get(id){
-
-
-        return this.resources[id];
-
-
-    }
-
-
-
-    add(
-
-        id,
-
-        value
-
-    ){
-
-
-        if(this.resources[id]){
-
-
-            this.resources[id]
-
-            .add(value);
-
-
-        }
-
-
-    }
-
-
-
-    getAll(){
-
-
-        return this.resources;
 
 
     }
@@ -444,7 +445,11 @@ class ResourceManager {
         ){
 
 
-            if(this.resources[id]){
+            if(
+
+                this.resources[id]
+
+            ){
 
 
                 this.resources[id]
@@ -463,6 +468,7 @@ class ResourceManager {
 
 
     }
+
 
 
 }
