@@ -3,6 +3,7 @@
  * Research Manager
  *
  * Research System
+ * Production / Converter / Rebirth Integration
  */
 
 
@@ -16,7 +17,7 @@ class ResearchManager {
     constructor(){
 
 
-        this.research = {
+        this.research={
 
 
             agriculture:{
@@ -40,7 +41,11 @@ class ResearchManager {
                 },
 
 
-                effect:1.05
+                effect:1.05,
+
+
+                type:"production"
+
 
 
             },
@@ -68,7 +73,11 @@ class ResearchManager {
                 },
 
 
-                effect:1.1
+                effect:1.1,
+
+
+                type:"production"
+
 
 
             },
@@ -96,7 +105,11 @@ class ResearchManager {
                 },
 
 
-                effect:1.15
+                effect:1.15,
+
+
+                type:"production"
+
 
 
             },
@@ -124,7 +137,11 @@ class ResearchManager {
                 },
 
 
-                effect:1.25
+                effect:1.25,
+
+
+                type:"converter"
+
 
 
             },
@@ -152,7 +169,11 @@ class ResearchManager {
                 },
 
 
-                effect:1.5
+                effect:1.5,
+
+
+                type:"rebirth"
+
 
 
             }
@@ -265,6 +286,7 @@ class ResearchManager {
 
             ){
 
+
                 return false;
 
             }
@@ -321,7 +343,7 @@ class ResearchManager {
 
 
 
-    getMultiplier(){
+    getMultiplier(type=null){
 
 
         let value=1;
@@ -341,7 +363,23 @@ class ResearchManager {
 
 
 
-            value *=
+            if(
+
+                type
+
+                &&
+
+                data.type!==type
+
+            ){
+
+                continue;
+
+            }
+
+
+
+            value*=
 
             Math.pow(
 
@@ -363,28 +401,40 @@ class ResearchManager {
 
 
 
-    getRebirthBonus(){
+    getProductionMultiplier(){
 
 
-        const data=
+        return this.getMultiplier(
 
-        this.research.rebirth;
+            "production"
+
+        );
 
 
-
-        if(!data){
-
-            return 1;
-
-        }
+    }
 
 
 
-        return Math.pow(
+    getConverterMultiplier(){
 
-            data.effect,
 
-            data.level
+        return this.getMultiplier(
+
+            "converter"
+
+        );
+
+
+    }
+
+
+
+    getRebirthMultiplier(){
+
+
+        return this.getMultiplier(
+
+            "rebirth"
 
         );
 
@@ -424,37 +474,4 @@ class ResearchManager {
 
 
 
-        for(
-
-            const id in data
-
-        ){
-
-
-            if(
-
-                this.research[id]
-
-            ){
-
-
-                this.research[id]=
-
-                data[id];
-
-
-            }
-
-
-        }
-
-
-    }
-
-
-
-}
-
-
-
-export default new ResearchManager();
+       
