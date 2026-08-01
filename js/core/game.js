@@ -2,19 +2,17 @@
  * World Creator
  * Game Core
  *
- * Main Game Loop Controller
+ * Main Simulation Loop
  */
 
 
-import TimeManager from "./time.js";
-
-import SaveManager from "./save.js";
-
-import ResourceManager from "../resource/Manager.js";
-
-import WorldManager from "../world/Manager.js";
-
 import EPManager from "../ep/Manager.js";
+
+import ResearchManager from "../research/Manager.js";
+
+import UpgradeManager from "../upgrades/Manager.js";
+
+import SettingsManager from "../settings/Manager.js";
 
 import eventBus from "./eventBus.js";
 
@@ -29,21 +27,13 @@ class Game {
         this.running=false;
 
 
-        this.tickTimer=null;
-
-
-        this.saveTimer=null;
-
-
-
-        this.baseEPGain=1;
+        this.timer=null;
 
 
         this.speedMultiplier=1;
 
 
-
-        this.autoSaveTime=300000;
+        this.tickCount=0;
 
 
     }
@@ -67,59 +57,26 @@ class Game {
 
 
 
-        this.applyOfflineProgress();
-
-
-
-        this.startTick();
-
-
-
-        this.startAutoSave();
+        this.loop();
 
 
     }
 
 
 
-    startTick(){
+    stop(){
 
 
-        this.stopTick();
-
-
-
-        this.tickTimer=setInterval(
-
-
-            ()=>{
-
-
-                this.tick();
-
-
-            },
-
-
-            this.getTickSpeed()
-
-
-        );
-
-
-    }
+        this.running=false;
 
 
 
-    stopTick(){
+        if(this.timer){
 
 
-        if(this.tickTimer){
+            clearTimeout(
 
-
-            clearInterval(
-
-                this.tickTimer
+                this.timer
 
             );
 
@@ -127,15 +84,11 @@ class Game {
         }
 
 
-
-        this.tickTimer=null;
-
-
     }
 
 
 
-    restartTick(){
+    loop(){
 
 
         if(!this.running){
@@ -148,19 +101,23 @@ class Game {
 
 
 
-        this.startTick();
-
-
-    }
+        this.tick();
 
 
 
-    getTickSpeed(){
+        const speed=
+
+        SettingsManager.getTickSpeed();
 
 
-        return (
 
-            TimeManager.getTickSpeed()
+        this.timer=
+
+        setTimeout(
+
+            ()=>this.loop(),
+
+            speed
 
             /
 
@@ -173,145 +130,46 @@ class Game {
 
 
 
-    setSpeedMultiplier(value){
+    tick(){
 
 
-        const speed=
+        const research=
 
-        Number(value);
-
-
-
-        if(
-
-            speed>0
-
-        ){
-
-
-            this.speedMultiplier=speed;
+        ResearchManager.getMultiplier();
 
 
 
-            this.restartTick();
+        const upgrade=
 
-
-        }
-
-
-    }
+        UpgradeManager.getTotalMultiplier();
 
 
 
-    getSpeedMultiplier(){
+        const gain=
 
+        research
 
-        return this.speedMultiplier;
+        *
 
-
-    }
-
-
-
-    startAutoSave(){
-
-
-        this.stopAutoSave();
+        upgrade;
 
 
 
-        this.saveTimer=setInterval(
+        EPManager.add(
 
-
-            ()=>{
-
-
-                this.save();
-
-
-            },
-
-
-            this.autoSaveTime
-
+            gain
 
         );
 
 
-    }
 
-
-
-    stopAutoSave(){
-
-
-        if(this.saveTimer){
-
-
-            clearInterval(
-
-                this.saveTimer
-
-            );
-
-
-        }
-
-
-
-        this.saveTimer=null;
-
-
-    }
-
-
-
-    setAutoSaveTime(value){
-
-
-        const time=
-
-        Number(value);
-
-
-
-        if(
-
-            time>0
-
-        ){
-
-
-            this.autoSaveTime=time;
-
-
-
-            if(this.running){
-
-
-                this.startAutoSave();
-
-
-            }
-
-
-        }
-
-
-    }
-
-
-
-    save(){
-
-
-        SaveManager.save();
+        this.tickCount++;
 
 
 
         eventBus.emit(
 
-            "save:complete"
+            "game:tick"
 
         );
 
@@ -320,18 +178,12 @@ class Game {
 
 
 
-    applyOfflineProgress(){
-
-
-        const seconds=
-
-        TimeManager.getOfflineSeconds();
-
+    debugTick(count){
 
 
         if(
 
-            seconds<=0
+            count<=0
 
         ){
 
@@ -347,7 +199,7 @@ class Game {
 
             let i=0;
 
-            i<seconds;
+            i<count;
 
             i++
 
@@ -364,136 +216,36 @@ class Game {
 
 
 
-    tick(){
+    setSpeedMultiplier(value){
 
 
-        this.productionTick();
-
-
-    }
-
-
-
-    productionTick(){
-
-
-
-        WorldManager.addExp(
-
-            1
-
-        );
-
-
-
-        ResourceManager.update();
-
-
-
-        EPManager.add(
-
-            this.getEPGain()
-
-        );
-
-
-
-        eventBus.emit(
-
-            "game:tick"
-
-        );
-
-
-    }
-
-
-
-    getEPGain(){
-
-
-        let value=
-
-        this.baseEPGain;
-
-
-
-        // Upgrade補正接続予定
-
-
-
-        return value;
-
-
-    }
-
-
-
-    setEPGain(value){
-
-
-        this.baseEPGain=
+        this.speedMultiplier=
 
         Number(value)
 
         ||
 
-        0;
+        1;
 
 
     }
 
 
 
-    debugTick(amount){
+    getSpeedMultiplier(){
 
 
-        this.tick();
-
-
-
-        if(
-
-            amount
-
-        ){
-
-
-            for(
-
-                let i=1;
-
-                i<amount;
-
-                i++
-
-            ){
-
-
-                this.tick();
-
-
-            }
-
-
-        }
+        return this.speedMultiplier;
 
 
     }
 
 
 
-    stop(){
+    getTickCount(){
 
 
-        this.stopTick();
-
-
-        this.stopAutoSave();
-
-
-
-        this.running=false;
+        return this.tickCount;
 
 
     }
