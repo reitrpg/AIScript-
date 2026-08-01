@@ -1,20 +1,18 @@
 /**
  * World Creator
- * Main Entry
+ * Main Entry Point
  *
- * System Initialize
+ * System Startup Controller
  */
 
 
-import Game from "./game.js";
-
 import SaveManager from "./save.js";
+
+import Game from "./game.js";
 
 import TimeManager from "./time.js";
 
 import UI from "../ui/UI.js";
-
-import ResearchUI from "../ui/ResearchUI.js";
 
 
 
@@ -27,6 +25,9 @@ class Main {
         this.initialized=false;
 
 
+        this.running=false;
+
+
     }
 
 
@@ -34,11 +35,7 @@ class Main {
     init(){
 
 
-        if(
-
-            this.initialized
-
-        ){
+        if(this.initialized){
 
 
             return;
@@ -48,26 +45,54 @@ class Main {
 
 
 
-        this.initialized=true;
+        try{
+
+
+            this.load();
 
 
 
-        this.loadData();
+            this.initializeTime();
 
 
 
-        this.initializeSystem();
+            this.initializeModes();
 
 
 
-        this.startGame();
+            this.initializeUI();
+
+
+
+            this.startGame();
+
+
+
+            this.initialized=true;
+
+
+        }
+
+        catch(error){
+
+
+            console.error(
+
+                "Initialization Error",
+
+                error
+
+            );
+
+
+        }
 
 
     }
 
 
 
-    loadData(){
+    load(){
 
 
         SaveManager.load();
@@ -77,24 +102,88 @@ class Main {
 
 
 
-    initializeSystem(){
+    initializeTime(){
 
 
-        TimeManager.getTickSpeed();
+        const settings=
 
+        SaveManager.getSettings();
+
+
+
+        if(
+
+            settings.tickSpeed
+
+        ){
+
+
+            TimeManager.setTickSpeed(
+
+                settings.tickSpeed
+
+            );
+
+
+        }
+
+
+    }
+
+
+
+    initializeModes(){
+
+
+        const settings=
+
+        SaveManager.getSettings();
+
+
+
+        if(
+
+            settings.speedRun
+
+        ){
+
+
+            this.startSpeedRunMode();
+
+
+        }
+
+
+
+        const debug=
+
+        SaveManager.getDebug();
+
+
+
+        if(
+
+            debug.enabled
+
+        ){
+
+
+            this.startDebugMode();
+
+
+        }
+
+
+    }
+
+
+
+    initializeUI(){
 
 
         UI.init(
 
             "game"
-
-        );
-
-
-
-        ResearchUI.init(
-
-            "research"
 
         );
 
@@ -107,6 +196,50 @@ class Main {
 
 
         Game.start();
+
+
+        this.running=true;
+
+
+    }
+
+
+
+    startDebugMode(){
+
+
+        console.log(
+
+            "Debug Mode Enabled"
+
+        );
+
+
+    }
+
+
+
+    startSpeedRunMode(){
+
+
+        Game.setSpeedMultiplier(
+
+            2
+
+        );
+
+
+    }
+
+
+
+    stop(){
+
+
+        Game.stop();
+
+
+        this.running=false;
 
 
     }
