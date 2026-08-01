@@ -2,13 +2,15 @@
  * World Creator
  * Main Entry
  *
- * Debug Version
+ * Research Connect Version
  */
 
 
 import game from "./game.js";
 
 import ui from "../ui/UI.js";
+
+import researchUI from "../ui/Research.js";
 
 import router from "../ui/Router.js";
 
@@ -17,6 +19,8 @@ import tabs from "../ui/Tabs.js";
 import ResourceManager from "../resource/Manager.js";
 
 import WorldManager from "../world/Manager.js";
+
+import ResearchManager from "../research/Manager.js";
 
 
 
@@ -34,22 +38,10 @@ function initialize() {
     ResourceManager.init();
 
 
-    console.log(
-
-        "[Resource] Initialized"
-
-    );
-
-
-
     WorldManager.init();
 
 
-    console.log(
-
-        "[World] Initialized"
-
-    );
+    ResearchManager.init();
 
 
 
@@ -60,9 +52,10 @@ function initialize() {
     );
 
 
-    console.log(
 
-        "[UI] Initialized"
+    researchUI.init(
+
+        "app"
 
     );
 
@@ -80,33 +73,11 @@ function initialize() {
 
 
 
-    console.log(
-
-        "[Navigation] Initialized"
-
-    );
-
-
-
     game.init();
-
-
-    console.log(
-
-        "[Game] Initialized"
-
-    );
-
 
 
     game.start();
 
-
-    console.log(
-
-        "[Game] Started"
-
-    );
 
 
 }
