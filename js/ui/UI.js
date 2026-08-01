@@ -1,6 +1,8 @@
 /**
  * World Creator
  * Main UI System
+ *
+ * World / Resource Display
  */
 
 
@@ -18,7 +20,7 @@ class UI {
     constructor(){
 
 
-        this.root=null;
+        this.area=null;
 
 
     }
@@ -28,7 +30,7 @@ class UI {
     init(id){
 
 
-        this.root=
+        this.area=
 
         document.getElementById(
 
@@ -38,7 +40,8 @@ class UI {
 
 
 
-        if(!this.root){
+        if(!this.area){
+
 
             return;
 
@@ -46,10 +49,11 @@ class UI {
 
 
 
-        this.render();
+        this.createLayout();
 
 
-        this.bind();
+
+        this.bindEvents();
 
 
 
@@ -61,80 +65,38 @@ class UI {
 
 
 
-    render(){
+    createLayout(){
 
 
-        this.root.innerHTML=`
+        this.area.innerHTML=`
 
-        <div class="tabs">
-
-
-            <button data-tab="world">
-            世界
-            </button>
-
-
-            <button data-tab="resource">
-            資源
-            </button>
-
-
-            <button data-tab="research">
-            研究
-            </button>
+        <div id="world-info">
 
 
         </div>
 
 
 
-        <div id="world-tab">
+        <hr>
 
 
-            <h2>
-            世界情報
-            </h2>
 
-
-            <div id="world-info"></div>
-
-
-            <div id="rebirth-info"></div>
+        <div id="resource-info">
 
 
         </div>
 
 
 
-        <div id="resource-tab"
-        style="display:none;">
+        <hr>
 
 
-            <h2>
-            資源
-            </h2>
 
-
-            <div id="resource-list"></div>
+        <div id="converter-area">
 
 
         </div>
 
-
-
-        <div id="research-tab"
-        style="display:none;">
-
-
-            <h2>
-            研究
-            </h2>
-
-
-            <div id="research-area"></div>
-
-
-        </div>
 
         `;
 
@@ -143,35 +105,17 @@ class UI {
 
 
 
-    bind(){
+    bindEvents(){
 
 
-        document
+        eventBus.on(
 
-        .querySelectorAll(
+            "resource:update",
 
-            "[data-tab]"
-
-        )
-
-        .forEach(
-
-            button=>{
+            ()=>{
 
 
-                button.onclick=
-
-                ()=>{
-
-
-                    this.openTab(
-
-                        button.dataset.tab
-
-                    );
-
-
-                };
+                this.update();
 
 
             }
@@ -179,29 +123,34 @@ class UI {
         );
 
 
+
         eventBus.on(
 
             "world:update",
 
-            ()=>this.update()
+            ()=>{
+
+
+                this.update();
+
+
+            }
 
         );
 
-
-        eventBus.on(
-
-            "resource:update",
-
-            ()=>this.update()
-
-        );
 
 
         eventBus.on(
 
             "world:rebirth",
 
-            ()=>this.update()
+            ()=>{
+
+
+                this.update();
+
+
+            }
 
         );
 
@@ -210,26 +159,68 @@ class UI {
 
 
 
-    openTab(name){
+    update(){
 
 
-        const tabs=[
-
-            "world",
-
-            "resource",
-
-            "research"
-
-        ];
+        this.updateWorld();
 
 
 
-        tabs.forEach(
-
-            tab=>{
+        this.updateResource();
 
 
-                const element=
+    }
 
-                document
+
+
+    updateWorld(){
+
+
+        const area=
+
+        document.getElementById(
+
+            "world-info"
+
+        );
+
+
+
+        if(!area){
+
+
+            return;
+
+        }
+
+
+
+        const world=
+
+        WorldManager.getCurrent();
+
+
+
+        if(!world){
+
+
+            area.innerHTML="";
+
+
+            return;
+
+        }
+
+
+
+        area.innerHTML=`
+
+        <h2>
+
+        World Status
+
+        </h2>
+
+
+
+        Lv
