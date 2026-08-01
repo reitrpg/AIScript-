@@ -2,17 +2,17 @@
  * World Creator
  * Resource Manager
  *
- * Research Integration
+ * Resource Production System
  */
 
 
 import Resource from "./Resource.js";
 
-import eventBus from "../core/eventBus.js";
-
 import WorldManager from "../world/Manager.js";
 
 import ResearchManager from "../research/Manager.js";
+
+import eventBus from "../core/eventBus.js";
 
 
 
@@ -48,9 +48,21 @@ class ResourceManager {
 
         name,
 
-        production
+        production=0
 
     ){
+
+
+        if(
+
+            this.resources[id]
+
+        ){
+
+            return;
+
+        }
+
 
 
         this.resources[id]=
@@ -150,8 +162,6 @@ class ResourceManager {
 
             }
 
-
-
             else{
 
 
@@ -174,8 +184,7 @@ class ResourceManager {
 
 
 
-    getWorldMultiplier(){
-
+    getProductionMultiplier(){
 
 
         const world=
@@ -194,31 +203,43 @@ class ResourceManager {
 
 
 
-        const levelBonus=
+        const rarity=
+
+        world.rarityMultiplier
+
+        ??
+
+        1;
+
+
+
+        const level=
 
         Math.pow(
 
-            1.05,
+            world.level,
 
-            world.level-1
+            2
 
-        );
+        )
 
+        /
 
-
-        const rarityBonus=
-
-        world.rarityMultiplier ?? 1;
+        100;
 
 
 
-        const rebirthBonus=
+        const rebirth=
 
-        world.rebirthMultiplier ?? 1;
+        world.rebirthMultiplier
+
+        ??
+
+        1;
 
 
 
-        const effectBonus=
+        const effect=
 
         this.getEffectMultiplier(
 
@@ -228,33 +249,33 @@ class ResourceManager {
 
 
 
-        const researchBonus=
+        const research=
 
         ResearchManager
 
-        .getMultiplier();
+        .getProductionMultiplier();
 
 
 
         return (
 
-            levelBonus
+            rarity
 
             *
 
-            rarityBonus
+            level
 
             *
 
-            rebirthBonus
+            effect
 
             *
 
-            effectBonus
+            rebirth
 
             *
 
-            researchBonus
+            research
 
         );
 
@@ -272,7 +293,9 @@ class ResourceManager {
 
         if(!effects){
 
+
             return value;
+
 
         }
 
@@ -284,7 +307,6 @@ class ResourceManager {
 
 
                 switch(effect){
-
 
 
                     case "豊かな森":
@@ -326,7 +348,6 @@ class ResourceManager {
                         break;
 
 
-
                 }
 
 
@@ -352,7 +373,7 @@ class ResourceManager {
 
         const multiplier=
 
-        this.getWorldMultiplier();
+        this.getProductionMultiplier();
 
 
 
@@ -369,7 +390,7 @@ class ResourceManager {
 
                 resource.add(
 
-                    resource.getProduction()
+                    resource.production
 
                     *
 
@@ -447,21 +468,33 @@ class ResourceManager {
 
             if(
 
-                this.resources[id]
+                !this.resources[id]
 
             ){
 
 
-                this.resources[id]
+                this.create(
 
-                .load(
+                    id,
 
-                    data[id]
+                    id,
+
+                    data[id].production
 
                 );
 
 
             }
+
+
+
+            this.resources[id]
+
+            .load(
+
+                data[id]
+
+            );
 
 
         }
