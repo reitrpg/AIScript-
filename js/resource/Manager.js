@@ -2,15 +2,11 @@
  * World Creator
  * Resource Manager
  *
- * Resource Control System
+ * Resource Production Management
  */
 
 
 import Resource from "./Resource.js";
-
-import WorldManager from "../world/Manager.js";
-
-import ResearchManager from "../research/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -25,32 +21,79 @@ class ResourceManager {
         this.resources={};
 
 
-        this.initialized=false;
+        this.productionMultiplier=1;
+
+
+
+        this.initialize();
 
 
     }
 
 
 
-    init(){
+    initialize(){
 
 
-        this.initialized=true;
+        this.create(
+
+            "food",
+
+            "食料"
+
+        );
+
+
+        this.create(
+
+            "wood",
+
+            "木材"
+
+        );
+
+
+        this.create(
+
+            "ore",
+
+            "鉱石"
+
+        );
+
+
+        this.create(
+
+            "mana",
+
+            "魔力"
+
+        );
+
+
+        this.create(
+
+            "crystal",
+
+            "結晶"
+
+        );
+
+
+        this.create(
+
+            "worldCore",
+
+            "世界核"
+
+        );
 
 
     }
 
 
 
-    create(
-
-        id,
-
-        name,
-
-        production=0
-
-    ){
+    create(id,name){
 
 
         if(
@@ -74,14 +117,6 @@ class ResourceManager {
             id,
 
             name
-
-        );
-
-
-
-        resource.setProduction(
-
-            production
 
         );
 
@@ -120,177 +155,27 @@ class ResourceManager {
 
 
 
-    syncWorldResources(){
+    add(id,value){
 
 
-        const world=
+        const resource=
 
-        WorldManager.getCurrent();
-
-
-
-        if(
-
-            !world
-
-            ||
-
-            !world.resources
-
-        ){
+        this.get(id);
 
 
-            return;
+
+        if(!resource){
+
+
+            return false;
 
         }
 
 
 
-        for(
+        resource.add(
 
-            const id in world.resources
-
-        ){
-
-
-            const data=
-
-            world.resources[id];
-
-
-
-            this.create(
-
-                id,
-
-                id,
-
-                data.base
-
-            );
-
-
-
-        }
-
-
-    }
-
-
-
-    getWorldMultiplier(){
-
-
-        const world=
-
-        WorldManager.getCurrent();
-
-
-
-        if(!world){
-
-
-            return 1;
-
-        }
-
-
-
-        const levelBonus=
-
-        Math.pow(
-
-            1.05,
-
-            world.level-1
-
-        );
-
-
-
-        const rarityBonus=
-
-        world.rarityMultiplier
-
-        ??
-
-        1;
-
-
-
-        const rebirthBonus=
-
-        world.rebirthMultiplier
-
-        ??
-
-        1;
-
-
-
-        const researchBonus=
-
-        ResearchManager
-
-        .getProductionMultiplier();
-
-
-
-        return (
-
-            levelBonus
-
-            *
-
-            rarityBonus
-
-            *
-
-            rebirthBonus
-
-            *
-
-            researchBonus
-
-        );
-
-
-    }
-
-
-
-    update(){
-
-
-        const multiplier=
-
-        this.getWorldMultiplier();
-
-
-
-        Object.values(
-
-            this.resources
-
-        )
-
-        .forEach(
-
-            resource=>{
-
-
-                resource.add(
-
-                    resource.getProduction()
-
-                    *
-
-                    multiplier
-
-                );
-
-
-            }
+            value
 
         );
 
@@ -301,6 +186,156 @@ class ResourceManager {
             "resource:update"
 
         );
+
+
+
+        return true;
+
+
+    }
+
+
+
+    consume(id,value){
+
+
+        const resource=
+
+        this.get(id);
+
+
+
+        if(!resource){
+
+
+            return false;
+
+        }
+
+
+
+        return resource.consume(
+
+            value
+
+        );
+
+
+    }
+
+
+
+    setProduction(id,value){
+
+
+        const resource=
+
+        this.get(id);
+
+
+
+        if(!resource){
+
+
+            return false;
+
+        }
+
+
+
+        resource.setProduction(
+
+            value
+
+        );
+
+
+
+        return true;
+
+
+    }
+
+
+
+    update(){
+
+
+        for(
+
+            const id in this.resources
+
+        ){
+
+
+            const resource=
+
+            this.resources[id];
+
+
+
+            const gain=
+
+            resource.getProduction()
+
+            *
+
+            this.productionMultiplier;
+
+
+
+            if(
+
+                gain > 0
+
+            ){
+
+
+                resource.add(
+
+                    gain
+
+                );
+
+
+            }
+
+
+        }
+
+
+
+        eventBus.emit(
+
+            "resource:update"
+
+        );
+
+
+    }
+
+
+
+    setProductionMultiplier(value){
+
+
+        this.productionMultiplier=
+
+        Number(value)
+
+        ||
+
+        1;
+
+
+    }
+
+
+
+    getProductionMultiplier(){
+
+
+        return this.productionMultiplier;
 
 
     }
@@ -323,16 +358,27 @@ class ResourceManager {
 
             data[id]=
 
-            this.resources[id]
-
-            .toJSON();
+            this.resources[id].toJSON();
 
 
         }
 
 
 
-        return data;
+        return {
+
+
+            productionMultiplier:
+
+            this.productionMultiplier,
+
+
+            resources:
+
+            data
+
+
+        };
 
 
     }
@@ -351,41 +397,56 @@ class ResourceManager {
 
 
 
+        this.productionMultiplier=
+
+        Number(
+
+            data.productionMultiplier
+
+        )
+
+        ||
+
+        1;
+
+
+
+        const resources=
+
+        data.resources
+
+        ??
+
+        data;
+
+
+
         for(
 
-            const id in data
+            const id in resources
 
         ){
 
 
-            const resource=
+            if(
 
-            this.create(
+                this.resources[id]
 
-                id,
-
-                data[id].name
-
-            );
+            ){
 
 
+                this.resources[id].load(
 
-            resource.load(
+                    resources[id]
 
-                data[id]
+                );
 
-            );
+
+            }
 
 
         }
 
 
-    }
 
-
-
-}
-
-
-
-export default new ResourceManager();
+        eventBus.emit(
