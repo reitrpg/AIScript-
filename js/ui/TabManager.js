@@ -1,8 +1,6 @@
 /**
  * World Creator
  * Tab Manager
- *
- * UI Navigation System
  */
 
 
@@ -12,7 +10,18 @@ class TabManager {
     constructor(){
 
 
-        this.current = "world";
+        this.current="world";
+
+
+        this.tabs=[
+
+            "world",
+
+            "resource",
+
+            "research"
+
+        ];
 
 
     }
@@ -22,32 +31,36 @@ class TabManager {
     init(){
 
 
-        const buttons =
+        document
 
-        document.querySelectorAll(
+        .querySelectorAll(
 
             "[data-tab]"
 
-        );
+        )
 
-
-
-        buttons.forEach(
+        .forEach(
 
             button=>{
 
 
-                button.onclick=()=>{
+                button.addEventListener(
+
+                    "click",
+
+                    ()=>{
 
 
-                    this.open(
+                        this.open(
 
-                        button.dataset.tab
+                            button.dataset.tab
 
-                    );
+                        );
 
 
-                };
+                    }
+
+                );
 
 
             }
@@ -70,41 +83,49 @@ class TabManager {
     open(name){
 
 
-        const sections =
+        if(
 
-        document.querySelectorAll(
+            !this.tabs.includes(name)
 
-            ".tab-content"
+        ){
 
-        );
+            return;
 
-
-
-        sections.forEach(
-
-            section=>{
+        }
 
 
-                if(
 
-                    section.id ===
-
-                    name + "-section"
-
-                ){
+        this.current=name;
 
 
-                    section.style.display=
 
-                    "block";
+        this.tabs.forEach(
 
-
-                }
-
-                else{
+            tab=>{
 
 
-                    section.style.display=
+                const area=
+
+                document.getElementById(
+
+                    tab+"-tab"
+
+                );
+
+
+
+                if(area){
+
+
+                    area.style.display=
+
+                    tab===name
+
+                    ?
+
+                    "block"
+
+                    :
 
                     "none";
 
@@ -117,52 +138,14 @@ class TabManager {
         );
 
 
-
-        this.current=name;
-
-
-
-        document
-
-        .querySelectorAll(
-
-            "[data-tab]"
-
-        )
-
-        .forEach(
-
-            button=>{
-
-
-                button.classList.remove(
-
-                    "active"
-
-                );
+    }
 
 
 
-                if(
-
-                    button.dataset.tab === name
-
-                ){
+    getCurrent(){
 
 
-                    button.classList.add(
-
-                        "active"
-
-                    );
-
-
-                }
-
-
-            }
-
-        );
+        return this.current;
 
 
     }
