@@ -2,13 +2,15 @@
  * World Creator
  * Main Entry
  *
- * Game Initialize
+ * System Initialize
  */
 
 
 import Game from "./game.js";
 
 import SaveManager from "./save.js";
+
+import TimeManager from "./time.js";
 
 import UI from "../ui/UI.js";
 
@@ -32,7 +34,11 @@ class Main {
     init(){
 
 
-        if(this.initialized){
+        if(
+
+            this.initialized
+
+        ){
 
 
             return;
@@ -46,7 +52,35 @@ class Main {
 
 
 
+        this.loadData();
+
+
+
+        this.initializeSystem();
+
+
+
+        this.startGame();
+
+
+    }
+
+
+
+    loadData(){
+
+
         SaveManager.load();
+
+
+    }
+
+
+
+    initializeSystem(){
+
+
+        TimeManager.getTickSpeed();
 
 
 
@@ -64,6 +98,12 @@ class Main {
 
         );
 
+
+    }
+
+
+
+    startGame(){
 
 
         Game.start();
