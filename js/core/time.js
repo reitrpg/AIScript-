@@ -2,11 +2,11 @@
  * World Creator
  * Time System
  *
- * Offline Time Management
+ * Offline Progress Support
  */
 
 
-class TimeManager {
+class Time {
 
 
     constructor(){
@@ -21,7 +21,7 @@ class TimeManager {
 
 
 
-    getNow(){
+    getCurrentTime(){
 
 
         return Date.now();
@@ -31,14 +31,56 @@ class TimeManager {
 
 
 
-    update(){
+    save(){
 
 
         localStorage.setItem(
 
             this.key,
 
-            this.getNow()
+            String(
+
+                this.getCurrentTime()
+
+            )
+
+        );
+
+
+    }
+
+
+
+    getLastTime(){
+
+
+        const value=
+
+        localStorage.getItem(
+
+            this.key
+
+        );
+
+
+
+        if(!value){
+
+
+            this.save();
+
+
+
+            return this.getCurrentTime();
+
+
+        }
+
+
+
+        return Number(
+
+            value
 
         );
 
@@ -50,40 +92,19 @@ class TimeManager {
     getOfflineSeconds(){
 
 
-        const last=
-
-        Number(
-
-            localStorage.getItem(
-
-                this.key
-
-            )
-
-        );
-
-
-
         const now=
 
-        this.getNow();
+        this.getCurrentTime();
 
 
 
-        if(
+        const last=
 
-            !last
-
-        ){
+        this.getLastTime();
 
 
-            this.update();
 
-
-            return 0;
-
-
-        }
+        this.save();
 
 
 
@@ -105,10 +126,6 @@ class TimeManager {
 
 
 
-        this.update();
-
-
-
         if(
 
             seconds<0
@@ -117,6 +134,25 @@ class TimeManager {
 
 
             seconds=0;
+
+
+        }
+
+
+
+        /*
+         * 最大24時間分のみ処理
+         */
+
+
+        if(
+
+            seconds>86400
+
+        ){
+
+
+            seconds=86400;
 
 
         }
@@ -134,4 +170,4 @@ class TimeManager {
 
 
 
-export default new TimeManager();
+export default new Time();
