@@ -1,89 +1,195 @@
+/**
+ * World Creator
+ * Main Style
+ */
+
+
 *{
 
-box-sizing:border-box;
+
+    box-sizing:border-box;
+
 
 }
+
 
 
 body{
 
-margin:0;
 
-background:#111;
+    margin:0;
 
-color:#eee;
 
-font-family:sans-serif;
+    padding:0;
+
+
+    font-family:
+
+    "Segoe UI",
+
+    sans-serif;
+
+
+    background:#111;
+
+
+    color:#eee;
+
 
 }
+
 
 
 #app{
 
-max-width:600px;
 
-margin:auto;
+    width:100%;
 
-padding:16px;
+
+    max-width:900px;
+
+
+    margin:auto;
+
+
+    padding:20px;
+
 
 }
 
 
-.header{
 
-text-align:center;
+h2,
+
+
+h3,
+
+
+h4{
+
+
+    margin-top:10px;
+
+
+}
+
+
+
+#world-info,
+
+
+#resource-info,
+
+
+#converter-area{
+
+
+    background:#1c1c1c;
+
+
+    border-radius:10px;
+
+
+    padding:15px;
+
+
+    margin-bottom:15px;
+
 
 }
 
 
-.tabs{
 
-display:flex;
+.converter-item{
 
-gap:8px;
 
-margin:10px 0;
+    padding:10px;
+
+
+    margin-bottom:10px;
+
+
+    border:1px solid #444;
+
+
+    border-radius:8px;
+
 
 }
+
 
 
 button{
 
-width:100%;
 
-padding:14px;
+    background:#3366ff;
 
-margin:5px 0;
 
-border-radius:8px;
+    color:white;
 
-border:none;
 
-background:#333;
+    border:none;
 
-color:white;
 
-font-size:16px;
+    border-radius:6px;
+
+
+    padding:8px 16px;
+
+
+    cursor:pointer;
+
 
 }
 
 
-.panel{
 
-background:#1d1d1d;
+button:hover{
 
-padding:15px;
 
-border-radius:12px;
+    background:#5580ff;
 
-margin-bottom:15px;
 
 }
 
 
-#resource-list div,
-#research-list button{
 
-margin-bottom:6px;
+hr{
+
+
+    border:none;
+
+
+    border-top:1px solid #333;
+
+
+    margin:15px 0;
+
+
+}
+
+
+
+@media(max-width:600px){
+
+
+    #app{
+
+
+        padding:10px;
+
+
+    }
+
+
+
+    button{
+
+
+        width:100%;
+
+
+    }
+
 
 }
