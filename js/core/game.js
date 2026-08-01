@@ -2,7 +2,7 @@
  * World Creator
  * Game Loop
  *
- * Offline Progress Integration
+ * Production / Offline Progress System
  */
 
 
@@ -11,6 +11,8 @@ import time from "./time.js";
 import ResourceManager from "../resource/Manager.js";
 
 import WorldManager from "../world/Manager.js";
+
+import SaveManager from "./save.js";
 
 import eventBus from "./eventBus.js";
 
@@ -28,7 +30,7 @@ class Game {
         this.interval=null;
 
 
-        this.offlineLimit=3600;
+        this.tickTime=1000;
 
 
     }
@@ -39,6 +41,7 @@ class Game {
 
 
         if(this.running){
+
 
             return;
 
@@ -66,71 +69,8 @@ class Game {
 
             },
 
-            1000
 
-        );
-
-
-    }
-
-
-
-    applyOfflineProgress(){
-
-
-        const seconds=
-
-        time.getOfflineSeconds();
-
-
-
-        if(
-
-            seconds<=0
-
-        ){
-
-            return;
-
-        }
-
-
-
-        const executeSeconds=
-
-        Math.min(
-
-            seconds,
-
-            this.offlineLimit
-
-        );
-
-
-
-        for(
-
-            let i=0;
-
-            i<executeSeconds;
-
-            i++
-
-        ){
-
-
-            this.productionTick();
-
-
-        }
-
-
-
-        eventBus.emit(
-
-            "offline:complete",
-
-            executeSeconds
+            this.tickTime
 
         );
 
@@ -152,6 +92,19 @@ class Game {
     productionTick(){
 
 
+        if(
+
+            !WorldManager.getCurrent()
+
+        ){
+
+
+            return;
+
+        }
+
+
+
         WorldManager.addExp(
 
             1
@@ -171,6 +124,74 @@ class Game {
         );
 
 
+        SaveManager.save();
+
+
+    }
+
+
+
+    applyOfflineProgress(){
+
+
+        const seconds=
+
+        time.getOfflineSeconds();
+
+
+
+        if(
+
+            seconds<=0
+
+        ){
+
+
+            return;
+
+        }
+
+
+
+        const limit=
+
+        Math.min(
+
+            seconds,
+
+            86400
+
+        );
+
+
+
+        for(
+
+            let i=0;
+
+            i<limit;
+
+            i++
+
+        ){
+
+
+            this.productionTick();
+
+
+        }
+
+
+
+        eventBus.emit(
+
+            "offline:complete",
+
+            limit
+
+        );
+
+
     }
 
 
@@ -178,7 +199,11 @@ class Game {
     stop(){
 
 
-        if(this.interval){
+        if(
+
+            this.interval
+
+        ){
 
 
             clearInterval(
@@ -188,11 +213,11 @@ class Game {
             );
 
 
+            this.interval=null;
+
+
         }
 
-
-
-        this.interval=null;
 
 
         this.running=false;
