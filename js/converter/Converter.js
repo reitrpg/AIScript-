@@ -1,15 +1,12 @@
 /**
  * World Creator
- * Resource Converter System
+ * Converter System
  *
- * Resource Processing
- * Research / World Effect Integration
+ * Resource Conversion Management
  */
 
 
 import ResourceManager from "../resource/Manager.js";
-
-import WorldManager from "../world/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -21,77 +18,79 @@ class Converter {
     constructor(){
 
 
+        this.researchMultiplier=1;
+
+
+
         this.recipes={
 
 
-            wood_food:{
+            woodToPlank:{
 
 
-                name:"木材加工食料化",
+                name:"木材加工",
 
 
                 input:"wood",
 
+
                 inputAmount:10,
 
 
-                output:"food",
+                output:"plank",
 
-                outputAmount:5
-
-
-            },
-
-
-
-            stone_ore:{
-
-
-                name:"石材精錬",
-
-
-                input:"stone",
-
-                inputAmount:20,
-
-
-                output:"ore",
-
-                outputAmount:5
-
-
-            },
-
-
-
-            mana_crystal:{
-
-
-                name:"魔力結晶生成",
-
-
-                input:"mana",
-
-                inputAmount:50,
-
-
-                output:"crystal",
 
                 outputAmount:1
+
+
+            },
+
+
+
+            oreToMetal:{
+
+
+                name:"鉱石精錬",
+
+
+                input:"ore",
+
+
+                inputAmount:10,
+
+
+                output:"metal",
+
+
+                outputAmount:1
+
+
+            },
+
+
+
+            crystalToMana:{
+
+
+                name:"結晶変換",
+
+
+                input:"crystal",
+
+
+                inputAmount:1,
+
+
+                output:"mana",
+
+
+                outputAmount:10
 
 
             }
 
 
         };
-
-
-
-        this.researchMultiplier=1;
-
-
-
-        this.worldMultiplier=1;
 
 
     }
@@ -114,145 +113,10 @@ class Converter {
 
 
 
-    updateWorldMultiplier(){
-
-
-        const world=
-
-        WorldManager.getCurrent();
-
-
-
-        if(!world){
-
-
-            this.worldMultiplier=1;
-
-
-            return;
-
-        }
-
-
-
-        let multiplier=1;
-
-
-
-        multiplier*=
-
-        world.rarityMultiplier
-
-        ??
-
-        1;
-
-
-
-        if(
-
-            world.effects
-
-        ){
-
-
-            world.effects.forEach(
-
-                effect=>{
-
-
-                    switch(effect){
-
-
-                        case "豊かな森":
-
-
-                            if(
-
-                                true
-
-                            ){
-
-                                multiplier*=1.1;
-
-                            }
-
-                            break;
-
-
-
-                        case "鉱脈の大地":
-
-
-                            multiplier*=1.15;
-
-                            break;
-
-
-
-                        case "魔力循環":
-
-
-                            multiplier*=1.2;
-
-                            break;
-
-
-
-                        case "神代遺構":
-
-
-                            multiplier*=1.25;
-
-                            break;
-
-
-
-                        case "世界樹の核":
-
-
-                            multiplier*=1.5;
-
-                            break;
-
-
-                    }
-
-
-                }
-
-            );
-
-
-        }
-
-
-
-        this.worldMultiplier=
-
-        multiplier;
-
-
-    }
-
-
-
     getMultiplier(){
 
 
-        this.updateWorldMultiplier();
-
-
-
-        return (
-
-            this.researchMultiplier
-
-            *
-
-            this.worldMultiplier
-
-        );
+        return this.researchMultiplier;
 
 
     }
@@ -283,7 +147,6 @@ class Converter {
 
             return false;
 
-
         }
 
 
@@ -303,7 +166,6 @@ class Converter {
 
             return false;
 
-
         }
 
 
@@ -321,12 +183,11 @@ class Converter {
 
             return false;
 
-
         }
 
 
 
-        let output=
+        const output=
 
         ResourceManager.get(
 
@@ -349,34 +210,23 @@ class Converter {
 
             );
 
-
-
-            output=
-
-            ResourceManager.get(
-
-                recipe.output
-
-            );
-
-
         }
 
 
 
-        const amount=
+        ResourceManager.get(
 
-        recipe.outputAmount
+            recipe.output
 
-        *
+        )
 
-        this.getMultiplier();
+        .add(
 
+            recipe.outputAmount
 
+            *
 
-        output.add(
-
-            amount
+            this.researchMultiplier
 
         );
 
@@ -384,4 +234,64 @@ class Converter {
 
         eventBus.emit(
 
-           
+            "resource:update"
+
+        );
+
+
+
+        return true;
+
+
+    }
+
+
+
+    toJSON(){
+
+
+        return {
+
+
+            researchMultiplier:
+
+            this.researchMultiplier
+
+
+        };
+
+
+    }
+
+
+
+    load(data){
+
+
+        if(!data){
+
+
+            return;
+
+        }
+
+
+
+        this.researchMultiplier=
+
+        data.researchMultiplier
+
+        ??
+
+        1;
+
+
+    }
+
+
+
+}
+
+
+
+export default new Converter();
