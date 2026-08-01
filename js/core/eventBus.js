@@ -1,8 +1,6 @@
 /**
  * World Creator
- * Event Bus
- *
- * システム間通信管理
+ * Event Bus System
  */
 
 
@@ -11,50 +9,190 @@ class EventBus {
 
     constructor(){
 
+
         this.events={};
 
-    }
-
-
-
-    on(name,callback){
-
-        if(!this.events[name]){
-
-            this.events[name]=[];
-
-        }
-
-
-        this.events[name].push(callback);
 
     }
 
 
 
-    emit(name,data){
+    on(
 
-        if(!this.events[name]){
+        name,
+
+        callback
+
+    ){
+
+
+        if(
+
+            typeof callback !== "function"
+
+        ){
 
             return;
 
         }
 
 
-        this.events[name]
-        .forEach(
-            callback=>
-            callback(data)
-        );
+
+        if(
+
+            !this.events[name]
+
+        ){
+
+
+            this.events[name]=[];
+
+        }
+
+
+
+        if(
+
+            !this.events[name]
+
+            .includes(callback)
+
+        ){
+
+
+            this.events[name]
+
+            .push(
+
+                callback
+
+            );
+
+
+        }
+
 
     }
+
+
+
+    emit(
+
+        name,
+
+        data
+
+    ){
+
+
+        if(
+
+            !this.events[name]
+
+        ){
+
+
+            return;
+
+        }
+
+
+
+        this.events[name]
+
+        .forEach(
+
+            callback=>{
+
+
+                try{
+
+
+                    callback(
+
+                        data
+
+                    );
+
+
+                }
+
+                catch(error){
+
+
+                    console.error(
+
+                        "Event Error:",
+
+                        name,
+
+                        error
+
+                    );
+
+
+                }
+
+
+            }
+
+        );
+
+
+    }
+
+
+
+    off(
+
+        name,
+
+        callback
+
+    ){
+
+
+        if(
+
+            !this.events[name]
+
+        ){
+
+            return;
+
+        }
+
+
+
+        this.events[name]=
+
+        this.events[name]
+
+        .filter(
+
+            fn=>
+
+            fn!==callback
+
+        );
+
+
+    }
+
+
+
+    clear(){
+
+
+        this.events={};
+
+
+    }
+
 
 
 }
 
 
-const eventBus=new EventBus();
 
-
-export default eventBus;
-                  
+export default new EventBus();
