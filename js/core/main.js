@@ -2,7 +2,7 @@
  * World Creator
  * Main Entry
  *
- * System Initialization
+ * Debug Initialization Version
  */
 
 
@@ -34,203 +34,253 @@ class Main {
     start(){
 
 
+        console.log(
 
-        /*
-         * Resource初期化
-         */
-
-
-        ResourceManager.init();
-
-
-
-        /*
-         * Save読込
-         */
-
-
-        const loaded=
-
-        SaveManager.load();
-
-
-
-        /*
-         * World生成
-         */
-
-
-        if(
-
-            !loaded
-
-            ||
-
-            !WorldManager.getCurrent()
-
-        ){
-
-
-            WorldManager.createWorld();
-
-
-        }
-
-
-
-        /*
-         * Resource同期
-         */
-
-
-        ResourceManager.syncWorldResources();
-
-
-
-        /*
-         * Converter補正反映
-         */
-
-
-        Converter.setResearchMultiplier(
-
-            ResearchManager.getConverterMultiplier()
+            "Main start"
 
         );
 
 
 
-        /*
-         * UI開始
-         */
+        try{
 
 
-        UI.init(
+            console.log(
 
-            "app"
+                "Resource init"
 
-        );
+            );
 
 
-
-        ResearchUI.init(
-
-            "research-area"
-
-        );
+            ResourceManager.init();
 
 
 
-        ConverterUI.init(
+            console.log(
 
-            "converter-area"
+                "Save load"
 
-        );
-
-
-
-        /*
-         * Research更新
-         */
+            );
 
 
-        eventBus.on(
+            const loaded=
 
-            "research:update",
-
-            ()=>{
+            SaveManager.load();
 
 
-                Converter.setResearchMultiplier(
 
-                    ResearchManager.getConverterMultiplier()
+            console.log(
+
+                "Loaded:",
+
+                loaded
+
+            );
+
+
+
+            if(
+
+                !loaded
+
+                ||
+
+                !WorldManager.getCurrent()
+
+            ){
+
+
+                console.log(
+
+                    "Create World"
 
                 );
 
 
 
-                SaveManager.save();
+                WorldManager.createWorld();
 
 
             }
 
-        );
+
+
+            console.log(
+
+                "Resource sync"
+
+            );
+
+
+            ResourceManager.syncWorldResources();
 
 
 
-        /*
-         * Resource更新
-         */
+            console.log(
+
+                "Converter init"
+
+            );
 
 
-        eventBus.on(
+            Converter.setResearchMultiplier(
 
-            "resource:update",
+                ResearchManager
 
-            ()=>{
+                .getConverterMultiplier()
 
-
-                SaveManager.save();
-
-
-            }
-
-        );
+            );
 
 
 
-        /*
-         * World更新
-         */
+            console.log(
+
+                "UI init"
+
+            );
 
 
-        eventBus.on(
+            UI.init(
 
-            "world:update",
+                "app"
 
-            ()=>{
-
-
-                SaveManager.save();
-
-
-            }
-
-        );
+            );
 
 
 
-        /*
-         * 転生
-         */
+            ResearchUI.init(
 
+                "research-area"
 
-        eventBus.on(
-
-            "world:rebirth",
-
-            ()=>{
-
-
-                ResourceManager.syncWorldResources();
+            );
 
 
 
-                SaveManager.save();
+            ConverterUI.init(
+
+                "converter-area"
+
+            );
 
 
-            }
 
-        );
+            console.log(
 
+                "Event bind"
 
-
-        /*
-         * Game開始
-         */
+            );
 
 
-        game.start();
+
+            eventBus.on(
+
+                "research:update",
+
+                ()=>{
+
+
+                    Converter.setResearchMultiplier(
+
+                        ResearchManager
+
+                        .getConverterMultiplier()
+
+                    );
+
+
+                    SaveManager.save();
+
+
+                }
+
+            );
+
+
+
+            eventBus.on(
+
+                "resource:update",
+
+                ()=>{
+
+
+                    SaveManager.save();
+
+
+                }
+
+            );
+
+
+
+            eventBus.on(
+
+                "world:update",
+
+                ()=>{
+
+
+                    SaveManager.save();
+
+
+                }
+
+            );
+
+
+
+            eventBus.on(
+
+                "world:rebirth",
+
+                ()=>{
+
+
+                    ResourceManager.syncWorldResources();
+
+
+                    SaveManager.save();
+
+
+                }
+
+            );
+
+
+
+            console.log(
+
+                "Game start"
+
+            );
+
+
+            game.start();
+
+
+
+            console.log(
+
+                "World Creator Started"
+
+            );
+
+
+        }
+
+        catch(error){
+
+
+            console.error(
+
+                "Initialization Error",
+
+                error
+
+            );
+
+
+        }
 
 
     }
@@ -240,10 +290,6 @@ class Main {
 
 
 
-const main=
+new Main()
 
-new Main();
-
-
-
-main.start();
+.start();
