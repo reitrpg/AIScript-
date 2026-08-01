@@ -1,12 +1,15 @@
 /**
  * World Creator
- * Resource Converter
+ * Resource Converter System
  *
- * Research Integration
+ * Resource Processing
+ * Research / World Effect Integration
  */
 
 
 import ResourceManager from "../resource/Manager.js";
+
+import WorldManager from "../world/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -29,12 +32,10 @@ class Converter {
 
                 input:"wood",
 
-
                 inputAmount:10,
 
 
                 output:"food",
-
 
                 outputAmount:5
 
@@ -51,12 +52,10 @@ class Converter {
 
                 input:"stone",
 
-
                 inputAmount:20,
 
 
                 output:"ore",
-
 
                 outputAmount:5
 
@@ -73,12 +72,10 @@ class Converter {
 
                 input:"mana",
 
-
                 inputAmount:50,
 
 
                 output:"crystal",
-
 
                 outputAmount:1
 
@@ -91,6 +88,10 @@ class Converter {
 
 
         this.researchMultiplier=1;
+
+
+
+        this.worldMultiplier=1;
 
 
     }
@@ -107,6 +108,151 @@ class Converter {
         ||
 
         1;
+
+
+    }
+
+
+
+    updateWorldMultiplier(){
+
+
+        const world=
+
+        WorldManager.getCurrent();
+
+
+
+        if(!world){
+
+
+            this.worldMultiplier=1;
+
+
+            return;
+
+        }
+
+
+
+        let multiplier=1;
+
+
+
+        multiplier*=
+
+        world.rarityMultiplier
+
+        ??
+
+        1;
+
+
+
+        if(
+
+            world.effects
+
+        ){
+
+
+            world.effects.forEach(
+
+                effect=>{
+
+
+                    switch(effect){
+
+
+                        case "豊かな森":
+
+
+                            if(
+
+                                true
+
+                            ){
+
+                                multiplier*=1.1;
+
+                            }
+
+                            break;
+
+
+
+                        case "鉱脈の大地":
+
+
+                            multiplier*=1.15;
+
+                            break;
+
+
+
+                        case "魔力循環":
+
+
+                            multiplier*=1.2;
+
+                            break;
+
+
+
+                        case "神代遺構":
+
+
+                            multiplier*=1.25;
+
+                            break;
+
+
+
+                        case "世界樹の核":
+
+
+                            multiplier*=1.5;
+
+                            break;
+
+
+                    }
+
+
+                }
+
+            );
+
+
+        }
+
+
+
+        this.worldMultiplier=
+
+        multiplier;
+
+
+    }
+
+
+
+    getMultiplier(){
+
+
+        this.updateWorldMultiplier();
+
+
+
+        return (
+
+            this.researchMultiplier
+
+            *
+
+            this.worldMultiplier
+
+        );
 
 
     }
@@ -137,6 +283,7 @@ class Converter {
 
             return false;
 
+
         }
 
 
@@ -156,6 +303,7 @@ class Converter {
 
             return false;
 
+
         }
 
 
@@ -172,6 +320,7 @@ class Converter {
 
 
             return false;
+
 
         }
 
@@ -221,7 +370,7 @@ class Converter {
 
         *
 
-        this.researchMultiplier;
+        this.getMultiplier();
 
 
 
@@ -235,21 +384,4 @@ class Converter {
 
         eventBus.emit(
 
-            "resource:update"
-
-        );
-
-
-
-        return true;
-
-
-    }
-
-
-
-}
-
-
-
-export default new Converter();
+           
