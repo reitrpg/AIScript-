@@ -1,186 +1,168 @@
 /**
  * World Creator
- * World Resource Generation
+ * World Growth System
+ *
+ * Level Event Integration
  */
 
 
-// 既存WorldManager内の
-// createResources()
-// を以下へ置換
-
-
-createResources(rarity, effects){
-
-
-    const resources = {};
-
-
-    const basic = [
-
-        "wood",
-
-        "stone",
-
-        "food"
-
-    ];
+import eventBus from "../core/eventBus.js";
 
 
 
-    const advanced = [
-
-        "ore",
-
-        "mana"
-
-    ];
+class WorldManager {
 
 
-
-    const rare = [
-
-        "crystal",
-
-        "starCrystal"
-
-    ];
+    constructor(){
 
 
-
-    let count = 2;
-
+        this.current=null;
 
 
-    switch(rarity){
+        this.unlocks={
 
+            extraResource1:false,
 
-        case "Rare":
+            extraResource2:false,
 
-            count = 3;
+            rareResource:false
 
-            break;
-
-
-        case "Epic":
-
-            count = 4;
-
-            break;
-
-
-        case "Legend":
-
-            count = 5;
-
-            break;
-
-
-        case "Mythic":
-
-            count = 6;
-
-            break;
+        };
 
 
     }
 
 
 
-    const pool = [
-
-        ...basic
-
-    ];
+    levelUp(){
 
 
+        if(!this.current){
 
-    if(
+            return;
 
-        rarity !== "Normal"
+        }
 
-    ){
 
-        pool.push(
 
-            ...advanced
+        this.current.level++;
+
+
+
+        this.checkUnlock();
+
+
+
+        eventBus.emit(
+
+            "world:levelup",
+
+            this.current
 
         );
 
-    }
 
 
+        eventBus.emit(
 
-    if(
+            "world:update",
 
-        rarity === "Legend"
-
-        ||
-
-        rarity === "Mythic"
-
-    ){
-
-        pool.push(
-
-            ...rare
+            this.current
 
         );
 
+
     }
 
 
 
-    while(
-
-        Object.keys(resources).length
-
-        <
-
-        count
-
-    ){
+    checkUnlock(){
 
 
-        const id =
+        const lv=
 
-        pool[
-
-            Math.floor(
-
-                Math.random()
-
-                *
-
-                pool.length
-
-            )
-
-        ];
+        this.current.level;
 
 
 
         if(
 
-            !resources[id]
+            lv>=10
+
+            &&
+
+            !this.unlocks.extraResource1
 
         ){
 
 
-            resources[id]={
+            this.unlocks.extraResource1=true;
 
 
-                base:
 
-                this.getBaseProduction(
+            eventBus.emit(
 
-                    rarity,
+                "world:unlock",
 
-                    id
+                "resource_slot"
 
-                )
+            );
 
 
-            };
+        }
+
+
+
+        if(
+
+            lv>=50
+
+            &&
+
+            !this.unlocks.extraResource2
+
+        ){
+
+
+            this.unlocks.extraResource2=true;
+
+
+
+            eventBus.emit(
+
+                "world:unlock",
+
+                "advanced_resource"
+
+            );
+
+
+        }
+
+
+
+        if(
+
+            lv>=100
+
+            &&
+
+            !this.unlocks.rareResource
+
+        ){
+
+
+            this.unlocks.rareResource=true;
+
+
+
+            eventBus.emit(
+
+                "world:unlock",
+
+                "rare_material"
+
+            );
 
 
         }
@@ -190,132 +172,18 @@ createResources(rarity, effects){
 
 
 
-    // 固有効果による追加素材
+    getUnlocks(){
 
 
-    if(
-
-        effects.includes(
-
-            "世界樹の核"
-
-        )
-
-    ){
-
-
-        resources.worldCore={
-
-
-            base:1
-
-
-        };
+        return this.unlocks;
 
 
     }
 
-
-
-    if(
-
-        effects.includes(
-
-            "星の祝福"
-
-        )
-
-    ){
-
-
-        resources.starCrystal={
-
-
-            base:1
-
-
-        };
-
-
-    }
-
-
-
-    return resources;
 
 
 }
 
 
 
-
-getBaseProduction(
-
-    rarity,
-
-    resource
-
-){
-
-
-    let value = 1;
-
-
-
-    switch(rarity){
-
-
-        case "Rare":
-
-            value*=2;
-
-            break;
-
-
-        case "Epic":
-
-            value*=4;
-
-            break;
-
-
-        case "Legend":
-
-            value*=8;
-
-            break;
-
-
-        case "Mythic":
-
-            value*=15;
-
-            break;
-
-
-    }
-
-
-
-    if(
-
-        resource==="crystal"
-
-        ||
-
-        resource==="worldCore"
-
-    ){
-
-
-        value*=0.2;
-
-
-    }
-
-
-
-    return value;
-
-
-}
+export default new WorldManager();
