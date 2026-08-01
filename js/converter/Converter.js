@@ -31,16 +31,22 @@ class Converter {
                 name:"木材加工",
 
 
-                input:"wood",
+                input:{
 
 
-                inputAmount:10,
+                    wood:10
 
 
-                output:"plank",
+                },
 
 
-                outputAmount:1
+                output:{
+
+
+                    plank:1
+
+
+                }
 
 
             },
@@ -53,16 +59,22 @@ class Converter {
                 name:"鉱石精錬",
 
 
-                input:"ore",
+                input:{
 
 
-                inputAmount:10,
+                    ore:10
 
 
-                output:"metal",
+                },
 
 
-                outputAmount:1
+                output:{
+
+
+                    metal:1
+
+
+                }
 
 
             },
@@ -72,19 +84,84 @@ class Converter {
             crystalToMana:{
 
 
-                name:"結晶変換",
+                name:"魔力結晶変換",
 
 
-                input:"crystal",
+                input:{
 
 
-                inputAmount:1,
+                    crystal:1
 
 
-                output:"mana",
+                },
 
 
-                outputAmount:10
+                output:{
+
+
+                    mana:10
+
+
+                }
+
+
+            },
+
+
+
+            foodToPreserved:{
+
+
+                name:"保存食加工",
+
+
+                input:{
+
+
+                    food:20
+
+
+                },
+
+
+                output:{
+
+
+                    preservedFood:5
+
+
+                }
+
+
+            },
+
+
+
+            woodOreToMaterial:{
+
+
+                name:"建築素材生成",
+
+
+                input:{
+
+
+                    wood:5,
+
+
+                    ore:5
+
+
+                },
+
+
+                output:{
+
+
+                    material:1
+
+
+                }
 
 
             }
@@ -133,6 +210,57 @@ class Converter {
 
 
 
+    canConvert(recipe){
+
+
+        for(
+
+            const id in recipe.input
+
+        ){
+
+
+            const resource=
+
+            ResourceManager.get(
+
+                id
+
+            );
+
+
+
+            if(
+
+                !resource
+
+                ||
+
+                resource.getAmount()
+
+                <
+
+                recipe.input[id]
+
+            ){
+
+
+                return false;
+
+            }
+
+
+        }
+
+
+
+        return true;
+
+
+    }
+
+
+
     convert(id){
 
 
@@ -147,24 +275,6 @@ class Converter {
 
             return false;
 
-        }
-
-
-
-        const input=
-
-        ResourceManager.get(
-
-            recipe.input
-
-        );
-
-
-
-        if(!input){
-
-
-            return false;
 
         }
 
@@ -172,9 +282,9 @@ class Converter {
 
         if(
 
-            !input.consume(
+            !this.canConvert(
 
-                recipe.inputAmount
+                recipe
 
             )
 
@@ -187,48 +297,79 @@ class Converter {
 
 
 
-        const output=
+        for(
 
-        ResourceManager.get(
+            const item in recipe.input
 
-            recipe.output
-
-        );
+        ){
 
 
+            ResourceManager
 
-        if(!output){
+            .get(item)
 
+            .consume(
 
-            ResourceManager.create(
-
-                recipe.output,
-
-                recipe.output,
-
-                0
+                recipe.input[item]
 
             );
+
 
         }
 
 
 
-        ResourceManager.get(
+        for(
 
-            recipe.output
+            const item in recipe.output
 
-        )
+        ){
 
-        .add(
 
-            recipe.outputAmount
+            let resource=
 
-            *
+            ResourceManager.get(
 
-            this.researchMultiplier
+                item
 
-        );
+            );
+
+
+
+            if(!resource){
+
+
+                ResourceManager.create(
+
+                    item,
+
+                    item,
+
+                    0
+
+                );
+
+
+            }
+
+
+
+            ResourceManager
+
+            .get(item)
+
+            .add(
+
+                recipe.output[item]
+
+                *
+
+                this.researchMultiplier
+
+            );
+
+
+        }
 
 
 
