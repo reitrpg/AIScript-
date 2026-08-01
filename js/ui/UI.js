@@ -1,8 +1,6 @@
 /**
  * World Creator
- * Main UI
- *
- * World Information Update
+ * UI Rebirth Integration
  */
 
 
@@ -10,393 +8,505 @@ import eventBus from "../core/eventBus.js";
 
 import WorldManager from "../world/Manager.js";
 
-import ResourceManager from "../resource/Manager.js";
-
 
 
 class UI {
 
 
-    constructor(){
+constructor(){
 
+this.root=null;
 
-        this.root = null;
+}
 
 
-    }
 
+init(id){
 
 
-    init(id){
+this.root=document.getElementById(id);
 
 
-        this.root =
+if(!this.root){
 
-            document.getElementById(id);
+return;
 
+}
 
 
-        if(!this.root){
+this.render();
 
-            return;
+this.bind();
 
-        }
+this.update();
 
 
+}
 
-        this.render();
 
-        this.bind();
 
-        this.update();
+render(){
 
 
-    }
+this.root.innerHTML=`
 
+<h1>
+World Creator
+</h1>
 
 
-    render(){
+<section id="world-info">
 
+</section>
 
-        this.root.innerHTML = `
 
+<section id="rebirth-info">
 
-        <h1>
-        World Creator
-        </h1>
+</section>
 
 
+<button id="create-world">
+Create World
+</button>
 
-        <div class="tabs">
 
-            <button data-tab="world">
+<button id="rebirth-world">
+Rebirth
+</button>
 
-            World
 
-            </button>
+`;
 
 
-            <button data-tab="resource">
 
-            Resource
+}
 
-            </button>
 
 
-            <button data-tab="research">
+bind(){
 
-            Research
 
-            </button>
+document
 
-        </div>
+.getElementById(
 
+"create-world"
 
+)
 
-        <section id="world-section">
+.onclick=()=>{
 
 
-            <h2>
-            World
-            </h2>
+eventBus.emit(
 
+"world:create"
 
-            <div id="world-info">
+);
 
-            </div>
 
+};
 
 
-            <button id="create-world">
 
-            Create World
+document
 
-            </button>
+.getElementById(
 
+"rebirth-world"
 
+)
 
-            <button id="rebirth-world">
+.onclick=()=>{
 
-            Rebirth
 
-            </button>
+const world=
 
+WorldManager.getCurrent();
 
-        </section>
 
 
+if(!world){
 
-        <section id="resource-section">
+return;
 
+}
 
-            <h2>
-            Resource
-            </h2>
 
 
-            <div id="resource-list">
+if(
 
-            </div>
+confirm(
 
+"この世界を転生しますか？\n現在Lv："+
 
-        </section>
+world.level
 
+)
 
+){
 
-        `;
 
+WorldManager.rebirth();
 
-    }
 
 
+this.update();
 
-    bind(){
 
+}
 
-        const create =
 
-        document.getElementById(
 
-            "create-world"
+};
 
-        );
 
 
+eventBus.on(
 
-        if(create){
+"world:update",
 
+()=>{
 
-            create.onclick = ()=>{
 
+this.update();
 
-                eventBus.emit(
 
-                    "world:create"
+}
 
-                );
+);
 
 
-            };
 
+eventBus.on(
 
-        }
+"world:created",
 
+()=>{
 
 
-        const rebirth =
+this.update();
 
-        document.getElementById(
 
-            "rebirth-world"
+}
 
-        );
+);
 
 
 
-        if(rebirth){
+eventBus.on(
 
+"world:rebirth",
 
-            rebirth.onclick = ()=>{
+()=>{
 
 
-                WorldManager.rebirth();
+this.update();
 
 
+}
 
-                this.update();
+);
 
 
-            };
 
+}
 
-        }
 
 
+update(){
 
-        eventBus.on(
 
-            "world:update",
+this.updateWorld();
 
-            ()=>{
 
+this.updateRebirth();
 
-                this.updateWorld();
 
+}
 
-            }
 
-        );
 
+updateWorld(){
 
 
-        eventBus.on(
+const area=
 
-            "world:created",
+document.getElementById(
 
-            ()=>{
+"world-info"
 
+);
 
-                this.updateWorld();
 
 
-            }
+if(!area){
 
-        );
+return;
 
+}
 
 
-        eventBus.on(
 
-            "resource:update",
+const world=
 
-            ()=>{
+WorldManager.getCurrent();
 
 
-                this.updateResource();
 
+if(!world){
 
-            }
 
-        );
+area.textContent=
 
+"No World";
 
-    }
 
+return;
 
 
-    update(){
+}
 
 
-        this.updateWorld();
 
-        this.updateResource();
+area.innerHTML=`
 
+<h2>
+World
+</h2>
 
-    }
 
+名前：
+${world.name}
 
+<br>
 
-    updateWorld(){
 
+レアリティ：
+${world.rarity}
 
-        const area =
+<br>
 
-        document.getElementById(
 
-            "world-info"
+Lv：
+${world.level}
 
-        );
+<br>
 
 
+EXP：
+${world.exp}
 
-        if(!area){
+/
 
-            return;
+${WorldManager.getNeedExp()}
 
-        }
 
+<br>
 
 
-        const world =
+転生回数：
+${world.rebirthCount}
 
-        WorldManager.getCurrent();
+回
 
 
+<br>
 
-        if(!world){
 
+転生倍率：
+${world.rebirthMultiplier.toFixed(2)}
+倍
 
-            area.textContent =
 
-            "No World";
+<br><br>
 
 
-            return;
+素材産出種類
 
 
-        }
+<br>
 
 
+${this.renderResource(world)}
 
-        area.innerHTML = `
 
+<br>
 
-        <p>
 
-        名前：
+固有効果
 
-        ${world.name}
 
-        </p>
+<br>
 
 
+${
 
-        <p>
+world.effects.length
 
-        レアリティ：
+?
 
-        ${world.rarity}
+world.effects.join("<br>")
 
-        </p>
+:
 
+"なし"
 
+}
 
-        <p>
+`;
 
-        Lv：
 
-        ${world.level}
 
-        </p>
+}
 
 
 
-        <p>
+renderResource(world){
 
-        EXP：
 
-        ${world.exp}
+let text="";
 
-        /
 
-        ${WorldManager.getNeedExp()}
+for(
 
-        </p>
+const id in world.resources
 
+){
 
 
-        <p>
+text +=
 
-        転生倍率：
+id
 
-        ${world.rebirthMultiplier.toFixed(2)}
++
 
-        倍
+" : "
 
-        </p>
++
 
+world.resources[id].base
 
++
 
-        <p>
+"<br>";
 
-        素材産出種類
 
-        </p>
+}
 
 
 
-        ${this.renderResources(world)}
+return text;
 
 
+}
 
-        <p>
 
-        固有効果
 
-        </p>
+updateRebirth(){
 
 
+const area=
 
-        ${
+document.getElementById(
 
-           
+"rebirth-info"
+
+);
+
+
+
+if(!area){
+
+return;
+
+}
+
+
+
+const world=
+
+WorldManager.getCurrent();
+
+
+
+if(!world){
+
+area.textContent="";
+
+return;
+
+}
+
+
+
+const next=
+
+(
+
+Math.pow(
+
+world.level,
+
+2
+
+)
+
+/
+
+100
+
+);
+
+
+
+area.innerHTML=`
+
+転生後倍率増加：
+
+×
+
+${next.toFixed(2)}
+
+<br>
+
+現在倍率：
+
+×
+
+${world.rebirthMultiplier.toFixed(2)}
+
+<br>
+
+転生後倍率：
+
+×
+
+${
+
+(
+
+world.rebirthMultiplier
+
+*
+
+next
+
+)
+
+.toFixed(2)
+
+}
+
+`;
+
+
+
+}
+
+
+
+}
+
+
+
+export default new UI();
