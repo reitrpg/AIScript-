@@ -2,19 +2,186 @@
  * World Creator
  * Time System
  *
- * Offline Progress Support
+ * Tick / Offline Time Management
  */
 
 
-class Time {
+class TimeManager {
 
 
     constructor(){
 
 
-        this.key=
+        this.tickSpeed = 1000;
 
-        "world_creator_last_time";
+
+        this.timeScale = 1;
+
+
+
+        this.lastTime =
+
+        Date.now();
+
+
+    }
+
+
+
+    getTickSpeed(){
+
+
+        return this.tickSpeed;
+
+
+    }
+
+
+
+    setTickSpeed(value){
+
+
+        const speed=
+
+        Number(value);
+
+
+
+        if(
+
+            speed > 0
+
+        ){
+
+
+            this.tickSpeed=speed;
+
+
+        }
+
+
+    }
+
+
+
+    getTimeScale(){
+
+
+        return this.timeScale;
+
+
+    }
+
+
+
+    setTimeScale(value){
+
+
+        const scale=
+
+        Number(value);
+
+
+
+        if(
+
+            scale > 0
+
+        ){
+
+
+            this.timeScale=scale;
+
+
+        }
+
+
+    }
+
+
+
+    getDeltaTime(){
+
+
+        const now=
+
+        Date.now();
+
+
+
+        const delta=
+
+        (
+
+            now -
+
+            this.lastTime
+
+        )
+
+        /
+
+        1000;
+
+
+
+        this.lastTime=
+
+        now;
+
+
+
+        return delta
+
+        *
+
+        this.timeScale;
+
+
+    }
+
+
+
+    getOfflineSeconds(){
+
+
+        const now=
+
+        Date.now();
+
+
+
+        const elapsed=
+
+        (
+
+            now -
+
+            this.lastTime
+
+        )
+
+        /
+
+        1000;
+
+
+
+        this.lastTime=
+
+        now;
+
+
+
+        return Math.floor(
+
+            elapsed
+
+            *
+
+            this.timeScale
+
+        );
 
 
     }
@@ -31,143 +198,8 @@ class Time {
 
 
 
-    save(){
-
-
-        localStorage.setItem(
-
-            this.key,
-
-            String(
-
-                this.getCurrentTime()
-
-            )
-
-        );
-
-
-    }
-
-
-
-    getLastTime(){
-
-
-        const value=
-
-        localStorage.getItem(
-
-            this.key
-
-        );
-
-
-
-        if(!value){
-
-
-            this.save();
-
-
-
-            return this.getCurrentTime();
-
-
-        }
-
-
-
-        return Number(
-
-            value
-
-        );
-
-
-    }
-
-
-
-    getOfflineSeconds(){
-
-
-        const now=
-
-        this.getCurrentTime();
-
-
-
-        const last=
-
-        this.getLastTime();
-
-
-
-        this.save();
-
-
-
-        let seconds=
-
-        Math.floor(
-
-            (
-
-                now-last
-
-            )
-
-            /
-
-            1000
-
-        );
-
-
-
-        if(
-
-            seconds<0
-
-        ){
-
-
-            seconds=0;
-
-
-        }
-
-
-
-        /*
-         * 最大24時間分のみ処理
-         */
-
-
-        if(
-
-            seconds>86400
-
-        ){
-
-
-            seconds=86400;
-
-
-        }
-
-
-
-        return seconds;
-
-
-    }
-
-
-
 }
 
 
 
-export default new Time();
+export default new TimeManager();
