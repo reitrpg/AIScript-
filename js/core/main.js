@@ -28,14 +28,19 @@ class Main {
     start(){
 
 
+        /*
+         * 基本初期化
+         */
 
-        // Resource初期化
 
         ResourceManager.init();
 
 
 
-        // セーブ読み込み
+        /*
+         * セーブ読込
+         */
+
 
         const loaded =
 
@@ -43,7 +48,10 @@ class Main {
 
 
 
-        // 世界が存在しない場合生成
+        /*
+         * 世界が無い場合生成
+         */
+
 
         if(
 
@@ -63,13 +71,19 @@ class Main {
 
 
 
-        // 世界素材同期
+        /*
+         * 世界資源同期
+         */
+
 
         ResourceManager.syncWorldResources();
 
 
 
-        // 研究倍率反映
+        /*
+         * 研究倍率反映
+         */
+
 
         ResourceManager.setResearchMultiplier(
 
@@ -79,7 +93,10 @@ class Main {
 
 
 
-        // UI初期化
+        /*
+         * UI生成
+         */
+
 
         UI.init(
 
@@ -89,7 +106,29 @@ class Main {
 
 
 
-        // 世界更新
+        /*
+         * イベント
+         */
+
+
+        eventBus.on(
+
+            "world:create",
+
+            ()=>{
+
+
+                ResourceManager.syncWorldResources();
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
 
         eventBus.on(
 
@@ -98,12 +137,7 @@ class Main {
             ()=>{
 
 
-                ResourceManager.syncWorldResources();
-
-
-
                 SaveManager.save();
-
 
 
                 UI.update();
@@ -114,8 +148,6 @@ class Main {
         );
 
 
-
-        // 資源更新
 
         eventBus.on(
 
@@ -127,7 +159,6 @@ class Main {
                 SaveManager.save();
 
 
-
                 UI.update();
 
 
@@ -136,8 +167,6 @@ class Main {
         );
 
 
-
-        // 研究完了
 
         eventBus.on(
 
@@ -153,7 +182,6 @@ class Main {
                 );
 
 
-
                 SaveManager.save();
 
 
@@ -162,8 +190,6 @@ class Main {
         );
 
 
-
-        // 転生
 
         eventBus.on(
 
@@ -175,9 +201,7 @@ class Main {
                 ResourceManager.syncWorldResources();
 
 
-
                 SaveManager.save();
-
 
 
                 UI.update();
@@ -189,24 +213,12 @@ class Main {
 
 
 
-        // ゲーム開始
+        /*
+         * ゲーム開始
+         */
+
 
         game.start();
 
 
-
     }
-
-
-
-}
-
-
-
-const main=
-
-new Main();
-
-
-
-main.start();
