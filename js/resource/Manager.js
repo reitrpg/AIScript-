@@ -2,13 +2,15 @@
  * World Creator
  * Resource Manager
  *
- * Integrated Version
+ * World Production Integration
  */
 
 
 import Resource from "./Resource.js";
 
 import eventBus from "../core/eventBus.js";
+
+import WorldManager from "../world/Manager.js";
 
 
 
@@ -19,7 +21,6 @@ class ResourceManager {
 
 
         this.resources = {};
-
 
         this.initialized = false;
 
@@ -33,9 +34,7 @@ class ResourceManager {
 
         if(this.initialized){
 
-
             return;
-
 
         }
 
@@ -109,14 +108,13 @@ class ResourceManager {
 
         this.resources[id] =
 
-            new Resource(
+        new Resource(
 
-                id,
+            id,
 
-                name
+            name
 
-            );
-
+        );
 
 
         this.resources[id]
@@ -141,74 +139,22 @@ class ResourceManager {
     ){
 
 
-        const resource =
-
-            this.resources[id];
+        if(this.resources[id]){
 
 
+            this.resources[id]
 
-        if(!resource){
-
-
-            return;
+            .add(value);
 
 
         }
-
-
-
-        resource.add(
-
-            value
-
-        );
 
 
     }
 
 
 
-    remove(
-
-        id,
-
-        value
-
-    ){
-
-
-        const resource =
-
-            this.resources[id];
-
-
-
-        if(!resource){
-
-
-            return false;
-
-
-        }
-
-
-
-        return resource.remove(
-
-            value
-
-        );
-
-
-    }
-
-
-
-    get(
-
-        id
-
-    ){
+    get(id){
 
 
         return this.resources[id];
@@ -228,7 +174,172 @@ class ResourceManager {
 
 
 
+    getWorldMultiplier(){
+
+
+        const world =
+
+        WorldManager.getCurrent();
+
+
+
+        if(!world){
+
+
+            return 1;
+
+
+        }
+
+
+
+        const levelBonus =
+
+
+        Math.pow(
+
+            1.05,
+
+            world.level - 1
+
+        );
+
+
+
+        const rarityBonus =
+
+        world.rarityMultiplier ?? 1;
+
+
+
+        const rebirthBonus =
+
+        world.rebirthMultiplier ?? 1;
+
+
+
+        const effectBonus =
+
+        this.getEffectMultiplier(
+
+            world
+
+        );
+
+
+
+        return (
+
+            levelBonus
+
+            *
+
+            rarityBonus
+
+            *
+
+            effectBonus
+
+            *
+
+            rebirthBonus
+
+        );
+
+
+    }
+
+
+
+    getEffectMultiplier(world){
+
+
+        if(
+
+            !world.effects ||
+
+            world.effects.length===0
+
+        ){
+
+
+            return 1;
+
+
+        }
+
+
+
+        let multiplier = 1;
+
+
+
+        world.effects.forEach(
+
+            effect=>{
+
+
+                if(
+
+                    effect==="豊かな森"
+
+                ){
+
+
+                    multiplier *= 1.2;
+
+
+                }
+
+
+
+                if(
+
+                    effect==="神代遺構"
+
+                ){
+
+
+                    multiplier *= 1.4;
+
+
+                }
+
+
+
+                if(
+
+                    effect==="世界樹の核"
+
+                ){
+
+
+                    multiplier *= 2;
+
+
+                }
+
+
+            }
+
+        );
+
+
+
+        return multiplier;
+
+
+    }
+
+
+
     update(){
+
+
+        const multiplier =
+
+        this.getWorldMultiplier();
+
 
 
         Object.values(
@@ -239,10 +350,18 @@ class ResourceManager {
 
         .forEach(
 
-            resource => {
+            resource=>{
 
 
-                resource.update();
+                resource.add(
+
+                    resource.getProduction()
+
+                    *
+
+                    multiplier
+
+                );
 
 
             }
@@ -253,9 +372,7 @@ class ResourceManager {
 
         eventBus.emit(
 
-            "resource:update",
-
-            this.resources
+            "resource:update"
 
         );
 
@@ -267,7 +384,7 @@ class ResourceManager {
     toJSON(){
 
 
-        const data = {};
+        const data={};
 
 
 
@@ -280,9 +397,9 @@ class ResourceManager {
 
             data[id] =
 
-                this.resources[id]
+            this.resources[id]
 
-                .toJSON();
+            .toJSON();
 
 
         }
@@ -301,9 +418,7 @@ class ResourceManager {
 
         if(!data){
 
-
             return;
-
 
         }
 
@@ -343,7 +458,7 @@ class ResourceManager {
 
 const resourceManager =
 
-    new ResourceManager();
+new ResourceManager();
 
 
 
