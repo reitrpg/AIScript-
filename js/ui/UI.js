@@ -342,4 +342,57 @@ class UI {
 
         `
 
-        <h
+        <h2>
+
+        Resources
+
+        </h2>
+
+        `;
+
+
+
+        for(
+
+            const id in resources
+
+        ){
+
+
+            const resource=
+
+            resources[id];
+
+
+
+            html+=`
+
+            ${resource.name}
+
+            :
+
+            ${resource.amount.toFixed(2)}
+
+            <br>
+
+            `;
+
+
+        }
+
+
+
+        area.innerHTML=
+
+        html;
+
+
+    }
+
+
+
+}
+
+
+
+export default new UI();
