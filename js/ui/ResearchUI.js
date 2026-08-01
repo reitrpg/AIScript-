@@ -28,7 +28,11 @@ class ResearchUI {
 
         this.area=
 
-        document.getElementById(id);
+        document.getElementById(
+
+            id
+
+        );
 
 
 
@@ -40,14 +44,22 @@ class ResearchUI {
 
 
 
-        this.render();
+        this.update();
 
 
     }
 
 
 
-    render(){
+    update(){
+
+
+        if(!this.area){
+
+            return;
+
+        }
+
 
 
         const data=
@@ -73,10 +85,9 @@ class ResearchUI {
 
 
 
-            html += `
+            html+=`
 
-
-            <div class="research">
+            <div class="research-item">
 
 
             <h3>
@@ -84,6 +95,7 @@ class ResearchUI {
             ${research.name}
 
             </h3>
+
 
 
             Lv:
@@ -95,30 +107,24 @@ class ResearchUI {
             ${research.max}
 
 
+
             <br>
+
 
 
             効果:
 
-            ${research.effect}
+            ×${
 
+                Math.pow(
 
-            <br>
+                    research.effect,
 
-
-            必要素材:
-
-
-            <br>
-
-
-            ${
-
-                this.costText(
-
-                    research.cost
+                    research.level
 
                 )
+
+                .toFixed(2)
 
             }
 
@@ -127,17 +133,15 @@ class ResearchUI {
             <br>
 
 
+
             <button
 
-            data-id="${id}"
+            data-research="${id}">
 
-            class="research-button">
-
-
-            強化
-
+            研究する
 
             </button>
+
 
 
             </div>
@@ -163,56 +167,14 @@ class ResearchUI {
 
 
 
-    costText(cost){
-
-
-        let text="";
-
-
-
-        for(
-
-            const id in cost
-
-        ){
-
-
-            text +=
-
-            id
-
-            +
-
-            " : "
-
-            +
-
-            cost[id]
-
-            +
-
-            "<br>";
-
-
-        }
-
-
-
-        return text;
-
-
-    }
-
-
-
     bind(){
 
 
-        document
+        this.area
 
         .querySelectorAll(
 
-            ".research-button"
+            "[data-research]"
 
         )
 
@@ -221,26 +183,39 @@ class ResearchUI {
             button=>{
 
 
-                button.onclick=()=>{
+                button.onclick=
+
+                ()=>{
 
 
-                    ResearchManager.researchUp(
+                    const id=
 
-                        button.dataset.id
-
-                    );
-
-
-
-                    eventBus.emit(
-
-                        "resource:update"
-
-                    );
+                    button.dataset.research;
 
 
 
-                    this.render();
+                    if(
+
+                        ResearchManager.researchUp(
+
+                            id
+
+                        )
+
+                    ){
+
+
+                        this.update();
+
+
+                        eventBus.emit(
+
+                            "research:complete"
+
+                        );
+
+
+                    }
 
 
                 };
