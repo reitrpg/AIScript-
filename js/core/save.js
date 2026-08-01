@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * Compatible Save Loader
+ * World / Resource / Research / Converter
  */
 
 
@@ -11,6 +11,8 @@ import WorldManager from "../world/Manager.js";
 import ResourceManager from "../resource/Manager.js";
 
 import ResearchManager from "../research/Manager.js";
+
+import Converter from "../converter/Converter.js";
 
 
 
@@ -25,6 +27,7 @@ class SaveManager {
         "world_creator_save";
 
 
+
         this.version=3;
 
 
@@ -33,7 +36,6 @@ class SaveManager {
 
 
     save(){
-
 
 
         const data={
@@ -59,7 +61,13 @@ class SaveManager {
 
             research:
 
-            ResearchManager.toJSON()
+            ResearchManager.toJSON(),
+
+
+
+            converter:
+
+            Converter.toJSON()
 
 
 
@@ -71,7 +79,11 @@ class SaveManager {
 
             this.key,
 
-            JSON.stringify(data)
+            JSON.stringify(
+
+                data
+
+            )
 
         );
 
@@ -116,11 +128,11 @@ class SaveManager {
 
 
 
-            if(data.world){
+            if(
 
+                data.world
 
-                delete data.world.Age;
-
+            ){
 
 
                 WorldManager.load(
@@ -134,7 +146,11 @@ class SaveManager {
 
 
 
-            if(data.resources){
+            if(
+
+                data.resources
+
+            ){
 
 
                 ResourceManager.load(
@@ -148,12 +164,34 @@ class SaveManager {
 
 
 
-            if(data.research){
+            if(
+
+                data.research
+
+            ){
 
 
                 ResearchManager.load(
 
                     data.research
+
+                );
+
+
+            }
+
+
+
+            if(
+
+                data.converter
+
+            ){
+
+
+                Converter.load(
+
+                    data.converter
 
                 );
 
@@ -170,7 +208,6 @@ class SaveManager {
         catch(error){
 
 
-
             console.error(
 
                 "Save Load Error",
@@ -178,10 +215,6 @@ class SaveManager {
                 error
 
             );
-
-
-
-            this.clear();
 
 
 
