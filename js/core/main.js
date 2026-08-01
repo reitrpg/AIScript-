@@ -37,6 +37,9 @@ class Main {
         this.started=false;
 
 
+        this.autoSaveTimer=null;
+
+
     }
 
 
@@ -67,6 +70,10 @@ class Main {
 
 
         this.initializeUI();
+
+
+
+        this.startAutoSave();
 
 
 
@@ -219,6 +226,65 @@ class Main {
             "debug-content"
 
         );
+
+
+    }
+
+
+
+    startAutoSave(){
+
+
+        this.clearAutoSave();
+
+
+
+        const time=
+
+        SettingsManager.getAutoSaveTime();
+
+
+
+        this.autoSaveTimer=
+
+        setInterval(
+
+            ()=>{
+
+
+                SaveManager.save();
+
+
+
+            },
+
+            time
+
+        );
+
+
+    }
+
+
+
+    clearAutoSave(){
+
+
+        if(this.autoSaveTimer){
+
+
+            clearInterval(
+
+                this.autoSaveTimer
+
+            );
+
+
+
+            this.autoSaveTimer=null;
+
+
+        }
 
 
     }
