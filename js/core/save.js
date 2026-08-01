@@ -31,7 +31,7 @@ class SaveManager {
         "world_creator_save";
 
 
-        this.version=11;
+        this.version=12;
 
 
         this.data={};
@@ -57,7 +57,33 @@ class SaveManager {
 
 
 
-            settings:{},
+            settings:{
+
+
+
+                tickSpeed:1000,
+
+
+                autoSave:300000,
+
+
+                numberFormat:"normal",
+
+
+                debugMode:false,
+
+
+                speedRun:false,
+
+
+                language:"ja",
+
+
+                seed:null
+
+
+
+            },
 
 
 
@@ -199,6 +225,7 @@ class SaveManager {
             this.createDefault();
 
 
+
             return false;
 
 
@@ -240,6 +267,7 @@ class SaveManager {
                 error
 
             );
+
 
 
             this.data=
@@ -287,6 +315,52 @@ class SaveManager {
 
 
             }
+
+
+        }
+
+
+
+        if(
+
+            this.data.settings===undefined
+
+        ){
+
+
+            this.data.settings=
+
+            defaultData.settings;
+
+
+        }
+
+
+
+        if(
+
+            this.data.debug===undefined
+
+        ){
+
+
+            this.data.debug=
+
+            defaultData.debug;
+
+
+        }
+
+
+
+        if(
+
+            this.data.upgrades===undefined
+
+        ){
+
+
+            this.data.upgrades={};
 
 
         }
