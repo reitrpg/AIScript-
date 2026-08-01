@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * World + Resource + Research + EP
+ * Save / Load Management
  */
 
 
@@ -29,7 +29,7 @@ class SaveManager {
         "world_creator_save";
 
 
-        this.version=5;
+        this.version=6;
 
 
     }
@@ -45,7 +45,6 @@ class SaveManager {
             version:
 
             this.version,
-
 
 
             time:
@@ -249,6 +248,23 @@ class SaveManager {
 
             }
 
+            else{
+
+
+                EPManager.load({
+
+
+                    amount:0,
+
+
+                    totalEarned:0
+
+
+                });
+
+
+            }
+
 
 
             return true;
@@ -287,6 +303,16 @@ class SaveManager {
             this.key
 
         );
+
+
+    }
+
+
+
+    getVersion(){
+
+
+        return this.version;
 
 
     }
