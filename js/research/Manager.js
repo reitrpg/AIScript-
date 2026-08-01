@@ -1,12 +1,10 @@
 /**
  * World Creator
- * Research System
+ * Research Manager
  *
- * Divine Revelation Research
+ * Divine Research System
  */
 
-
-import ResourceManager from "../resource/Manager.js";
 
 import EPManager from "../ep/Manager.js";
 
@@ -20,42 +18,33 @@ class ResearchManager {
     constructor(){
 
 
-        this.research={
+        this.researches={
 
 
 
-            harvest:{
+            originKnowledge:{
 
 
                 name:
 
-                "豊穣神の恩寵",
+                "創世神託の記録",
 
 
                 description:
 
-                "生命の循環を理解し、世界の実りを増幅させる。",
+                "世界の始まりに残された知識の欠片。",
 
 
                 level:0,
 
 
-                max:null,
+                maxLevel:10,
 
 
-                cost:{
+                baseCost:100,
 
 
-                    ep:10
-
-
-                },
-
-
-                growth:1.05,
-
-
-                infinite:true
+                effect:0.05
 
 
 
@@ -63,38 +52,29 @@ class ResearchManager {
 
 
 
-            earth:{
+            eternalFlow:{
 
 
                 name:
 
-                "大地脈の啓示",
+                "永劫なる流転の啓示",
 
 
                 description:
 
-                "地脈に眠る力を読み取り、資源の流れを強化する。",
+                "世界を巡る力の流れを理解する。",
 
 
                 level:0,
 
 
-                max:null,
+                maxLevel:10,
 
 
-                cost:{
+                baseCost:500,
 
 
-                    ep:50
-
-
-                },
-
-
-                growth:1.08,
-
-
-                infinite:true
+                effect:0.08
 
 
 
@@ -102,77 +82,29 @@ class ResearchManager {
 
 
 
-            mana:{
+            divineLaw:{
 
 
                 name:
 
-                "原初魔力への接触",
+                "神域法則への接触",
 
 
                 description:
 
-                "世界創造以前の魔力構造へ接続する。",
+                "世界を構成する法則の一部へ到達する。",
 
 
                 level:0,
 
 
-                max:null,
+                maxLevel:5,
 
 
-                cost:{
+                baseCost:5000,
 
 
-                    ep:200
-
-
-                },
-
-
-                growth:1.1,
-
-
-                infinite:true
-
-
-
-            },
-
-
-
-            creation:{
-
-
-                name:
-
-                "創世神の残響",
-
-
-                description:
-
-                "世界の根源法則の一部を理解する。",
-
-
-                level:0,
-
-
-                max:null,
-
-
-                cost:{
-
-
-                    ep:1000
-
-
-                },
-
-
-                growth:1.15,
-
-
-                infinite:true
+                effect:0.15
 
 
 
@@ -189,7 +121,7 @@ class ResearchManager {
     get(id){
 
 
-        return this.research[id];
+        return this.researches[id];
 
 
     }
@@ -199,7 +131,7 @@ class ResearchManager {
     getAll(){
 
 
-        return this.research;
+        return this.researches;
 
 
     }
@@ -211,43 +143,37 @@ class ResearchManager {
 
         const data=
 
-        this.research[id];
+        this.researches[id];
 
 
 
         if(!data){
 
 
-            return null;
+            return 0;
 
 
         }
 
 
 
-        return {
+        return Math.floor(
 
 
-            ep:
+            data.baseCost
 
-            Math.floor(
+            *
 
-                data.cost.ep
+            Math.pow(
 
-                *
+                2,
 
-                Math.pow(
-
-                    1.25,
-
-                    data.level
-
-                )
+                data.level
 
             )
 
 
-        };
+        );
 
 
     }
@@ -257,17 +183,31 @@ class ResearchManager {
     canResearch(id){
 
 
-        const cost=
+        const data=
 
-        this.getCost(
-
-            id
-
-        );
+        this.researches[id];
 
 
 
-        if(!cost){
+        if(!data){
+
+
+            return false;
+
+
+        }
+
+
+
+        if(
+
+            data.level
+
+            >=
+
+            data.maxLevel
+
+        ){
 
 
             return false;
@@ -279,7 +219,7 @@ class ResearchManager {
 
         return EPManager.canPay(
 
-            cost.ep
+            this.getCost(id)
 
         );
 
@@ -293,7 +233,7 @@ class ResearchManager {
 
         const data=
 
-        this.research[id];
+        this.researches[id];
 
 
 
@@ -309,19 +249,15 @@ class ResearchManager {
 
         const cost=
 
-        this.getCost(
-
-            id
-
-        );
+        this.getCost(id);
 
 
 
         if(
 
-            !this.canResearch(
+            !EPManager.consume(
 
-                id
+                cost
 
             )
 
@@ -332,14 +268,6 @@ class ResearchManager {
 
 
         }
-
-
-
-        EPManager.consume(
-
-            cost.ep
-
-        );
 
 
 
@@ -362,69 +290,40 @@ class ResearchManager {
 
 
 
-    getEffect(id){
-
-
-        const data=
-
-        this.research[id];
-
-
-
-        if(!data){
-
-
-            return 1;
-
-
-        }
-
-
-
-        return Math.pow(
-
-
-            data.growth,
-
-
-            data.level
-
-
-        );
-
-
-    }
-
-
-
     getMultiplier(){
 
 
-        let value=1;
+        let multiplier=1;
 
 
 
         for(
 
-            const id in this.research
+            const id in this.researches
 
         ){
 
 
-            value*=
+            const data=
 
-            this.getEffect(
+            this.researches[id];
 
-                id
 
-            );
+
+            multiplier+=
+
+            data.level
+
+            *
+
+            data.effect;
 
 
         }
 
 
 
-        return value;
+        return multiplier;
 
 
     }
@@ -436,7 +335,7 @@ class ResearchManager {
 
         const data=
 
-        this.research[id];
+        this.researches[id];
 
 
 
@@ -462,11 +361,28 @@ class ResearchManager {
             level:data.level,
 
 
-            cost:this.getCost(id),
+            maxLevel:data.maxLevel,
 
 
-            canResearch:this.canResearch(id)
+            cost:{
 
+
+                ep:
+
+                this.getCost(id)
+
+
+            },
+
+
+            canResearch:
+
+            this.canResearch(id),
+
+
+            effect:
+
+            data.effect
 
         };
 
@@ -478,7 +394,7 @@ class ResearchManager {
     toJSON(){
 
 
-        return this.research;
+        return this.researches;
 
 
     }
@@ -488,10 +404,40 @@ class ResearchManager {
     load(data){
 
 
-        if(data){
+        if(!data){
 
 
-            this.research=data;
+            return;
+
+
+        }
+
+
+
+        for(
+
+            const id in data
+
+        ){
+
+
+            if(
+
+                this.researches[id]
+
+            ){
+
+
+                this.researches[id].level=
+
+                data[id].level
+
+                ??
+
+                0;
+
+
+            }
 
 
         }
