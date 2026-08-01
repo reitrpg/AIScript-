@@ -2,7 +2,7 @@
  * World Creator
  * Resource Converter
  *
- * Resource Processing System
+ * Research Integration
  */
 
 
@@ -87,6 +87,26 @@ class Converter {
 
 
         };
+
+
+
+        this.researchMultiplier=1;
+
+
+    }
+
+
+
+    setResearchMultiplier(value){
+
+
+        this.researchMultiplier=
+
+        Number(value)
+
+        ||
+
+        1;
 
 
     }
@@ -181,6 +201,7 @@ class Converter {
             );
 
 
+
             output=
 
             ResourceManager.get(
@@ -194,9 +215,19 @@ class Converter {
 
 
 
+        const amount=
+
+        recipe.outputAmount
+
+        *
+
+        this.researchMultiplier;
+
+
+
         output.add(
 
-            recipe.outputAmount
+            amount
 
         );
 
