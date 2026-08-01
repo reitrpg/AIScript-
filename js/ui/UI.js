@@ -1,18 +1,16 @@
 /**
  * World Creator
- * User Interface
+ * Main UI Controller
  *
- * Main Display Controller
+ * Resource and EP Display
  */
 
-
-import WorldManager from "../world/Manager.js";
 
 import ResourceManager from "../resource/Manager.js";
 
 import EPManager from "../ep/Manager.js";
 
-import SaveManager from "../core/save.js";
+import SettingsManager from "../settings/Manager.js";
 
 import eventBus from "../core/eventBus.js";
 
@@ -25,9 +23,6 @@ class UI {
 
 
         this.area=null;
-
-
-        this.sections={};
 
 
     }
@@ -57,39 +52,21 @@ class UI {
 
 
 
-        this.createLayout();
+        this.render();
 
-
-
-        this.update();
-
-
-
-        this.registerEvents();
-
-
-    }
-
-
-
-    registerEvents(){
 
 
         eventBus.on(
 
             "resource:update",
 
-            ()=>this.update()
-
-        );
+            ()=>{
 
 
+                this.render();
 
-        eventBus.on(
 
-            "world:update",
-
-            ()=>this.update()
+            }
 
         );
 
@@ -99,7 +76,13 @@ class UI {
 
             "ep:update",
 
-            ()=>this.update()
+            ()=>{
+
+
+                this.render();
+
+
+            }
 
         );
 
@@ -109,7 +92,13 @@ class UI {
 
             "settings:update",
 
-            ()=>this.update()
+            ()=>{
+
+
+                this.render();
+
+
+            }
 
         );
 
@@ -118,215 +107,10 @@ class UI {
 
 
 
-    createLayout(){
+    render(){
 
 
-        this.area.innerHTML=`
-
-        <div id="world-section"></div>
-
-        <div id="ep-section"></div>
-
-        <div id="resource-section"></div>
-
-        <div id="system-section"></div>
-
-        `;
-
-
-
-        this.sections.world=
-
-        document.getElementById(
-
-            "world-section"
-
-        );
-
-
-
-        this.sections.ep=
-
-        document.getElementById(
-
-            "ep-section"
-
-        );
-
-
-
-        this.sections.resource=
-
-        document.getElementById(
-
-            "resource-section"
-
-        );
-
-
-
-        this.sections.system=
-
-        document.getElementById(
-
-            "system-section"
-
-        );
-
-
-    }
-
-
-
-    getNumberFormat(){
-
-
-        const settings=
-
-        SaveManager.getSettings();
-
-
-
-        return settings.numberFormat
-
-        ??
-
-        "normal";
-
-
-    }
-
-
-
-    formatNumber(value){
-
-
-        value=
-
-        Number(value)
-
-        ||
-
-        0;
-
-
-
-        const mode=
-
-        this.getNumberFormat();
-
-
-
-        if(
-
-            mode==="simple"
-
-        ){
-
-
-            return Math.floor(
-
-                value
-
-            );
-
-
-        }
-
-
-
-        if(
-
-            value<1000
-
-        ){
-
-
-            return value.toFixed(2);
-
-
-        }
-
-
-
-        const units=[
-
-
-            "",
-
-
-            "K",
-
-
-            "M",
-
-
-            "B",
-
-
-            "T",
-
-
-            "Qa",
-
-
-            "Qi"
-
-
-        ];
-
-
-
-        let index=0;
-
-
-
-        while(
-
-            value>=1000
-
-            &&
-
-            index<units.length-1
-
-        ){
-
-
-            value/=1000;
-
-
-            index++;
-
-
-        }
-
-
-
-        return (
-
-            value.toFixed(2)
-
-            +
-
-            units[index]
-
-        );
-
-
-    }
-
-
-
-    updateWorld(){
-
-
-        const world=
-
-        WorldManager.getCurrent();
-
-
-
-        if(!world){
+        if(!this.area){
 
 
             return;
@@ -336,67 +120,22 @@ class UI {
 
 
 
-        this.sections.world.innerHTML=`
+        let html=`
 
-        <h3>
-
-        世界情報
-
-        </h3>
+        <div class="main-status">
 
 
+        <h2>
 
-        Lv:
+        世界状態
 
-        ${world.level}
+        </h2>
 
 
 
-        <br>
+        <div>
 
-
-
-        EXP:
-
-        ${
-
-            this.formatNumber(
-
-                world.exp
-
-            )
-
-        }
-
-
-
-        <br>
-
-
-
-        転生:
-
-        ${world.rebirthCount}
-
-        `;
-
-
-    }
-
-
-
-    updateEP(){
-
-
-        this.sections.ep.innerHTML=`
-
-        <h3>
-
-        EP
-
-        </h3>
-
-
+        EP:
 
         ${
 
@@ -408,23 +147,9 @@ class UI {
 
         }
 
-        `;
+        </div>
 
 
-    }
-
-
-
-    updateResource(){
-
-
-        const resources=
-
-        ResourceManager.getAll();
-
-
-
-        let html=`
 
         <h3>
 
@@ -432,7 +157,15 @@ class UI {
 
         </h3>
 
+
+
         `;
+
+
+
+        const resources=
+
+        ResourceManager.getAll();
 
 
 
@@ -451,15 +184,24 @@ class UI {
 
             html+=`
 
+
+
+            <div class="resource">
+
+
             ${resource.name}
 
+
+
             :
+
+
 
             ${
 
                 this.formatNumber(
 
-                    resource.getAmount()
+                    resource.amount
 
                 )
 
@@ -467,7 +209,9 @@ class UI {
 
 
 
-            <br>
+            </div>
+
+
 
             `;
 
@@ -476,7 +220,15 @@ class UI {
 
 
 
-        this.sections.resource.innerHTML=
+        html+=`
+
+        </div>
+
+        `;
+
+
+
+        this.area.innerHTML=
 
         html;
 
@@ -485,63 +237,129 @@ class UI {
 
 
 
-    updateSystem(){
+    formatNumber(value){
 
 
-        this.sections.system.innerHTML=`
+        const format=
 
-        <h3>
+        SettingsManager.get(
 
-        システム
+            "numberFormat"
 
-        </h3>
-
-
-
-        <button>
-
-        設定
-
-        </button>
+        );
 
 
 
-        <button>
+        const number=
 
-        デバッグ
+        Number(value)
 
-        </button>
+        ||
 
-        `;
-
-
-    }
+        0;
 
 
 
-    update(){
+        if(
+
+            format==="simple"
+
+        ){
 
 
-        if(!this.area){
+            return this.simpleFormat(
 
+                number
 
-            return;
+            );
 
 
         }
 
 
 
-        this.updateWorld();
+        return number.toLocaleString(
+
+            "ja-JP"
+
+        );
 
 
-        this.updateEP();
+    }
 
 
-        this.updateResource();
+
+    simpleFormat(value){
 
 
-        this.updateSystem();
+        const units=[
+
+
+            "",
+
+
+            "K",
+
+
+            "M",
+
+
+            "B",
+
+
+            "T"
+
+
+
+        ];
+
+
+
+        let index=0;
+
+
+        let number=value;
+
+
+
+        while(
+
+            number>=1000
+
+            &&
+
+            index<units.length-1
+
+        ){
+
+
+            number/=1000;
+
+
+            index++;
+
+
+        }
+
+
+
+        return (
+
+            Math.floor(
+
+                number*100
+
+            )
+
+            /
+
+            100
+
+        )
+
+        +
+
+        units[index];
 
 
     }
