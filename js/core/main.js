@@ -2,7 +2,7 @@
  * World Creator
  * Main Entry
  *
- * Initialization System
+ * System Initialization
  */
 
 
@@ -16,7 +16,11 @@ import ResourceManager from "../resource/Manager.js";
 
 import ResearchManager from "../research/Manager.js";
 
+import Converter from "../converter/Converter.js";
+
 import UI from "../ui/UI.js";
+
+import ConverterUI from "../ui/ConverterUI.js";
 
 import eventBus from "./eventBus.js";
 
@@ -28,8 +32,9 @@ class Main {
     start(){
 
 
+
         /*
-         * 基本初期化
+         * Resource初期化
          */
 
 
@@ -38,18 +43,18 @@ class Main {
 
 
         /*
-         * セーブ読込
+         * Save読込
          */
 
 
-        const loaded =
+        const loaded=
 
         SaveManager.load();
 
 
 
         /*
-         * 世界が無い場合生成
+         * World生成
          */
 
 
@@ -72,7 +77,7 @@ class Main {
 
 
         /*
-         * 世界資源同期
+         * Resource同期
          */
 
 
@@ -81,20 +86,28 @@ class Main {
 
 
         /*
-         * 研究倍率反映
+         * Research反映
          */
 
 
-        ResourceManager.setResearchMultiplier(
+        const researchMultiplier=
 
-            ResearchManager.getMultiplier()
+        ResearchManager
+
+        .getConverterMultiplier();
+
+
+
+        Converter.setResearchMultiplier(
+
+            researchMultiplier
 
         );
 
 
 
         /*
-         * UI生成
+         * UI開始
          */
 
 
@@ -106,66 +119,17 @@ class Main {
 
 
 
+        ConverterUI.init(
+
+            "converter-area"
+
+        );
+
+
+
         /*
-         * イベント
+         * Research更新
          */
-
-
-        eventBus.on(
-
-            "world:create",
-
-            ()=>{
-
-
-                ResourceManager.syncWorldResources();
-
-
-                SaveManager.save();
-
-
-            }
-
-        );
-
-
-
-        eventBus.on(
-
-            "world:update",
-
-            ()=>{
-
-
-                SaveManager.save();
-
-
-                UI.update();
-
-
-            }
-
-        );
-
-
-
-        eventBus.on(
-
-            "resource:update",
-
-            ()=>{
-
-
-                SaveManager.save();
-
-
-                UI.update();
-
-
-            }
-
-        );
-
 
 
         eventBus.on(
@@ -175,9 +139,11 @@ class Main {
             ()=>{
 
 
-                ResourceManager.setResearchMultiplier(
+                Converter.setResearchMultiplier(
 
-                    ResearchManager.getMultiplier()
+                    ResearchManager
+
+                    .getConverterMultiplier()
 
                 );
 
@@ -191,20 +157,19 @@ class Main {
 
 
 
+        /*
+         * World更新
+         */
+
+
         eventBus.on(
 
-            "world:rebirth",
+            "world:update",
 
             ()=>{
 
 
-                ResourceManager.syncWorldResources();
-
-
                 SaveManager.save();
-
-
-                UI.update();
 
 
             }
@@ -214,7 +179,55 @@ class Main {
 
 
         /*
-         * ゲーム開始
+         * Resource更新
+         */
+
+
+        eventBus.on(
+
+            "resource:update",
+
+            ()=>{
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        /*
+         * 転生
+         */
+
+
+        eventBus.on(
+
+            "world:rebirth",
+
+            ()=>{
+
+
+                ResourceManager
+
+                .syncWorldResources();
+
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        /*
+         * Game開始
          */
 
 
@@ -222,3 +235,16 @@ class Main {
 
 
     }
+
+
+}
+
+
+
+const main=
+
+new Main();
+
+
+
+main.start();
