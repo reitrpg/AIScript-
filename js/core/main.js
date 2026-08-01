@@ -2,7 +2,7 @@
  * World Creator
  * Main Entry
  *
- * Research Connect Version
+ * Research Final Connect
  */
 
 
@@ -29,10 +29,15 @@ function initialize() {
 
     console.log(
 
-        "[World Creator] Starting..."
+        "[World Creator] Boot"
 
     );
 
+
+
+    /*
+        Data Initialize
+    */
 
 
     ResourceManager.init();
@@ -45,6 +50,11 @@ function initialize() {
 
 
 
+    /*
+        UI Initialize
+    */
+
+
     ui.init(
 
         "app"
@@ -53,11 +63,7 @@ function initialize() {
 
 
 
-    researchUI.init(
-
-        "app"
-
-    );
+    researchUI.init();
 
 
 
@@ -73,11 +79,23 @@ function initialize() {
 
 
 
+    /*
+        Game Initialize
+    */
+
+
     game.init();
 
 
     game.start();
 
+
+
+    console.log(
+
+        "[World Creator] Running"
+
+    );
 
 
 }
