@@ -1,255 +1,379 @@
 /**
  * World Creator
- * Research System
+ * Research Data
  *
- * 研究項目管理
+ * Individual Research Object
  */
 
 
 import BigNumber from "../number/BigNumber.js";
-import eventBus from "../core/eventBus.js";
+
 
 
 class Research {
 
 
-    constructor(data = {}) {
+    constructor(data={}){
 
 
-        this.id =
-            data.id ?? "unknown";
+        this.id=
 
+        data.id
 
-        this.name =
-            data.name ?? "Research";
+        ??
 
-
-        this.description =
-            data.description ?? "";
+        "unknown";
 
 
 
-        this.cost =
-            this.convertCost(
-                data.cost ?? {}
-            );
+        this.name=
+
+        data.name
+
+        ??
+
+        "Research";
 
 
 
-        this.effect =
-            data.effect ?? {};
+        this.description=
+
+        data.description
+
+        ??
+
+        "";
 
 
 
-        this.level = 0;
+        this.level=
+
+        data.level
+
+        ??
+
+        0;
 
 
-        this.progress =
-            BigNumber.zero();
+
+        this.max=
+
+        data.max
+
+        ??
+
+        1;
 
 
-        this.completed = false;
+
+        this.effect=
+
+        data.effect
+
+        ??
+
+        1;
+
+
+
+        this.type=
+
+        data.type
+
+        ??
+
+        "production";
+
+
+
+        this.cost=
+
+        data.cost
+
+        ??
+
+        {};
+
+
+
+        this.progress=
+
+        BigNumber.zero();
+
+
+        this.completed=false;
+
 
     }
 
 
 
-    /**
-     * コスト変換
-     */
-
-    convertCost(cost) {
+    addProgress(value){
 
 
-        const result = {};
+        if(
 
+            this.level >=
 
-        for (const key in cost) {
+            this.max
 
+        ){
 
-            result[key] =
-                BigNumber.from(
-                    cost[key]
-                );
-
-        }
-
-
-        return result;
-
-    }
-
-
-
-    /**
-     * 研究進行
-     */
-
-    addProgress(value) {
-
-
-        if (this.completed) {
 
             return;
 
         }
 
 
+
         this.progress.add(
+
             value
+
         );
 
 
-        if (
+
+        if(
+
             this.checkComplete()
-        ) {
+
+        ){
+
 
             this.complete();
 
+
         }
 
+
     }
 
 
 
-    /**
-     * 完成確認
-     */
-
-    checkComplete() {
+    checkComplete(){
 
 
-        const required =
-            this.cost.knowledge ??
-            BigNumber.from(100);
+        const required=
 
+        BigNumber.from(
 
-
-        return (
-            this.progress.exponent >
-            required.exponent ||
             (
-                this.progress.exponent ===
-                required.exponent &&
-                this.progress.value >=
-                required.value
+
+                this.level + 1
+
             )
+
+            *
+
+            100
+
         );
 
+
+
+        return this.progress
+
+        .greaterOrEqual(
+
+            required
+
+        );
+
+
     }
 
 
 
-    /**
-     * 完成
-     */
-
-    complete() {
+    complete(){
 
 
-        this.completed = true;
+        if(
+
+            this.level >=
+
+            this.max
+
+        ){
+
+
+            return;
+
+        }
+
+
 
         this.level++;
 
 
-        eventBus.emit(
-            "research:complete",
-            this
+
+        this.progress=
+
+        BigNumber.zero();
+
+
+
+        this.completed=true;
+
+
+    }
+
+
+
+    getMultiplier(){
+
+
+        return Math.pow(
+
+            this.effect,
+
+            this.level
+
         );
 
+
     }
 
 
 
-    /**
-     * 状態取得
-     */
-
-    getState() {
+    getState(){
 
 
         return {
 
+
             level:
-                this.level,
+
+            this.level,
+
 
             progress:
-                this.progress,
+
+            this.progress,
+
 
             completed:
-                this.completed
+
+            this.completed
+
 
         };
+
 
     }
 
 
 
-    /**
-     * 保存
-     */
-
-    toJSON() {
+    toJSON(){
 
 
         return {
 
+
             id:
-                this.id,
+
+            this.id,
+
+
+            name:
+
+            this.name,
+
+
+            description:
+
+            this.description,
+
 
             level:
-                this.level,
 
-            progress: {
+            this.level,
 
-                value:
-                    this.progress.value,
 
-                exponent:
-                    this.progress.exponent
+            max:
 
-            },
+            this.max,
+
+
+            effect:
+
+            this.effect,
+
+
+            type:
+
+            this.type,
+
+
+            cost:
+
+            this.cost,
+
+
+            progress:
+
+            this.progress.toJSON(),
+
 
             completed:
-                this.completed
+
+            this.completed
+
 
         };
+
 
     }
 
 
 
-    /**
-     * 復元
-     */
-
-    load(data) {
+    load(data){
 
 
-        if (!data) {
+        if(!data){
+
 
             return;
 
         }
 
 
-        this.level =
-            data.level ?? 0;
+
+        this.level=
+
+        data.level
+
+        ??
+
+        0;
 
 
-        this.progress =
-            BigNumber.from(
-                data.progress
-            );
+
+        this.completed=
+
+        data.completed
+
+        ??
+
+        false;
 
 
-        this.completed =
-            data.completed ?? false;
+
+        this.progress=
+
+        BigNumber.from(
+
+            data.progress
+
+        );
+
 
     }
 
 
+
 }
+
 
 
 export default Research;
