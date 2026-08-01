@@ -2,17 +2,17 @@
  * World Creator
  * Service Worker
  *
- * Offline Support
+ * Offline Cache System
  */
 
 
-const CACHE_NAME=
+const CACHE_NAME =
 
-"world-creator-v1";
+"world-creator-v2";
 
 
 
-const FILES=[
+const FILES = [
 
 
     "./",
@@ -24,43 +24,45 @@ const FILES=[
     "./css/style.css",
 
 
-    "./js/core/main.js",
 
+    "./js/core/main.js",
 
     "./js/core/game.js",
 
-
     "./js/core/save.js",
-
 
     "./js/core/time.js",
 
-
     "./js/core/eventBus.js",
+
 
 
     "./js/world/Manager.js",
 
 
-    "./js/resource/Manager.js",
 
+    "./js/resource/Manager.js",
 
     "./js/resource/Resource.js",
 
 
+
     "./js/research/Manager.js",
 
-
     "./js/research/Research.js",
+
 
 
     "./js/converter/Converter.js",
 
 
+
     "./js/ui/UI.js",
 
+    "./js/ui/ResearchUI.js",
 
     "./js/ui/ConverterUI.js",
+
 
 
     "./js/number/BigNumber.js"
