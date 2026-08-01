@@ -1,6 +1,8 @@
 /**
  * World Creator
  * Big Number System
+ *
+ * Large Number Support
  */
 
 
@@ -60,7 +62,9 @@ class BigNumber {
 
         ){
 
+
             return data;
+
 
         }
 
@@ -68,9 +72,10 @@ class BigNumber {
 
         if(
 
-            typeof data==="number"
+            typeof data === "number"
 
         ){
+
 
             return new BigNumber(
 
@@ -80,17 +85,16 @@ class BigNumber {
 
             );
 
+
         }
 
 
 
-        if(
+        if(!data){
 
-            !data
-
-        ){
 
             return BigNumber.zero();
+
 
         }
 
@@ -118,9 +122,12 @@ class BigNumber {
 
         ){
 
+
             this.exponent=0;
 
+
             return;
+
 
         }
 
@@ -128,12 +135,19 @@ class BigNumber {
 
         while(
 
-            Math.abs(this.value)>=10
+            Math.abs(
+
+                this.value
+
+            )
+
+            >=10
 
         ){
 
 
             this.value/=10;
+
 
 
             this.exponent++;
@@ -145,7 +159,13 @@ class BigNumber {
 
         while(
 
-            Math.abs(this.value)<1
+            Math.abs(
+
+                this.value
+
+            )
+
+            <1
 
             &&
 
@@ -155,6 +175,7 @@ class BigNumber {
 
 
             this.value*=10;
+
 
 
             this.exponent--;
@@ -170,7 +191,7 @@ class BigNumber {
     add(other){
 
 
-        const num=
+        const target=
 
         BigNumber.from(
 
@@ -182,12 +203,74 @@ class BigNumber {
 
         if(
 
-            this.exponent===num.exponent
+            target.value===0
 
         ){
 
 
-            this.value+=num.value;
+            return this;
+
+
+        }
+
+
+
+        if(
+
+            this.value===0
+
+        ){
+
+
+            this.value=
+
+            target.value;
+
+
+
+            this.exponent=
+
+            target.exponent;
+
+
+
+            return this;
+
+
+        }
+
+
+
+        const diff=
+
+        this.exponent
+
+        -
+
+        target.exponent;
+
+
+
+        if(
+
+            diff>=0
+
+        ){
+
+
+            this.value+=
+
+            target.value
+
+            *
+
+            Math.pow(
+
+                10,
+
+                -diff
+
+            );
 
 
         }
@@ -195,65 +278,29 @@ class BigNumber {
         else{
 
 
-            const diff=
+            this.value=
 
-            this.exponent-num.exponent;
+            this.value
 
+            *
 
+            Math.pow(
 
-            if(
+                10,
 
-                diff>=0
+                diff
 
-            ){
+            )
 
+            +
 
-                this.value+=
-
-                num.value
-
-                *
-
-                Math.pow(
-
-                    10,
-
-                    -diff
-
-                );
-
-
-            }
-
-            else{
-
-
-                this.value=
-
-                this.value
-
-                *
-
-                Math.pow(
-
-                    10,
-
-                    diff
-
-                )
-
-                +
-
-                num.value;
+            target.value;
 
 
 
-                this.exponent=
+            this.exponent=
 
-                num.exponent;
-
-
-            }
+            target.exponent;
 
 
         }
@@ -274,7 +321,7 @@ class BigNumber {
     compare(other){
 
 
-        const num=
+        const target=
 
         BigNumber.from(
 
@@ -286,19 +333,29 @@ class BigNumber {
 
         if(
 
-            this.exponent!==num.exponent
+            this.exponent !==
+
+            target.exponent
 
         ){
 
 
-            return this.exponent-num.exponent;
+            return this.exponent
+
+            -
+
+            target.exponent;
 
 
         }
 
 
 
-        return this.value-num.value;
+        return this.value
+
+        -
+
+        target.value;
 
 
     }
@@ -308,17 +365,13 @@ class BigNumber {
     greaterOrEqual(other){
 
 
-        return (
+        return this.compare(
 
-            this.compare(
+            other
 
-                other
+        )
 
-            )
-
-            >=0
-
-        );
+        >=0;
 
 
     }
@@ -336,6 +389,62 @@ class BigNumber {
             this.value,
 
 
+
             exponent:
 
-            this
+            this.exponent
+
+
+
+        };
+
+
+    }
+
+
+
+    toString(){
+
+
+        if(
+
+            this.exponent===0
+
+        ){
+
+
+            return String(
+
+                this.value
+
+            );
+
+
+        }
+
+
+
+        return (
+
+            this.value.toFixed(2)
+
+            +
+
+            "e"
+
+            +
+
+            this.exponent
+
+        );
+
+
+    }
+
+
+
+}
+
+
+
+export default BigNumber;
