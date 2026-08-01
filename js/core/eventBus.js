@@ -1,6 +1,8 @@
 /**
  * World Creator
  * Event Bus System
+ *
+ * Global Event Communication
  */
 
 
@@ -28,18 +30,6 @@ class EventBus {
 
         if(
 
-            typeof callback !== "function"
-
-        ){
-
-            return;
-
-        }
-
-
-
-        if(
-
             !this.events[name]
 
         ){
@@ -47,29 +37,18 @@ class EventBus {
 
             this.events[name]=[];
 
-        }
-
-
-
-        if(
-
-            !this.events[name]
-
-            .includes(callback)
-
-        ){
-
-
-            this.events[name]
-
-            .push(
-
-                callback
-
-            );
-
 
         }
+
+
+
+        this.events[name]
+
+        .push(
+
+            callback
+
+        );
 
 
     }
@@ -80,14 +59,20 @@ class EventBus {
 
         name,
 
-        data
+        data=null
 
     ){
 
 
+        const listeners=
+
+        this.events[name];
+
+
+
         if(
 
-            !this.events[name]
+            !listeners
 
         ){
 
@@ -98,9 +83,7 @@ class EventBus {
 
 
 
-        this.events[name]
-
-        .forEach(
+        listeners.forEach(
 
             callback=>{
 
@@ -158,6 +141,7 @@ class EventBus {
 
         ){
 
+
             return;
 
         }
@@ -170,9 +154,7 @@ class EventBus {
 
         .filter(
 
-            fn=>
-
-            fn!==callback
+            event=>event!==callback
 
         );
 
@@ -181,10 +163,24 @@ class EventBus {
 
 
 
-    clear(){
+    clear(name){
 
 
-        this.events={};
+        if(name){
+
+
+            delete this.events[name];
+
+
+        }
+
+        else{
+
+
+            this.events={};
+
+
+        }
 
 
     }
