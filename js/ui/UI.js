@@ -1,25 +1,44 @@
 /**
  * World Creator
- * Main UI
+ * Main UI System
  */
 
+
 import WorldManager from "../world/Manager.js";
+
+import ResourceManager from "../resource/Manager.js";
+
+import eventBus from "../core/eventBus.js";
 
 
 
 class UI {
 
 
+    constructor(){
+
+
+        this.root=null;
+
+
+    }
+
+
+
     init(id){
 
 
-        this.area=
+        this.root=
 
-        document.getElementById(id);
+        document.getElementById(
+
+            id
+
+        );
 
 
 
-        if(!this.area){
+        if(!this.root){
 
             return;
 
@@ -30,6 +49,13 @@ class UI {
         this.render();
 
 
+        this.bind();
+
+
+
+        this.update();
+
+
 
     }
 
@@ -38,236 +64,77 @@ class UI {
     render(){
 
 
-        this.area.innerHTML=`
+        this.root.innerHTML=`
 
         <div class="tabs">
 
+
             <button data-tab="world">
-            World
+            世界
             </button>
 
 
             <button data-tab="resource">
-            Resource
+            資源
             </button>
 
 
             <button data-tab="research">
-            Research
+            研究
             </button>
+
 
         </div>
 
 
 
-        <section
-        id="world-section"
-        class="tab-content">
+        <div id="world-tab">
 
 
             <h2>
-            World
+            世界情報
             </h2>
 
 
-            <div id="world-info">
-
-            </div>
+            <div id="world-info"></div>
 
 
-            <div id="rebirth-info">
-
-            </div>
+            <div id="rebirth-info"></div>
 
 
-        </section>
+        </div>
 
 
 
-        <section
-        id="resource-section"
-        class="tab-content">
+        <div id="resource-tab"
+        style="display:none;">
 
 
             <h2>
-            Resource
+            資源
             </h2>
 
 
-            <div id="resource-list">
-
-            </div>
+            <div id="resource-list"></div>
 
 
-            <div id="converter-area">
-
-            </div>
-
-
-        </section>
+        </div>
 
 
 
-        <section
-        id="research-section"
-        class="tab-content">
+        <div id="research-tab"
+        style="display:none;">
 
 
             <h2>
-            Research
+            研究
             </h2>
 
 
-            <div id="research-area">
+            <div id="research-area"></div>
 
-            </div>
 
-
-        </section>
-
-
-
-        `;
-
-
-
-        this.update();
-
-
-    }
-
-
-
-    update(){
-
-
-        const world=
-
-        WorldManager.getCurrent();
-
-
-
-        const area=
-
-        document.getElementById(
-
-            "world-info"
-
-        );
-
-
-
-        if(area && world){
-
-
-            area.innerHTML=`
-
-            名前:
-            ${world.name}
-
-            <br>
-
-            レアリティ:
-            ${world.rarity}
-
-            <br>
-
-            Lv:
-            ${world.level}
-
-            <br>
-
-            EXP:
-            ${world.exp}
-
-            `;
-
-
-        }
-
-
-
-        this.updateRebirth();
-
-
-    }
-
-
-
-    updateRebirth(){
-
-
-        const area=
-
-        document.getElementById(
-
-            "rebirth-info"
-
-        );
-
-
-
-        if(!area){
-
-            return;
-
-        }
-
-
-
-        const world=
-
-        WorldManager.getCurrent();
-
-
-
-        if(!world){
-
-            return;
-
-        }
-
-
-
-        const increase=
-
-        (
-
-            Math.pow(
-
-                world.level,
-
-                2
-
-            )
-
-            /
-
-            100
-
-        );
-
-
-
-        area.innerHTML=`
-
-        <h3>
-        転生情報
-        </h3>
-
-
-        現在倍率:
-
-        ×${world.rebirthMultiplier}
-
-
-        <br>
-
-
-        次回増加:
-
-        ×${increase}
-
+        </div>
 
         `;
 
@@ -275,8 +142,94 @@ class UI {
     }
 
 
-}
+
+    bind(){
+
+
+        document
+
+        .querySelectorAll(
+
+            "[data-tab]"
+
+        )
+
+        .forEach(
+
+            button=>{
+
+
+                button.onclick=
+
+                ()=>{
+
+
+                    this.openTab(
+
+                        button.dataset.tab
+
+                    );
+
+
+                };
+
+
+            }
+
+        );
+
+
+        eventBus.on(
+
+            "world:update",
+
+            ()=>this.update()
+
+        );
+
+
+        eventBus.on(
+
+            "resource:update",
+
+            ()=>this.update()
+
+        );
+
+
+        eventBus.on(
+
+            "world:rebirth",
+
+            ()=>this.update()
+
+        );
+
+
+    }
 
 
 
-export default new UI();
+    openTab(name){
+
+
+        const tabs=[
+
+            "world",
+
+            "resource",
+
+            "research"
+
+        ];
+
+
+
+        tabs.forEach(
+
+            tab=>{
+
+
+                const element=
+
+                document
