@@ -2,7 +2,7 @@
  * World Creator
  * Save System
  *
- * Full Game Save
+ * World + Resource + Research + EP
  */
 
 
@@ -13,6 +13,8 @@ import ResourceManager from "../resource/Manager.js";
 import ResearchManager from "../research/Manager.js";
 
 import Converter from "../converter/Converter.js";
+
+import EPManager from "../ep/Manager.js";
 
 
 
@@ -27,8 +29,7 @@ class SaveManager {
         "world_creator_save";
 
 
-
-        this.version=4;
+        this.version=5;
 
 
     }
@@ -73,7 +74,13 @@ class SaveManager {
 
             converter:
 
-            Converter.toJSON()
+            Converter.toJSON(),
+
+
+
+            ep:
+
+            EPManager.toJSON()
 
 
 
@@ -218,6 +225,24 @@ class SaveManager {
                 Converter.load(
 
                     data.converter
+
+                );
+
+
+            }
+
+
+
+            if(
+
+                data.ep
+
+            ){
+
+
+                EPManager.load(
+
+                    data.ep
 
                 );
 
