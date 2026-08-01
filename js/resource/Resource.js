@@ -1,161 +1,95 @@
-/**
- * World Creator
- * Resource Object
- *
- * 個別資源データ管理
- */
-
-
-import BigNumber from "../number/BigNumber.js";
-
-
-
 class Resource {
 
 
     constructor(
         id,
-        name,
-        value = 0
-    ) {
+        name
+    ){
 
+        this.id=id;
 
-        this.id = id;
+        this.name=name;
 
+        this.amount=0;
 
-        this.name = name;
-
-
-        this.amount =
-
-            BigNumber.from(
-                value
-            );
+        this.production=0;
 
 
     }
 
 
 
-    /**
-     * 追加
-     */
+    add(value){
 
-    add(value) {
+        this.amount+=value;
+
+    }
 
 
-        this.amount.add(
-            value
+
+    remove(value){
+
+        if(this.amount<value){
+
+            return false;
+
+        }
+
+
+        this.amount-=value;
+
+        return true;
+
+    }
+
+
+
+    setProduction(value){
+
+        this.production=value;
+
+    }
+
+
+
+    update(){
+
+        this.add(
+            this.production
         );
 
-
     }
 
 
 
-    /**
-     * 消費
-     */
-
-    remove(value) {
-
-
-        this.amount.subtract(
-            value
-        );
-
-
-    }
-
-
-
-    /**
-     * 所持量取得
-     */
-
-    getValue() {
-
-
-        return this.amount;
-
-
-    }
-
-
-
-    /**
-     * 表示
-     */
-
-    display() {
-
-
-        return this.amount.toString();
-
-
-    }
-
-
-
-    /**
-     * 保存形式
-     */
-
-    toJSON() {
-
+    toJSON(){
 
         return {
 
+            id:this.id,
 
-            id:
+            name:this.name,
 
-                this.id,
+            amount:this.amount,
 
-
-            name:
-
-                this.name,
-
-
-            amount:
-
-                this.amount.toJSON()
-
+            production:this.production
 
         };
-
 
     }
 
 
 
-    /**
-     * 復元
-     */
+    load(data){
 
-    static fromJSON(data) {
+        this.amount=data.amount ?? 0;
 
-
-        return new Resource(
-
-            data.id,
-
-            data.name,
-
-            BigNumber.from(
-
-                data.amount
-
-            )
-
-        );
-
+        this.production=data.production ?? 0;
 
     }
 
 
 }
-
 
 
 export default Resource;
