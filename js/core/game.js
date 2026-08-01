@@ -1,12 +1,14 @@
 /**
  * World Creator
- * Game Loop
+ * Game Core
  *
- * Tick Control System
+ * Main Game Loop Controller
  */
 
 
 import TimeManager from "./time.js";
+
+import SaveManager from "./save.js";
 
 import ResourceManager from "../resource/Manager.js";
 
@@ -27,12 +29,21 @@ class Game {
         this.running=false;
 
 
-        this.interval=null;
+        this.tickTimer=null;
+
+
+        this.saveTimer=null;
 
 
 
-        this.epPerTick=1;
+        this.baseEPGain=1;
 
+
+        this.speedMultiplier=1;
+
+
+
+        this.autoSaveTime=300000;
 
 
     }
@@ -60,31 +71,25 @@ class Game {
 
 
 
-        this.createLoop();
+        this.startTick();
+
+
+
+        this.startAutoSave();
 
 
     }
 
 
 
-    createLoop(){
+    startTick(){
 
 
-        if(this.interval){
-
-
-            clearInterval(
-
-                this.interval
-
-            );
-
-
-        }
+        this.stopTick();
 
 
 
-        this.interval=setInterval(
+        this.tickTimer=setInterval(
 
 
             ()=>{
@@ -96,7 +101,7 @@ class Game {
             },
 
 
-            TimeManager.getTickSpeed()
+            this.getTickSpeed()
 
 
         );
@@ -106,14 +111,34 @@ class Game {
 
 
 
-    restartLoop(){
+    stopTick(){
 
 
-        if(
+        if(this.tickTimer){
 
-            !this.running
 
-        ){
+            clearInterval(
+
+                this.tickTimer
+
+            );
+
+
+        }
+
+
+
+        this.tickTimer=null;
+
+
+    }
+
+
+
+    restartTick(){
+
+
+        if(!this.running){
 
 
             return;
@@ -123,7 +148,172 @@ class Game {
 
 
 
-        this.createLoop();
+        this.startTick();
+
+
+    }
+
+
+
+    getTickSpeed(){
+
+
+        return (
+
+            TimeManager.getTickSpeed()
+
+            /
+
+            this.speedMultiplier
+
+        );
+
+
+    }
+
+
+
+    setSpeedMultiplier(value){
+
+
+        const speed=
+
+        Number(value);
+
+
+
+        if(
+
+            speed>0
+
+        ){
+
+
+            this.speedMultiplier=speed;
+
+
+
+            this.restartTick();
+
+
+        }
+
+
+    }
+
+
+
+    getSpeedMultiplier(){
+
+
+        return this.speedMultiplier;
+
+
+    }
+
+
+
+    startAutoSave(){
+
+
+        this.stopAutoSave();
+
+
+
+        this.saveTimer=setInterval(
+
+
+            ()=>{
+
+
+                this.save();
+
+
+            },
+
+
+            this.autoSaveTime
+
+
+        );
+
+
+    }
+
+
+
+    stopAutoSave(){
+
+
+        if(this.saveTimer){
+
+
+            clearInterval(
+
+                this.saveTimer
+
+            );
+
+
+        }
+
+
+
+        this.saveTimer=null;
+
+
+    }
+
+
+
+    setAutoSaveTime(value){
+
+
+        const time=
+
+        Number(value);
+
+
+
+        if(
+
+            time>0
+
+        ){
+
+
+            this.autoSaveTime=time;
+
+
+
+            if(this.running){
+
+
+                this.startAutoSave();
+
+
+            }
+
+
+        }
+
+
+    }
+
+
+
+    save(){
+
+
+        SaveManager.save();
+
+
+
+        eventBus.emit(
+
+            "save:complete"
+
+        );
 
 
     }
@@ -164,11 +354,10 @@ class Game {
         ){
 
 
-            this.productionTick();
+            this.tick();
 
 
         }
-
 
 
     }
@@ -186,6 +375,7 @@ class Game {
 
 
     productionTick(){
+
 
 
         WorldManager.addExp(
@@ -222,7 +412,17 @@ class Game {
     getEPGain(){
 
 
-        return this.epPerTick;
+        let value=
+
+        this.baseEPGain;
+
+
+
+        // Upgrade補正接続予定
+
+
+
+        return value;
 
 
     }
@@ -232,7 +432,7 @@ class Game {
     setEPGain(value){
 
 
-        this.epPerTick=
+        this.baseEPGain=
 
         Number(value)
 
@@ -245,24 +445,52 @@ class Game {
 
 
 
-    stop(){
+    debugTick(amount){
 
 
-        if(this.interval){
+        this.tick();
 
 
-            clearInterval(
 
-                this.interval
+        if(
 
-            );
+            amount
+
+        ){
+
+
+            for(
+
+                let i=1;
+
+                i<amount;
+
+                i++
+
+            ){
+
+
+                this.tick();
+
+
+            }
 
 
         }
 
 
+    }
 
-        this.interval=null;
+
+
+    stop(){
+
+
+        this.stopTick();
+
+
+        this.stopAutoSave();
+
 
 
         this.running=false;
