@@ -1,41 +1,166 @@
+/**
+ * World Creator
+ * Main Entry
+ *
+ * Initialization System
+ */
+
+
 import game from "./game.js";
 
-import ui from "../ui/UI.js";
+import SaveManager from "./save.js";
 
-import researchUI from "../ui/Research.js";
+import WorldManager from "../world/Manager.js";
 
-import tabs from "../ui/Tabs.js";
+import ResourceManager from "../resource/Manager.js";
 
-import router from "../ui/Router.js";
+import UI from "../ui/UI.js";
 
-
-
-function start(){
-
-
-ui.init(
-
-"app"
-
-);
+import eventBus from "./eventBus.js";
 
 
 
-researchUI.init();
+class Main {
+
+
+    start(){
 
 
 
-tabs.init();
+        // Resource初期化
+
+        ResourceManager.init();
 
 
-router.init();
+
+        // セーブ読み込み
+
+        const loaded =
+
+        SaveManager.load();
 
 
 
-game.init();
+        // 世界が存在しない場合作成
+
+        if(
+
+            !loaded
+
+            ||
+
+            !WorldManager.getCurrent()
+
+        ){
 
 
-game.start();
+            WorldManager.createWorld();
+
+
+        }
+
+
+
+        // 世界素材を同期
+
+        ResourceManager.syncWorldResources();
+
+
+
+        // UI開始
+
+        UI.init(
+
+            "app"
+
+        );
+
+
+
+        // イベント接続
+
+
+        eventBus.on(
+
+            "world:create",
+
+            ()=>{
+
+
+                WorldManager.createWorld();
+
+
+                ResourceManager.syncWorldResources();
+
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "world:update",
+
+            ()=>{
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "resource:update",
+
+            ()=>{
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        eventBus.on(
+
+            "world:rebirth",
+
+            ()=>{
+
+
+                ResourceManager.syncWorldResources();
+
+
+                SaveManager.save();
+
+
+            }
+
+        );
+
+
+
+        // ゲーム開始
+
+        game.start();
+
+
+
+    }
 
 
 
@@ -43,26 +168,10 @@ game.start();
 
 
 
-if(
+const main =
 
-document.readyState==="loading"
-
-){
+new Main();
 
 
-document.addEventListener(
 
-"DOMContentLoaded",
-
-start
-
-);
-
-
-}else{
-
-
-start();
-
-
-}
+main.start();
