@@ -2,11 +2,12 @@
  * World Creator
  * World Manager
  *
- * Integrated Version
+ * World Generation Integration
  */
 
 
 import eventBus from "../core/eventBus.js";
+
 
 
 class WorldManager {
@@ -25,6 +26,7 @@ class WorldManager {
     init(){
 
 
+
     }
 
 
@@ -37,31 +39,36 @@ class WorldManager {
 
             {
                 name:"Normal",
-                multiplier:1
+                multiplier:1,
+                effectCount:1
             },
 
 
             {
                 name:"Rare",
-                multiplier:1.5
+                multiplier:1.5,
+                effectCount:1
             },
 
 
             {
                 name:"Epic",
-                multiplier:2.5
+                multiplier:2.5,
+                effectCount:2
             },
 
 
             {
                 name:"Legend",
-                multiplier:5
+                multiplier:5,
+                effectCount:2
             },
 
 
             {
                 name:"Mythic",
-                multiplier:10
+                multiplier:10,
+                effectCount:3
             }
 
 
@@ -71,19 +78,19 @@ class WorldManager {
 
         const rarity =
 
-            rarities[
+        rarities[
 
-                Math.floor(
+            Math.floor(
 
-                    Math.random()
+                Math.random()
 
-                    *
+                *
 
-                    rarities.length
+                rarities.length
 
-                )
+            )
 
-            ];
+        ];
 
 
 
@@ -92,52 +99,51 @@ class WorldManager {
 
             name:
 
-                "New World",
+            this.createName(),
 
 
 
             rarity:
 
-                rarity.name,
+            rarity.name,
 
 
 
             rarityMultiplier:
 
-                rarity.multiplier,
+            rarity.multiplier,
 
 
 
-            level:
-
-                1,
+            level:1,
 
 
 
-            exp:
-
-                0,
+            exp:0,
 
 
 
-            rebirthCount:
-
-                0,
+            rebirthCount:0,
 
 
 
-            rebirthMultiplier:
-
-                1,
+            rebirthMultiplier:1,
 
 
 
-            resources:{},
+            resources:
+
+            this.createResources(),
 
 
 
-            effects:[]
+            effects:
 
+            this.createEffects(
+
+                rarity.effectCount
+
+            )
 
 
         };
@@ -157,14 +163,244 @@ class WorldManager {
 
 
 
+    createName(){
+
+
+        const names=[
+
+
+            "アステリア",
+
+            "エルドラ",
+
+            "ネヴァリス",
+
+            "オルビス",
+
+            "ミストラ"
+
+
+        ];
+
+
+
+        return names[
+
+            Math.floor(
+
+                Math.random()
+
+                *
+
+                names.length
+
+            )
+
+        ];
+
+
+    }
+
+
+
+    createResources(){
+
+
+        const list=[
+
+
+            "wood",
+
+            "stone",
+
+            "food",
+
+            "mana",
+
+            "ore",
+
+            "crystal"
+
+
+        ];
+
+
+
+        const result={};
+
+
+
+        const count =
+
+        2 +
+
+        Math.floor(
+
+            Math.random()*3
+
+        );
+
+
+
+        while(
+
+            Object.keys(result).length
+
+            <
+
+            count
+
+        ){
+
+
+            const id =
+
+            list[
+
+                Math.floor(
+
+                    Math.random()
+
+                    *
+
+                    list.length
+
+                )
+
+            ];
+
+
+
+            result[id]={
+
+
+                base:
+
+                1 +
+
+                Math.floor(
+
+                    Math.random()*10
+
+                )
+
+
+            };
+
+
+        }
+
+
+
+        return result;
+
+
+    }
+
+
+
+    createEffects(count){
+
+
+        const effects=[
+
+
+            "豊かな森",
+
+            "鉱脈の大地",
+
+            "魔力循環",
+
+            "神代遺構",
+
+            "世界樹の核"
+
+
+        ];
+
+
+
+        const result=[];
+
+
+
+        while(
+
+            result.length < count
+
+        ){
+
+
+            const effect =
+
+            effects[
+
+                Math.floor(
+
+                    Math.random()
+
+                    *
+
+                    effects.length
+
+                )
+
+            ];
+
+
+
+            if(
+
+                !result.includes(effect)
+
+            ){
+
+
+                result.push(effect);
+
+
+            }
+
+
+        }
+
+
+
+        return result;
+
+
+    }
+
+
+
+    getNeedExp(){
+
+
+        return Math.floor(
+
+            100 *
+
+            Math.pow(
+
+                1.5,
+
+                this.current.level-1
+
+            )
+
+        );
+
+
+    }
+
+
+
     addExp(value){
 
 
         if(!this.current){
 
-
             return;
-
 
         }
 
@@ -183,48 +419,16 @@ class WorldManager {
         ){
 
 
-            this.levelUp();
-
-
-        }
-
-
-    }
-
-
-
-    getNeedExp(){
-
-
-        return Math.floor(
-
-            100 *
-
-            Math.pow(
-
-                1.5,
-
-                this.current.level - 1
-
-            )
-
-        );
-
-
-    }
-
-
-
-    levelUp(){
-
-
-        this.current.exp -=
+            this.current.exp -=
 
             this.getNeedExp();
 
 
 
-        this.current.level++;
+            this.current.level++;
+
+
+        }
 
 
 
@@ -241,107 +445,41 @@ class WorldManager {
 
 
 
-    getLevelMultiplier(){
-
-
-        if(!this.current){
-
-
-            return 1;
-
-
-        }
-
-
-
-        return Math.pow(
-
-            1.05,
-
-            this.current.level - 1
-
-        );
-
-
-    }
-
-
-
-    getProductionMultiplier(){
-
-
-        if(!this.current){
-
-
-            return 1;
-
-
-        }
-
-
-
-        return (
-
-            this.getLevelMultiplier()
-
-            *
-
-            this.current.rarityMultiplier
-
-            *
-
-            this.current.rebirthMultiplier
-
-        );
-
-
-    }
-
-
-
     rebirth(){
 
 
         if(!this.current){
 
-
             return false;
-
 
         }
 
 
 
-        const level =
+        const lv =
 
-            this.current.level;
-
-
-
-        const bonus =
-
-
-            (
-
-                Math.pow(
-
-                    level,
-
-                    2
-
-                )
-
-                /
-
-                100
-
-            );
+        this.current.level;
 
 
 
         this.current.rebirthMultiplier *=
 
-            bonus;
+
+        (
+
+            Math.pow(
+
+                lv,
+
+                2
+
+            )
+
+            /
+
+            100
+
+        );
 
 
 
@@ -349,10 +487,9 @@ class WorldManager {
 
 
 
-        this.current.level = 1;
+        this.current.level=1;
 
-
-        this.current.exp = 0;
+        this.current.exp=0;
 
 
 
@@ -386,30 +523,7 @@ class WorldManager {
     update(){
 
 
-        if(!this.current){
-
-
-            return;
-
-
-        }
-
-
-
-        this.addExp(
-
-            1
-
-        );
-
-
-        eventBus.emit(
-
-            "world:update",
-
-            this.current
-
-        );
+        this.addExp(1);
 
 
     }
@@ -429,13 +543,7 @@ class WorldManager {
     load(data){
 
 
-        if(data){
-
-
-            this.current = data;
-
-
-        }
+        this.current=data;
 
 
     }
@@ -445,9 +553,9 @@ class WorldManager {
 
 
 
-const worldManager =
+const worldManager=
 
-    new WorldManager();
+new WorldManager();
 
 
 
