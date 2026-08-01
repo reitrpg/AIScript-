@@ -3,32 +3,26 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
+<title>
+World Creator
+</title>
 
-    <title>
-        World Creator
-    </title>
+<link rel="stylesheet"
+href="./css/style.css">
 
+<link rel="stylesheet"
+href="./css/mobile.css">
 
-    <!-- CSS -->
+<link rel="manifest"
+href="./manifest.json">
 
-    <link rel="stylesheet"
-        href="./css/style.css">
-
-
-    <!-- PWA -->
-
-    <link rel="manifest"
-        href="./manifest.json">
-
-
-    <meta name="theme-color"
-        content="#000000">
-
+<meta name="theme-color"
+content="#111111">
 
 </head>
 
@@ -36,62 +30,37 @@
 <body>
 
 
-    <!-- Game Root -->
+<main id="app">
 
-    <main id="app">
-
-        Loading...
-
-    </main>
+</main>
 
 
-
-    <!-- Service Worker 登録 -->
-
-    <script>
-
-        if (
-            "serviceWorker" in navigator
-        ) {
+<script
+type="module"
+src="./js/core/main.js">
+</script>
 
 
-            window.addEventListener(
+<script>
 
-                "load",
+if ("serviceWorker" in navigator) {
 
-                () => {
+window.addEventListener(
+"load",
+()=>{
 
+navigator.serviceWorker.register(
+"./service-worker.js"
+);
 
-                    navigator.serviceWorker.register(
+}
+);
 
-                        "./service-worker.js"
+}
 
-                    );
-
-
-                }
-
-            );
-
-
-        }
-
-
-    </script>
-
-
-
-    <!-- Game Entry -->
-
-    <script
-        type="module"
-        src="./js/core/main.js">
-
-    </script>
-
+</script>
 
 
 </body>
-
 
 </html>
