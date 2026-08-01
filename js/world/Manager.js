@@ -1,118 +1,130 @@
 /**
  * World Creator
- * World Level System
+ * Rebirth System
  *
- * Exponential EXP Curve
+ * Lv Based Multiplier
  */
 
 
-getNeedExp(){
+import eventBus from "../core/eventBus.js";
+
+import ResearchManager from "../research/Manager.js";
+
+
+
+rebirth(){
 
 
     if(!this.current){
 
-        return 100;
+        return false;
 
     }
 
 
 
-    return Math.floor(
+    const level =
+
+    this.current.level;
 
 
-        100 *
+
+    let researchBonus = 1;
+
+
+
+    const research =
+
+    ResearchManager
+
+    .getAll()
+
+    .rebirth;
+
+
+
+    if(research){
+
+
+        researchBonus =
 
         Math.pow(
 
-            1.35,
+            research.effect,
 
-            this.current.level - 1
+            research.level
+
+        );
+
+
+    }
+
+
+
+    const increase =
+
+
+        (
+
+            Math.pow(
+
+                level,
+
+                2
+
+            )
+
+            /
+
+            100
 
         )
 
+        *
+
+        researchBonus;
+
+
+
+    this.current.rebirthMultiplier *=
+
+
+        increase;
+
+
+
+    this.current.rebirthCount++;
+
+
+
+    this.current.level = 1;
+
+
+    this.current.exp = 0;
+
+
+
+    eventBus.emit(
+
+        "world:rebirth",
+
+        this.current
 
     );
 
 
-}
+
+    eventBus.emit(
+
+        "world:update",
+
+        this.current
+
+    );
 
 
 
-addExp(value){
-
-
-    if(!this.current){
-
-        return;
-
-    }
-
-
-
-    this.current.exp += value;
-
-
-
-    let levelUp=false;
-
-
-
-    while(
-
-
-        this.current.exp >=
-
-        this.getNeedExp()
-
-
-    ){
-
-
-
-        this.current.exp -=
-
-        this.getNeedExp();
-
-
-
-        this.current.level++;
-
-
-
-        levelUp=true;
-
-
-
-        this.checkUnlock();
-
-
-
-        eventBus.emit(
-
-            "world:levelup",
-
-            this.current
-
-        );
-
-
-    }
-
-
-
-    if(levelUp){
-
-
-        eventBus.emit(
-
-            "world:update",
-
-            this.current
-
-        );
-
-
-    }
+    return true;
 
 
 }
