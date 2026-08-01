@@ -2,7 +2,7 @@
  * World Creator
  * Resource Manager
  *
- * Resource Production System
+ * Resource Control System
  */
 
 
@@ -59,13 +59,15 @@ class ResourceManager {
 
         ){
 
-            return;
+
+            return this.resources[id];
+
 
         }
 
 
 
-        this.resources[id]=
+        const resource=
 
         new Resource(
 
@@ -77,13 +79,21 @@ class ResourceManager {
 
 
 
-        this.resources[id]
-
-        .setProduction(
+        resource.setProduction(
 
             production
 
         );
+
+
+
+        this.resources[id]=
+
+        resource;
+
+
+
+        return resource;
 
 
     }
@@ -129,6 +139,7 @@ class ResourceManager {
 
         ){
 
+
             return;
 
         }
@@ -142,39 +153,22 @@ class ResourceManager {
         ){
 
 
-            if(
+            const data=
 
-                !this.resources[id]
-
-            ){
+            world.resources[id];
 
 
-                this.create(
 
-                    id,
+            this.create(
 
-                    id,
+                id,
 
-                    world.resources[id].base
+                id,
 
-                );
+                data.base
 
+            );
 
-            }
-
-            else{
-
-
-                this.resources[id]
-
-                .setProduction(
-
-                    world.resources[id].base
-
-                );
-
-
-            }
 
 
         }
@@ -184,7 +178,7 @@ class ResourceManager {
 
 
 
-    getProductionMultiplier(){
+    getWorldMultiplier(){
 
 
         const world=
@@ -198,12 +192,23 @@ class ResourceManager {
 
             return 1;
 
-
         }
 
 
 
-        const rarity=
+        const levelBonus=
+
+        Math.pow(
+
+            1.05,
+
+            world.level-1
+
+        );
+
+
+
+        const rarityBonus=
 
         world.rarityMultiplier
 
@@ -213,23 +218,7 @@ class ResourceManager {
 
 
 
-        const level=
-
-        Math.pow(
-
-            world.level,
-
-            2
-
-        )
-
-        /
-
-        100;
-
-
-
-        const rebirth=
+        const rebirthBonus=
 
         world.rebirthMultiplier
 
@@ -239,17 +228,7 @@ class ResourceManager {
 
 
 
-        const effect=
-
-        this.getEffectMultiplier(
-
-            world.effects
-
-        );
-
-
-
-        const research=
+        const researchBonus=
 
         ResearchManager
 
@@ -259,105 +238,21 @@ class ResourceManager {
 
         return (
 
-            rarity
+            levelBonus
 
             *
 
-            level
+            rarityBonus
 
             *
 
-            effect
+            rebirthBonus
 
             *
 
-            rebirth
-
-            *
-
-            research
+            researchBonus
 
         );
-
-
-    }
-
-
-
-    getEffectMultiplier(effects){
-
-
-        let value=1;
-
-
-
-        if(!effects){
-
-
-            return value;
-
-
-        }
-
-
-
-        effects.forEach(
-
-            effect=>{
-
-
-                switch(effect){
-
-
-                    case "豊かな森":
-
-                        value*=1.2;
-
-                        break;
-
-
-
-                    case "鉱脈の大地":
-
-                        value*=1.3;
-
-                        break;
-
-
-
-                    case "魔力循環":
-
-                        value*=1.5;
-
-                        break;
-
-
-
-                    case "神代遺構":
-
-                        value*=1.4;
-
-                        break;
-
-
-
-                    case "世界樹の核":
-
-                        value*=2;
-
-                        break;
-
-
-                }
-
-
-            }
-
-        );
-
-
-
-        return value;
 
 
     }
@@ -367,13 +262,9 @@ class ResourceManager {
     update(){
 
 
-        this.syncWorldResources();
-
-
-
         const multiplier=
 
-        this.getProductionMultiplier();
+        this.getWorldMultiplier();
 
 
 
@@ -390,7 +281,7 @@ class ResourceManager {
 
                 resource.add(
 
-                    resource.production
+                    resource.getProduction()
 
                     *
 
@@ -453,6 +344,7 @@ class ResourceManager {
 
         if(!data){
 
+
             return;
 
         }
@@ -466,31 +358,19 @@ class ResourceManager {
         ){
 
 
-            if(
+            const resource=
 
-                !this.resources[id]
+            this.create(
 
-            ){
+                id,
 
+                data[id].name
 
-                this.create(
-
-                    id,
-
-                    id,
-
-                    data[id].production
-
-                );
-
-
-            }
+            );
 
 
 
-            this.resources[id]
-
-            .load(
+            resource.load(
 
                 data[id]
 
