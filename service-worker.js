@@ -1,225 +1,139 @@
-/**
- * World Creator
- * Service Worker
- *
- * PWA Cache System
- */
-
-
 const CACHE_NAME =
-
-    "world-creator-v1";
-
+"world-creator-v1";
 
 
-const FILES = [
+const CACHE_FILES = [
 
+"./",
 
-    "./",
+"./index.html",
 
-    "./index.html",
+"./css/style.css",
 
+"./css/mobile.css",
 
-    "./css/style.css",
+"./manifest.json",
 
-    "./css/mobile.css",
+"./js/core/main.js",
 
+"./js/core/game.js",
 
-    "./manifest.json",
+"./js/core/time.js",
 
+"./js/core/save.js",
 
+"./js/core/eventBus.js",
 
-    "./js/core/main.js",
+"./js/number/BigNumber.js",
 
-    "./js/core/game.js",
+"./js/resource/Resource.js",
 
-    "./js/core/eventBus.js",
+"./js/resource/Manager.js",
 
-    "./js/core/save.js",
+"./js/resource/Converter.js",
 
-    "./js/core/time.js",
+"./js/world/Manager.js",
 
+"./js/research/Manager.js",
 
+"./js/ui/UI.js",
 
-    "./js/number/BigNumber.js",
+"./js/ui/Research.js",
 
+"./js/ui/Tabs.js",
 
-
-    "./js/resource/Resource.js",
-
-    "./js/resource/Manager.js",
-
-    "./js/resource/Converter.js",
-
-
-
-    "./js/world/Manager.js",
-
-
-
-    "./js/ui/UI.js",
-
-    "./js/ui/Router.js",
-
-    "./js/ui/Tabs.js"
-
+"./js/ui/Router.js"
 
 ];
 
 
 
-/**
- * Install
- */
-
 self.addEventListener(
+"install",
+event=>{
 
-    "install",
+event.waitUntil(
 
-    event => {
+caches.open(
+CACHE_NAME
+)
+.then(
+cache=>
+cache.addAll(
+CACHE_FILES
+)
+)
 
+);
 
-        event.waitUntil(
-
-
-            caches.open(
-
-                CACHE_NAME
-
-            )
-
-            .then(
-
-                cache =>
-
-                    cache.addAll(
-
-                        FILES
-
-                    )
-
-            )
-
-
-        );
-
-
-    }
-
+}
 );
 
 
 
-
-
-/**
- * Activate
- */
-
 self.addEventListener(
+"activate",
+event=>{
 
-    "activate",
+event.waitUntil(
 
-    event => {
+caches.keys()
+.then(
+keys=>
 
+Promise.all(
 
-        event.waitUntil(
+keys.map(
 
+key=>{
 
-            caches.keys()
+if(
+key!==CACHE_NAME
+){
 
-            .then(
+return caches.delete(
+key
+);
 
-                keys =>
+}
 
+}
 
-                    Promise.all(
+)
 
-                        keys.map(
+)
 
-                            key => {
+)
 
+);
 
-                                if (
-
-                                    key !== CACHE_NAME
-
-                                ) {
-
-
-                                    return caches.delete(
-
-                                        key
-
-                                    );
-
-
-                                }
-
-
-                            }
-
-                        )
-
-                    )
-
-
-            )
-
-
-        );
-
-
-    }
-
+}
 );
 
 
 
-
-
-/**
- * Fetch
- */
-
 self.addEventListener(
+"fetch",
+event=>{
 
-    "fetch",
+event.respondWith(
 
-    event => {
+caches.match(
+event.request
+)
+.then(
 
+response=>
 
-        event.respondWith(
+response ||
 
+fetch(
+event.request
+)
 
-            caches.match(
+)
 
-                event.request
+);
 
-            )
-
-            .then(
-
-                response =>
-
-
-                    response
-
-                    ||
-
-                    fetch(
-
-                        event.request
-
-                    )
-
-
-            )
-
-
-        );
-
-
-    }
-
+}
 );
