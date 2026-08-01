@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 
 <head>
@@ -6,23 +7,16 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+content="width=device-width,initial-scale=1.0">
+
 
 <title>
 World Creator
 </title>
 
-<link rel="stylesheet"
-href="./css/style.css">
 
-<link rel="stylesheet"
-href="./css/mobile.css">
+<link rel="stylesheet" href="./css/style.css">
 
-<link rel="manifest"
-href="./manifest.json">
-
-<meta name="theme-color"
-content="#111111">
 
 </head>
 
@@ -30,37 +24,53 @@ content="#111111">
 <body>
 
 
-<main id="app">
-
-</main>
+<div id="app">
 
 
-<script
-type="module"
-src="./js/core/main.js">
-</script>
+</div>
+
+
+
+<script type="module" src="./js/core/main.js"></script>
+
 
 
 <script>
 
-if ("serviceWorker" in navigator) {
+
+if(
+
+"serviceWorker" in navigator
+
+){
+
 
 window.addEventListener(
+
 "load",
+
 ()=>{
 
+
 navigator.serviceWorker.register(
+
 "./service-worker.js"
+
 );
 
-}
-);
 
 }
+
+);
+
+
+}
+
 
 </script>
 
 
 </body>
+
 
 </html>
