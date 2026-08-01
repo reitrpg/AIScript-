@@ -2,17 +2,29 @@
  * World Creator
  * Main Entry Point
  *
- * System Startup Controller
+ * System Initialization Controller
  */
 
 
 import SaveManager from "./save.js";
 
+import SettingsManager from "../settings/Manager.js";
+
+import DebugManager from "../debug/Manager.js";
+
 import Game from "./game.js";
 
-import TimeManager from "./time.js";
-
 import UI from "../ui/UI.js";
+
+import TabUI from "../ui/TabUI.js";
+
+import ResearchUI from "../ui/ResearchUI.js";
+
+import UpgradeUI from "../ui/UpgradeUI.js";
+
+import SettingsUI from "../ui/SettingsUI.js";
+
+import DebugUI from "../ui/DebugUI.js";
 
 
 
@@ -22,10 +34,7 @@ class Main {
     constructor(){
 
 
-        this.initialized=false;
-
-
-        this.running=false;
+        this.started=false;
 
 
     }
@@ -35,7 +44,7 @@ class Main {
     init(){
 
 
-        if(this.initialized){
+        if(this.started){
 
 
             return;
@@ -45,133 +54,27 @@ class Main {
 
 
 
-        try{
-
-
-            this.load();
-
-
-
-            this.initializeTime();
-
-
-
-            this.initializeModes();
-
-
-
-            this.initializeUI();
-
-
-
-            this.startGame();
-
-
-
-            this.initialized=true;
-
-
-        }
-
-        catch(error){
-
-
-            console.error(
-
-                "Initialization Error",
-
-                error
-
-            );
-
-
-        }
-
-
-    }
-
-
-
-    load(){
-
-
         SaveManager.load();
 
 
-    }
+
+        SettingsManager.init();
 
 
 
-    initializeTime(){
-
-
-        const settings=
-
-        SaveManager.getSettings();
+        DebugManager.init();
 
 
 
-        if(
-
-            settings.tickSpeed
-
-        ){
-
-
-            TimeManager.setTickSpeed(
-
-                settings.tickSpeed
-
-            );
-
-
-        }
-
-
-    }
+        this.initializeUI();
 
 
 
-    initializeModes(){
-
-
-        const settings=
-
-        SaveManager.getSettings();
+        Game.start();
 
 
 
-        if(
-
-            settings.speedRun
-
-        ){
-
-
-            this.startSpeedRunMode();
-
-
-        }
-
-
-
-        const debug=
-
-        SaveManager.getDebug();
-
-
-
-        if(
-
-            debug.enabled
-
-        ){
-
-
-            this.startDebugMode();
-
-
-        }
+        this.started=true;
 
 
     }
@@ -188,58 +91,134 @@ class Main {
         );
 
 
-    }
 
+        TabUI.init(
 
-
-    startGame(){
-
-
-        Game.start();
-
-
-        this.running=true;
-
-
-    }
-
-
-
-    startDebugMode(){
-
-
-        console.log(
-
-            "Debug Mode Enabled"
+            "tabs"
 
         );
 
 
-    }
 
+        TabUI.addTab(
 
+            "world",
 
-    startSpeedRunMode(){
+            "世界",
 
+            ()=>`
 
-        Game.setSpeedMultiplier(
+            <div id="world-content">
 
-            2
+            </div>
+
+            `
 
         );
 
 
-    }
+
+        TabUI.addTab(
+
+            "research",
+
+            "研究",
+
+            ()=>`
+
+            <div id="research-content">
+
+            </div>
+
+            `
+
+        );
 
 
 
-    stop(){
+        TabUI.addTab(
+
+            "upgrade",
+
+            "強化",
+
+            ()=>`
+
+            <div id="upgrade-content">
+
+            </div>
+
+            `
+
+        );
 
 
-        Game.stop();
+
+        TabUI.addTab(
+
+            "settings",
+
+            "設定",
+
+            ()=>`
+
+            <div id="settings-content">
+
+            </div>
+
+            `
+
+        );
 
 
-        this.running=false;
+
+        TabUI.addTab(
+
+            "debug",
+
+            "Debug",
+
+            ()=>`
+
+            <div id="debug-content">
+
+            </div>
+
+            `
+
+        );
+
+
+
+        ResearchUI.init(
+
+            "research-content"
+
+        );
+
+
+
+        UpgradeUI.init(
+
+            "upgrade-content"
+
+        );
+
+
+
+        SettingsUI.init(
+
+            "settings-content"
+
+        );
+
+
+
+        DebugUI.init(
+
+            "debug-content"
+
+        );
 
 
     }
