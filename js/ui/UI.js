@@ -1,24 +1,203 @@
 /**
  * World Creator
- * World Status UI
- *
- * Rebirth Display Update
+ * Main UI
  */
 
-
 import WorldManager from "../world/Manager.js";
-
-import ResearchManager from "../research/Manager.js";
 
 
 
 class UI {
 
 
+    init(id){
+
+
+        this.area=
+
+        document.getElementById(id);
+
+
+
+        if(!this.area){
+
+            return;
+
+        }
+
+
+
+        this.render();
+
+
+
+    }
+
+
+
+    render(){
+
+
+        this.area.innerHTML=`
+
+        <div class="tabs">
+
+            <button data-tab="world">
+            World
+            </button>
+
+
+            <button data-tab="resource">
+            Resource
+            </button>
+
+
+            <button data-tab="research">
+            Research
+            </button>
+
+        </div>
+
+
+
+        <section
+        id="world-section"
+        class="tab-content">
+
+
+            <h2>
+            World
+            </h2>
+
+
+            <div id="world-info">
+
+            </div>
+
+
+            <div id="rebirth-info">
+
+            </div>
+
+
+        </section>
+
+
+
+        <section
+        id="resource-section"
+        class="tab-content">
+
+
+            <h2>
+            Resource
+            </h2>
+
+
+            <div id="resource-list">
+
+            </div>
+
+
+            <div id="converter-area">
+
+            </div>
+
+
+        </section>
+
+
+
+        <section
+        id="research-section"
+        class="tab-content">
+
+
+            <h2>
+            Research
+            </h2>
+
+
+            <div id="research-area">
+
+            </div>
+
+
+        </section>
+
+
+
+        `;
+
+
+
+        this.update();
+
+
+    }
+
+
+
+    update(){
+
+
+        const world=
+
+        WorldManager.getCurrent();
+
+
+
+        const area=
+
+        document.getElementById(
+
+            "world-info"
+
+        );
+
+
+
+        if(area && world){
+
+
+            area.innerHTML=`
+
+            名前:
+            ${world.name}
+
+            <br>
+
+            レアリティ:
+            ${world.rarity}
+
+            <br>
+
+            Lv:
+            ${world.level}
+
+            <br>
+
+            EXP:
+            ${world.exp}
+
+            `;
+
+
+        }
+
+
+
+        this.updateRebirth();
+
+
+    }
+
+
+
     updateRebirth(){
 
 
-        const area =
+        const area=
 
         document.getElementById(
 
@@ -36,7 +215,7 @@ class UI {
 
 
 
-        const world =
+        const world=
 
         WorldManager.getCurrent();
 
@@ -44,63 +223,19 @@ class UI {
 
         if(!world){
 
-
-            area.innerHTML="";
-
-
             return;
 
-
         }
 
 
 
-        const level =
-
-        world.level;
-
-
-
-        let researchBonus = 1;
-
-
-
-        const research =
-
-        ResearchManager
-
-        .getAll()
-
-        .rebirth;
-
-
-
-        if(research){
-
-
-            researchBonus =
-
-            Math.pow(
-
-                research.effect,
-
-                research.level
-
-            );
-
-
-        }
-
-
-
-        const increase =
-
+        const increase=
 
         (
 
             Math.pow(
 
-                level,
+                world.level,
 
                 2
 
@@ -110,93 +245,28 @@ class UI {
 
             100
 
-        )
-
-        *
-
-        researchBonus;
-
-
-
-        const next =
-
-
-        world.rebirthMultiplier
-
-        *
-
-        increase;
+        );
 
 
 
         area.innerHTML=`
 
         <h3>
-
         転生情報
-
         </h3>
 
 
-        現在Lv:
+        現在倍率:
 
-        ${level}
-
-
-        <br>
-
-
-        現在転生倍率:
-
-        ×${
-
-            world.rebirthMultiplier
-
-            .toFixed(2)
-
-        }
-
-
-        <br><br>
-
-
-        転生倍率増加:
-
-
-        ×${
-
-            increase
-
-            .toFixed(2)
-
-        }
+        ×${world.rebirthMultiplier}
 
 
         <br>
 
 
-        転生後倍率:
+        次回増加:
 
-
-        ×${
-
-            next
-
-            .toFixed(2)
-
-        }
-
-
-        <br>
-
-
-        転生回数:
-
-
-        ${world.rebirthCount}
-
-
-        回
+        ×${increase}
 
 
         `;
@@ -205,8 +275,8 @@ class UI {
     }
 
 
-
 }
+
 
 
 export default new UI();
