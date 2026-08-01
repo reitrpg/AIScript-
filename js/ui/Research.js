@@ -1,8 +1,8 @@
 /**
  * World Creator
- * Research UI
+ * Research UI Controller
  *
- * 技術研究表示管理
+ * UI統合版
  */
 
 
@@ -18,31 +18,21 @@ class ResearchUI {
     constructor() {
 
 
-        this.root = null;
+        this.initialized = false;
 
 
     }
 
 
 
-    /**
-     * 初期化
-     */
-
-    init(id) {
+    init() {
 
 
-        this.root =
+        if (
 
-            document.getElementById(
+            this.initialized
 
-                id
-
-            );
-
-
-
-        if (!this.root) {
+        ) {
 
 
             return;
@@ -52,62 +42,16 @@ class ResearchUI {
 
 
 
-        this.render();
-
-
         this.bind();
 
 
-        this.update();
+
+        this.initialized = true;
 
 
     }
 
 
-
-    /**
-     * 描画
-     */
-
-    render() {
-
-
-        this.root.innerHTML = `
-
-
-        <section class="panel">
-
-
-            <h2>
-
-                Research
-
-            </h2>
-
-
-            <div id="research-point">
-
-            </div>
-
-
-            <div id="research-list">
-
-            </div>
-
-
-        </section>
-
-
-        `;
-
-
-    }
-
-
-
-    /**
-     * イベント
-     */
 
     bind() {
 
@@ -147,10 +91,6 @@ class ResearchUI {
 
 
 
-    /**
-     * 更新
-     */
-
     update() {
 
 
@@ -163,10 +103,6 @@ class ResearchUI {
     }
 
 
-
-    /**
-     * ポイント表示
-     */
 
     updatePoint() {
 
@@ -193,6 +129,7 @@ class ResearchUI {
 
         area.textContent =
 
+
             "Research Point : "
 
             +
@@ -203,10 +140,6 @@ class ResearchUI {
     }
 
 
-
-    /**
-     * 研究一覧
-     */
 
     updateList() {
 
@@ -235,7 +168,7 @@ class ResearchUI {
 
 
 
-        const data =
+        const researches =
 
             ResearchManager.getAll();
 
@@ -243,14 +176,14 @@ class ResearchUI {
 
         for (
 
-            const id in data
+            const id in researches
 
         ) {
 
 
-            const item =
+            const research =
 
-                data[id];
+                researches[id];
 
 
 
@@ -267,7 +200,7 @@ class ResearchUI {
             button.textContent =
 
 
-                item.name
+                research.name
 
                 +
 
@@ -277,7 +210,7 @@ class ResearchUI {
 
                 (
 
-                    item.unlocked
+                    research.unlocked
 
                     ?
 
@@ -289,7 +222,7 @@ class ResearchUI {
 
                     +
 
-                    item.cost
+                    research.cost
 
                 );
 
@@ -297,7 +230,7 @@ class ResearchUI {
 
             button.disabled =
 
-                item.unlocked;
+                research.unlocked;
 
 
 
