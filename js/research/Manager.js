@@ -1,14 +1,14 @@
 /**
  * World Creator
- * Research Manager
+ * Research System
  *
- * Research Control System
+ * Divine Revelation Research
  */
 
 
-import Research from "./Research.js";
-
 import ResourceManager from "../resource/Manager.js";
+
+import eventBus from "../core/eventBus.js";
 
 
 
@@ -21,24 +21,20 @@ class ResearchManager {
         this.research={
 
 
-            agriculture:
-
-            new Research({
+            agriculture:{
 
 
-                id:"agriculture",
+                name:"豊穣神の啓示",
 
 
-                name:"農業技術",
+                description:
+                "生命を育む神の知識に触れ、世界の実りを高める。",
+
+
+                level:0,
 
 
                 max:10,
-
-
-                effect:1.05,
-
-
-                type:"production",
 
 
                 cost:{
@@ -47,31 +43,31 @@ class ResearchManager {
                     food:100
 
 
-                }
+                },
 
 
-            }),
+                effect:1.05
 
 
 
-            mining:
-
-            new Research({
+            },
 
 
-                id:"mining",
+
+            mining:{
 
 
-                name:"採掘技術",
+                name:"大地脈の解読",
+
+
+                description:
+                "大地に刻まれた古き流れを読み取り、鉱脈への理解を深める。",
+
+
+                level:0,
 
 
                 max:10,
-
-
-                effect:1.1,
-
-
-                type:"production",
 
 
                 cost:{
@@ -80,31 +76,31 @@ class ResearchManager {
                     ore:100
 
 
-                }
+                },
 
 
-            }),
+                effect:1.1
 
 
 
-            magic:
-
-            new Research({
+            },
 
 
-                id:"magic",
+
+            magic:{
 
 
-                name:"魔力研究",
+                name:"原初魔力への接触",
+
+
+                description:
+                "世界創生時より存在する魔力の根源へ近づく。",
+
+
+                level:0,
 
 
                 max:10,
-
-
-                effect:1.15,
-
-
-                type:"production",
 
 
                 cost:{
@@ -113,31 +109,31 @@ class ResearchManager {
                     mana:100
 
 
-                }
+                },
 
 
-            }),
+                effect:1.15
 
 
 
-            world:
-
-            new Research({
+            },
 
 
-                id:"world",
+
+            world:{
 
 
-                name:"世界解析",
+                name:"世界理の開眼",
+
+
+                description:
+                "世界そのものが持つ法則の一端を理解する。",
+
+
+                level:0,
 
 
                 max:5,
-
-
-                effect:1.25,
-
-
-                type:"converter",
 
 
                 cost:{
@@ -146,31 +142,31 @@ class ResearchManager {
                     crystal:10
 
 
-                }
+                },
 
 
-            }),
+                effect:1.25
 
 
 
-            rebirth:
-
-            new Research({
+            },
 
 
-                id:"rebirth",
+
+            rebirth:{
 
 
-                name:"転生理論",
+                name:"輪廻門の理解",
+
+
+                description:
+                "終わりと始まりを繋ぐ循環の理へ到達する。",
+
+
+                level:0,
 
 
                 max:5,
-
-
-                effect:1.5,
-
-
-                type:"rebirth",
 
 
                 cost:{
@@ -179,10 +175,14 @@ class ResearchManager {
                     worldCore:1
 
 
-                }
+                },
 
 
-            })
+                effect:1.5
+
+
+
+            }
 
 
         };
@@ -195,16 +195,17 @@ class ResearchManager {
     researchUp(id){
 
 
-        const research=
+        const data=
 
         this.research[id];
 
 
 
-        if(!research){
+        if(!data){
 
 
             return false;
+
 
         }
 
@@ -212,14 +213,15 @@ class ResearchManager {
 
         if(
 
-            research.level >=
+            data.level>=
 
-            research.max
+            data.max
 
         ){
 
 
             return false;
+
 
         }
 
@@ -229,7 +231,7 @@ class ResearchManager {
 
             !this.canPay(
 
-                research.cost
+                data.cost
 
             )
 
@@ -238,19 +240,28 @@ class ResearchManager {
 
             return false;
 
+
         }
 
 
 
         this.pay(
 
-            research.cost
+            data.cost
 
         );
 
 
 
-        research.level++;
+        data.level++;
+
+
+
+        eventBus.emit(
+
+            "research:update"
+
+        );
 
 
 
@@ -323,27 +334,15 @@ class ResearchManager {
         ){
 
 
-            const resource=
+            ResourceManager
 
-            ResourceManager.get(
+            .get(id)
 
-                id
+            .consume(
+
+                cost[id]
 
             );
-
-
-
-            if(resource){
-
-
-                resource.consume(
-
-                    cost[id]
-
-                );
-
-
-            }
 
 
         }
@@ -353,46 +352,38 @@ class ResearchManager {
 
 
 
-    getMultiplier(type){
+    getMultiplier(){
 
 
         let value=1;
 
 
 
-        Object.values(
+        for(
 
-            this.research
+            const id in this.research
 
-        )
-
-        .forEach(
-
-            research=>{
+        ){
 
 
-                if(
+            const data=
 
-                    !type
-
-                    ||
-
-                    research.type===type
-
-                ){
+            this.research[id];
 
 
-                    value*=
 
-                    research.getMultiplier();
+            value*=
+
+            Math.pow(
+
+                data.effect,
+
+                data.level
+
+            );
 
 
-                }
-
-
-            }
-
-        );
+        }
 
 
 
@@ -406,11 +397,7 @@ class ResearchManager {
     getProductionMultiplier(){
 
 
-        return this.getMultiplier(
-
-            "production"
-
-        );
+        return this.getMultiplier();
 
 
     }
@@ -420,25 +407,7 @@ class ResearchManager {
     getConverterMultiplier(){
 
 
-        return this.getMultiplier(
-
-            "converter"
-
-        );
-
-
-    }
-
-
-
-    getRebirthMultiplier(){
-
-
-        return this.getMultiplier(
-
-            "rebirth"
-
-        );
+        return this.getMultiplier();
 
 
     }
@@ -458,29 +427,7 @@ class ResearchManager {
     toJSON(){
 
 
-        const data={};
-
-
-
-        for(
-
-            const id in this.research
-
-        ){
-
-
-            data[id]=
-
-            this.research[id]
-
-            .toJSON();
-
-
-        }
-
-
-
-        return data;
+        return this.research;
 
 
     }
@@ -490,38 +437,10 @@ class ResearchManager {
     load(data){
 
 
-        if(!data){
-
-            return;
-
-        }
+        if(data){
 
 
-
-        for(
-
-            const id in data
-
-        ){
-
-
-            if(
-
-                this.research[id]
-
-            ){
-
-
-                this.research[id]
-
-                .load(
-
-                    data[id]
-
-                );
-
-
-            }
+            this.research=data;
 
 
         }
