@@ -26,6 +26,8 @@ import SettingsUI from "../ui/SettingsUI.js";
 
 import DebugUI from "../ui/DebugUI.js";
 
+import eventBus from "./eventBus.js";
+
 
 
 class Main {
@@ -70,6 +72,10 @@ class Main {
 
 
         this.initializeUI();
+
+
+
+        this.bindEvents();
 
 
 
@@ -232,6 +238,28 @@ class Main {
 
 
 
+    bindEvents(){
+
+
+        eventBus.on(
+
+            "settings:update",
+
+            ()=>{
+
+
+                this.startAutoSave();
+
+
+            }
+
+        );
+
+
+    }
+
+
+
     startAutoSave(){
 
 
@@ -242,6 +270,20 @@ class Main {
         const time=
 
         SettingsManager.getAutoSaveTime();
+
+
+
+        if(
+
+            time<=0
+
+        ){
+
+
+            return;
+
+
+        }
 
 
 
