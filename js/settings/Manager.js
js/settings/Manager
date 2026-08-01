@@ -1,0 +1,241 @@
+/**
+ * World Creator
+ * Settings Manager
+ *
+ * Game Configuration Controller
+ */
+
+import SaveManager from "../core/save.js";
+import eventBus from "../core/eventBus.js";
+
+class SettingsManager{
+
+    constructor(){
+
+        this.settings={
+
+            tickSpeed:1000,
+
+            autoSave:300000,
+
+            numberFormat:"normal",
+
+            debugMode:false,
+
+            speedRun:false,
+
+            seed:"",
+
+            language:"ja"
+
+        };
+
+    }
+
+    init(){
+
+        const save=
+
+        SaveManager.getSettings();
+
+        if(save){
+
+            this.settings={
+
+                ...this.settings,
+
+                ...save
+
+            };
+
+        }
+
+    }
+
+    save(){
+
+        SaveManager.setSettings(
+
+            this.settings
+
+        );
+
+        eventBus.emit(
+
+            "settings:update"
+
+        );
+
+    }
+
+    getAll(){
+
+        return this.settings;
+
+    }
+
+    get(key){
+
+        return this.settings[key];
+
+    }
+
+    set(key,value){
+
+        this.settings[key]=value;
+
+        this.save();
+
+    }
+
+    getTickSpeed(){
+
+        return this.settings.tickSpeed;
+
+    }
+
+    setTickSpeed(value){
+
+        const tick=
+
+        Math.max(
+
+            10,
+
+            Number(value)||1000
+
+        );
+
+        this.settings.tickSpeed=tick;
+
+        this.save();
+
+    }
+
+    getAutoSaveTime(){
+
+        return this.settings.autoSave;
+
+    }
+
+    setAutoSaveTime(value){
+
+        const time=
+
+        Math.max(
+
+            1000,
+
+            Number(value)||300000
+
+        );
+
+        this.settings.autoSave=time;
+
+        this.save();
+
+    }
+
+    getNumberFormat(){
+
+        return this.settings.numberFormat;
+
+    }
+
+    setNumberFormat(value){
+
+        this.settings.numberFormat=value;
+
+        this.save();
+
+    }
+
+    isDebug(){
+
+        return this.settings.debugMode;
+
+    }
+
+    toggleDebug(){
+
+        this.settings.debugMode=
+
+        !this.settings.debugMode;
+
+        this.save();
+
+    }
+
+    isSpeedRun(){
+
+        return this.settings.speedRun;
+
+    }
+
+    toggleSpeedRun(){
+
+        this.settings.speedRun=
+
+        !this.settings.speedRun;
+
+        this.save();
+
+    }
+
+    getSeed(){
+
+        return this.settings.seed;
+
+    }
+
+    setSeed(seed){
+
+        this.settings.seed=
+
+        String(seed);
+
+        this.save();
+
+    }
+
+    getLanguage(){
+
+        return this.settings.language;
+
+    }
+
+    setLanguage(language){
+
+        this.settings.language=language;
+
+        this.save();
+
+    }
+
+    reset(){
+
+        this.settings={
+
+            tickSpeed:1000,
+
+            autoSave:300000,
+
+            numberFormat:"normal",
+
+            debugMode:false,
+
+            speedRun:false,
+
+            seed:"",
+
+            language:"ja"
+
+        };
+
+        this.save();
+
+    }
+
+}
+
+export default new SettingsManager();
