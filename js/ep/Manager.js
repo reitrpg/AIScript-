@@ -1,8 +1,8 @@
 /**
  * World Creator
- * Evolution Point Manager
+ * EP Manager
  *
- * EP System Base
+ * Energy Point Controller
  */
 
 
@@ -26,50 +26,20 @@ class EPManager {
 
 
 
-    add(value){
+    get(){
 
 
-        const gain=
-
-        Number(value)
-
-        ||
-
-        0;
-
-
-
-        if(gain<=0){
-
-
-            return;
-
-        }
-
-
-
-        this.amount+=gain;
-
-
-        this.totalEarned+=gain;
-
-
-
-        eventBus.emit(
-
-            "ep:update"
-
-        );
+        return this.amount;
 
 
     }
 
 
 
-    consume(value){
+    add(value){
 
 
-        const cost=
+        const amount=
 
         Number(value)
 
@@ -79,11 +49,7 @@ class EPManager {
 
 
 
-        if(
-
-            this.amount < cost
-
-        ){
+        if(amount<=0){
 
 
             return false;
@@ -93,7 +59,11 @@ class EPManager {
 
 
 
-        this.amount-=cost;
+        this.amount+=amount;
+
+
+
+        this.totalEarned+=amount;
 
 
 
@@ -112,20 +82,60 @@ class EPManager {
 
 
 
-    get(){
+    consume(value){
 
 
-        return this.amount;
+        const amount=
+
+        Number(value)
+
+        ||
+
+        0;
 
 
-    }
+
+        if(
+
+            amount<=0
+
+        ){
+
+
+            return false;
+
+
+        }
 
 
 
-    getTotal(){
+        if(
+
+            this.amount<amount
+
+        ){
 
 
-        return this.totalEarned;
+            return false;
+
+
+        }
+
+
+
+        this.amount-=amount;
+
+
+
+        eventBus.emit(
+
+            "ep:update"
+
+        );
+
+
+
+        return true;
 
 
     }
@@ -137,9 +147,66 @@ class EPManager {
 
         return (
 
-            this.amount >=
+            this.amount
+
+            >=
 
             Number(value)
+
+        );
+
+
+    }
+
+
+
+    getTotalEarned(){
+
+
+        return this.totalEarned;
+
+
+    }
+
+
+
+    set(value){
+
+
+        this.amount=
+
+        Number(value)
+
+        ||
+
+        0;
+
+
+
+        eventBus.emit(
+
+            "ep:update"
+
+        );
+
+
+    }
+
+
+
+    reset(){
+
+
+        this.amount=0;
+
+
+        this.totalEarned=0;
+
+
+
+        eventBus.emit(
+
+            "ep:update"
 
         );
 
@@ -178,6 +245,7 @@ class EPManager {
 
 
             return;
+
 
         }
 
